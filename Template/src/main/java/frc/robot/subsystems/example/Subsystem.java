@@ -13,9 +13,10 @@ public class Subsystem extends SubsystemBase {
 
     private SubsystemIO subsystemIO;
     private SubsystemData data = new SubsystemData();
-
-    private ShuffleData<String> exampleData = new ShuffleData<String>(this.getName(), "example data", "example");
     private SubsystemStates state = SubsystemStates.STOP;
+
+    private ShuffleData<String> exampleDataLog = new ShuffleData<String>(this.getName(), "example data", "example");
+    private ShuffleData<String> stateLog = new ShuffleData<String>(this.getName(), "state", state.name());
 
     public Subsystem() {
         if (Robot.isSimulation()) {
@@ -39,7 +40,7 @@ public class Subsystem extends SubsystemBase {
     }
 
     // returns true when the state is reached
-    public boolean getIsStableState(){
+    public boolean getIsStableState() {
         return true;
     }
 
@@ -55,13 +56,29 @@ public class Subsystem extends SubsystemBase {
         this.state = state;
     }
 
-    public void logOtherData(){
-        exampleData.set("new value");
+    public void logOtherData() {
+        exampleDataLog.set("new value");
+        stateLog.set(state.name());
+    }
+
+    public void runStateStop() {
+        setVoltage(0);
+    }
+
+    public void runStateGo() {
+        setVoltage(6);
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         subsystemIO.updateData(data);
+
+        if (state == SubsystemStates.GO) {
+            runStateGo();
+        } else if (state == SubsystemStates.STOP) {
+            runStateStop();
+        }
+
         logOtherData();
     }
 
