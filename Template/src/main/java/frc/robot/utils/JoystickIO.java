@@ -72,9 +72,9 @@ public class JoystickIO {
 
         Robot.swerve.setDefaultCommand(
                 new SwerveDefaultCommand(
-                        () -> -pilot.getLeftX(),
-                        () -> -pilot.getLeftY(),
-                        () -> -pilot.getRightX()));
+                        () -> pilot.getLeftX(),
+                        () -> pilot.getLeftY(),
+                        () -> pilot.getRightX()));
     }
 
 }

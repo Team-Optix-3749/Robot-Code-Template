@@ -33,10 +33,9 @@ public class SwerveDefaultCommand extends Command {
   private final Supplier<Double> xSpdFunction, ySpdFunction, xTurningSpdFunction;
 
   public SwerveDefaultCommand(
-    Supplier<Double> xSpdFunction,
-    Supplier<Double> ySpdFunction,
-    Supplier<Double> xTurningSpdFunction
-  ) {
+      Supplier<Double> xSpdFunction,
+      Supplier<Double> ySpdFunction,
+      Supplier<Double> xTurningSpdFunction) {
     this.xSpdFunction = xSpdFunction;
     this.ySpdFunction = ySpdFunction;
     this.xTurningSpdFunction = xTurningSpdFunction;
@@ -45,63 +44,47 @@ public class SwerveDefaultCommand extends Command {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   @Override
   public void execute() {
-    double xMagnitude = xSpdFunction.get();
-    double yMagnitude = ySpdFunction.get();
-    double turningSpeed = xTurningSpdFunction.get();
+    // controllers are weird in what's positive, so we flip these
+    double xMagnitude = -xSpdFunction.get();
+    double yMagnitude = -ySpdFunction.get();
+    double turningSpeed = -xTurningSpdFunction.get();
 
+    // one combined magnitutde
     double linearMagnitude = Math.hypot(xMagnitude, yMagnitude);
+    // one combined direction
     Rotation2d linearDirection = new Rotation2d(xMagnitude, yMagnitude);
 
     // deadbands
-    linearMagnitude =
-      MathUtil.applyDeadband(linearMagnitude, ControllerConstants.deadband);
-    turningSpeed =
-      Math.abs(turningSpeed) > ControllerConstants.deadband
+    // is always postive
+    linearMagnitude = MathUtil.applyDeadband(linearMagnitude, ControllerConstants.deadband);
+    // can be negative
+    turningSpeed = Math.abs(turningSpeed) > ControllerConstants.deadband
         ? turningSpeed
         : 0.0;
 
     // squaring the inputs for smoother driving at low speeds
-    linearMagnitude =
-      Math.copySign(linearMagnitude * linearMagnitude, linearMagnitude);
+    linearMagnitude = Math.copySign(linearMagnitude * linearMagnitude, linearMagnitude);
     turningSpeed = Math.copySign(turningSpeed * turningSpeed, turningSpeed);
-    double maxSpeed;
-    if (DriverStation.isTeleopEnabled()) {
-      maxSpeed = SwerveConstants.DriveConstants.teleopMaxSpeedMetersPerSecond;
-    }
-    double driveSpeedMPS =
-      linearMagnitude * DriveConstants.maxSpeedMetersPerSecond;
 
-    turningSpeed =
-      turningSpeed * DriveConstants.maxAngularSpeedRadiansPerSecond;
+    double driveSpeedMPS = linearMagnitude * Robot.swerve.getMaxDriveSpeed();
+
+    turningSpeed = turningSpeed * Robot.swerve.getMaxAngularSpeed();
 
     // Calcaulate new linear components
     double xSpeed = driveSpeedMPS * Math.cos(linearDirection.getRadians());
     double ySpeed = driveSpeedMPS * Math.sin(linearDirection.getRadians());
     ChassisSpeeds chassisSpeeds;
 
-    //for the entirety of comp, this block of code meant nothing
-
-    chassisSpeeds =
-      ChassisSpeeds.fromFieldRelativeSpeeds(
-        ySpeed,
-        xSpeed,
+    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
+        UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,
         turningSpeed,
-        Robot.swerve.getRotation2d()
-      );
-
-    if (UtilityFunctions.isRedAlliance()) {
-      chassisSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-          -ySpeed,
-          -xSpeed,
-          turningSpeed,
-          Robot.swerve.getRotation2d())
-        ;
-    }
+        Robot.swerve.getRotation2d());
 
     // set chassis speeds
     Robot.swerve.setChassisSpeeds(chassisSpeeds);

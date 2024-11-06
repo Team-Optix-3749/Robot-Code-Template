@@ -9,9 +9,6 @@ public class SwerveConstants {
         public static final class ModuleConstants {
 
                 public static final double wheelDiameterMeters = Units.inchesToMeters(4);
-                // 2.04
-                // 2.006
-                // I think 2 is good lol
 
                 public static final double driveMotorGearRatio = 6.75;
                 public static final double turnMotorGearRatio = 12.8;
@@ -29,6 +26,7 @@ public class SwerveConstants {
                 private static final double kVDrivingSim = 3.19;
                 private static final double kSDrivingSim = 0.0;
 
+                // our PID values
                 public static double kPturning = Robot.isReal()
                                 ? kPTurningReal
                                 : kPTurningSim;
@@ -47,11 +45,9 @@ public class SwerveConstants {
                 public static double kADriving = Robot.isReal()
                                 ? kADrivingReal
                                 : 0;
-
         }
 
         public static final class DriveConstants {
-
                 // Distance between right and left wheels
                 public static final double trackWidth = Units.inchesToMeters(19.5);
                 // Distance between front and back wheels
@@ -62,8 +58,9 @@ public class SwerveConstants {
                                 new Translation2d(-wheelBase / 2, trackWidth / 2), // back left
                                 new Translation2d(-wheelBase / 2, -trackWidth / 2)); // back right
 
-                public static final int[] driveMotorPorts = { 3, 5, 7, 9 }; // FL, FR, BL, BR
-                public static final int[] turningMotorPorts = { 4, 6, 8, 10 }; // FL, FR, BL, BR
+                // Module Settings: order is FL, FR, BL, BR
+                public static final int[] driveMotorPorts = { 3, 5, 7, 9 };
+                public static final int[] turningMotorPorts = { 4, 6, 8, 10 };
                 public static final int[] absoluteEncoderPorts = { 11, 12, 13, 14 };
 
                 public static final boolean[] driveMotorReversed = {
@@ -91,57 +88,64 @@ public class SwerveConstants {
                                 186.943
                 };
 
-                // public static final double[] absoluteEncoderOffsetDeg = { -275, -48, 0, 263
-                // };
-
+                // current limits
                 public static final int driveMotorStallLimit = 25;
-                public static final int driveMotorFreeLimit = 40;
+                public static final int driveMotorFreeLimit = 50;
                 public static final int turnMotorStallLimit = 25;
-                public static final int turnMotorFreeLimit = 40;
+                public static final int turnMotorFreeLimit = 50;
 
+                // speed
                 private static final double realMaxSpeedMetersPerSecond = 4.3; // This is our actual top speed
-                private static final double realMaxAccelerationMetersPerSecondSquared = 3.3; 
-
-                public static final double teleopMaxSpeedMetersPerSecond = 4.5; // This will send any additional voltage
-                                                                                // availible to the motors, making us a
-                                                                                // bit faster if we have an extra good
-                                                                                // battery charge
-
-                private static final double realMaxAngularSpeedRadiansPerSecond = 6.5;// 12.162 max, needs to be verified
-                private static final double realMaxAngularAccelerationRadiansPerSecondSquared = 15.543; // needs to be verified
-
                 private static final double simMaxSpeedMetersPerSecond = 3.707;
-                private static final double simMaxAccelerationMetersPerSecondSquared = 2.5;
-                private static final double simMaxAngularSpeedRadiansPerSecond = 9.94;
-                private static final double simMaxAngularAccelerationRadiansPerSecondSquared = 9;
-
-                private static final double simMaxMotorVoltage = 12.0;
-                private static final double realMaxMotorVoltage = 12.0;
-
-                public static final double maxMotorVolts = Robot.isReal()
-                                ? DriveConstants.realMaxMotorVoltage
-                                : DriveConstants.simMaxMotorVoltage;
-
                 public static final double maxSpeedMetersPerSecond = Robot.isReal()
                                 ? DriveConstants.realMaxSpeedMetersPerSecond
                                 : DriveConstants.simMaxSpeedMetersPerSecond;
+                // acceleration
+                private static final double realMaxAccelerationMetersPerSecondSquared = 3.3; // actual top acceleration
+                private static final double simMaxAccelerationMetersPerSecondSquared = 2.5;
+                public static final double maxAccelerationMetersPerSecondSquared = Robot.isReal()
+                                ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
+                                : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
+                // teleop speed
+                public static final double teleopMaxSpeedReduction = 0;
+                public static final double teleopMaxSpeedMetersPerSecond = maxSpeedMetersPerSecond
+                                * (1 - teleopMaxSpeedReduction);
 
+                // auto speed
+                public static final double autoMaxSpeedReduction = 0;
+                public static final double autoMaxSpeedMetersPerSecond = maxSpeedMetersPerSecond
+                                * (1 - autoMaxSpeedReduction);
+
+                // angular speed
+                private static final double realMaxAngularSpeedRadiansPerSecond = 12.162;
+                private static final double simMaxAngularSpeedRadiansPerSecond = 9.94;
                 public static final double maxAngularSpeedRadiansPerSecond = Robot.isReal()
                                 ? DriveConstants.realMaxAngularSpeedRadiansPerSecond
                                 : DriveConstants.simMaxAngularSpeedRadiansPerSecond;
 
-                public static final double maxAccelerationMetersPerSecondSquared = Robot.isReal()
-                                ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
-                                : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
-
+                // angular acceleration
+                private static final double realMaxAngularAccelerationRadiansPerSecondSquared = 15.543;
+                private static final double simMaxAngularAccelerationRadiansPerSecondSquared = 9;
                 public static final double maxAngularAccelerationRadiansPerSecondSquared = Robot.isReal()
                                 ? DriveConstants.realMaxAngularAccelerationRadiansPerSecondSquared
                                 : DriveConstants.simMaxAngularAccelerationRadiansPerSecondSquared;
 
-                public static final double toleranceM_Misc = 0.02;
-                public static final double toleranceRad_Misc = Math.PI / 750;
+                // teleop angluar speed
+                public static final double teleopMaxAngularSpeedReduction = 0.4;
+                public static final double teleopMaxAngularSpeedMetersPerSecond = maxAngularSpeedRadiansPerSecond
+                                * (1 - teleopMaxAngularSpeedReduction);
 
-                // will eventally be easier to change values from here than poke around through
-                // files
+                // auto angular speed
+                public static final double autoMaxAngularSpeedReduction = 0;
+                public static final double autoMaxAngularSpeedMetersPerSecond = maxAngularSpeedRadiansPerSecond
+                                * (1 - autoMaxAngularSpeedReduction);
+
+                // motor volts
+                private static final double simMaxMotorVoltage = 12.0;
+                private static final double realMaxMotorVoltage = 12.0;
+                public static final double maxMotorVolts = Robot.isReal()
+                                ? DriveConstants.realMaxMotorVoltage
+                                : DriveConstants.simMaxMotorVoltage;
+
         }
 }

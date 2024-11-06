@@ -211,8 +211,6 @@ public class Swerve extends SubsystemBase {
     }
   }
 
- 
-
   public void stopModules() {
     for (SwerveModule module : modules) {
       module.stop();
@@ -238,7 +236,6 @@ public class Swerve extends SubsystemBase {
   public void resetGyro() {
     gyro.resetGyro();
     if (UtilityFunctions.isRedAlliance()) {
-
       swerveDrivePoseEstimator.resetPosition(new Rotation2d(), new SwerveModulePosition[] {
           modules[0].getPosition(),
           modules[1].getPosition(),
@@ -253,6 +250,16 @@ public class Swerve extends SubsystemBase {
           modules[3].getPosition()
       }, new Pose2d(swerveDrivePoseEstimator.getEstimatedPosition().getTranslation(), new Rotation2d()));
     }
+  }
+
+  public double getMaxDriveSpeed() {
+    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxSpeedMetersPerSecond
+        : SwerveConstants.DriveConstants.autoMaxSpeedMetersPerSecond;
+  }
+
+  public double getMaxAngularSpeed() {
+    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxAngularSpeedMetersPerSecond
+        : SwerveConstants.DriveConstants.autoMaxAngularSpeedMetersPerSecond;
   }
 
   public double totalAcceleration = 0;
