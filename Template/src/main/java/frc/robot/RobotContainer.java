@@ -22,8 +22,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    JoystickIO.pilotAndOperatorBindings();
-    JoystickIO.setDefaultCommands();
+    JoystickIO.getButtonBindings();
   }
 
   public Command getAutonomousCommand() {
