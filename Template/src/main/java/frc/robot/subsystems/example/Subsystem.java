@@ -15,8 +15,7 @@ public class Subsystem extends SubsystemBase {
     private SubsystemData data = new SubsystemData();
 
     private ShuffleData<String> exampleData = new ShuffleData<String>(this.getName(), "example data", "example");
-    // do we wants states? How do we want to implement them
-    // private SubsystemStates state = SubsystemStates.STOP;
+    private SubsystemStates state = SubsystemStates.STOP;
 
     public Subsystem() {
         if (Robot.isSimulation()) {
@@ -35,9 +34,9 @@ public class Subsystem extends SubsystemBase {
         return data.velocityUnitsLog.get();
     }
 
-    // public SubsystemStates getState() {
-    //     return state;
-    // }
+    public SubsystemStates getState() {
+        return state;
+    }
 
     public void setVoltage(double volts) {
         subsystemIO.setVoltage(volts);
@@ -47,9 +46,9 @@ public class Subsystem extends SubsystemBase {
         subsystemIO.setVoltage(0);
     }
 
-    // public void setState(SubsystemStates state) {
-    //     this.state = state;
-    // }
+    public void setState(SubsystemStates state) {
+        this.state = state;
+    }
 
     public void logOtherData(){
         exampleData.set("new value");

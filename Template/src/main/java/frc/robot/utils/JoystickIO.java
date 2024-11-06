@@ -1,17 +1,10 @@
 package frc.robot.utils;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import frc.robot.commands.swerve.SwerveTeleop;
 
 /**
  * Util class for button bindings
@@ -59,7 +52,6 @@ public class JoystickIO {
 
     public static void pilotBindings() {
         pilot.start().onTrue(Commands.runOnce(() -> Robot.swerve.resetGyro()));
-        pilot.startWhileHeld(null);
     }
 
     public static void simBindings() {

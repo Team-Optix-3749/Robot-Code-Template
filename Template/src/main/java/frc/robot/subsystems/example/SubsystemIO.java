@@ -1,8 +1,4 @@
 package frc.robot.subsystems.example;
-
-import javax.swing.text.Position;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.ShuffleData;
 
 public interface SubsystemIO {

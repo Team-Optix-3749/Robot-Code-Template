@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.example.SubsystemConstants;
 import frc.robot.subsystems.example.SubsystemIO;
-import frc.robot.utils.MiscConstants.SimConstants;
 
 public class SubsystemSparkMax implements SubsystemIO {
 
