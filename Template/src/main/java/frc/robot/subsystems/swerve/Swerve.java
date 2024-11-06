@@ -36,10 +36,9 @@ public class Swerve extends SubsystemBase {
 
   private GyroIO gyro;
   private GyroData gyroData = new GyroData();
+
   // equivilant to a odometer, but also intakes vision
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
-
-  private boolean isEnabled = false;
 
   private ShuffleData<Double[]> odometryLog = new ShuffleData<Double[]>(
       "swerve",
@@ -170,8 +169,22 @@ public class Swerve extends SubsystemBase {
     // return new Pose2d(new Translation2d(2, 4.9), new Rotation2d(Math.PI/2));
   }
 
+  public double getMaxDriveSpeed() {
+    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxSpeedMetersPerSecond
+        : SwerveConstants.DriveConstants.autoMaxSpeedMetersPerSecond;
+  }
+
+  public double getMaxAngularSpeed() {
+    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxAngularSpeedMetersPerSecond
+        : SwerveConstants.DriveConstants.autoMaxAngularSpeedMetersPerSecond;
+  }
+
   public SwerveDrivePoseEstimator getPoseEstimator() {
     return swerveDrivePoseEstimator;
+  }
+
+  public double getVerticalTilt() {
+    return gyroData.pitchDeg;
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -229,8 +242,10 @@ public class Swerve extends SubsystemBase {
 
   }
 
-  public double getVerticalTilt() {
-    return gyroData.pitchDeg;
+  public void setBreakMode(boolean enable) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].setBreakMode(enable);
+    }
   }
 
   public void resetGyro() {
@@ -250,16 +265,6 @@ public class Swerve extends SubsystemBase {
           modules[3].getPosition()
       }, new Pose2d(swerveDrivePoseEstimator.getEstimatedPosition().getTranslation(), new Rotation2d()));
     }
-  }
-
-  public double getMaxDriveSpeed() {
-    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxSpeedMetersPerSecond
-        : SwerveConstants.DriveConstants.autoMaxSpeedMetersPerSecond;
-  }
-
-  public double getMaxAngularSpeed() {
-    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxAngularSpeedMetersPerSecond
-        : SwerveConstants.DriveConstants.autoMaxAngularSpeedMetersPerSecond;
   }
 
   public double totalAcceleration = 0;
@@ -319,18 +324,6 @@ public class Swerve extends SubsystemBase {
 
     SmartDashboard.putNumber("robot acceleration", (robotVelocity - prevVelocity) / .02);
     prevVelocity = robotVelocity;
-
-    boolean driverStationStatus = DriverStation.isEnabled();
-    if (driverStationStatus && !isEnabled) {
-      isEnabled = driverStationStatus;
-      modules[0].setBreakMode(true);
-      ;
-    }
-    if (!driverStationStatus && isEnabled) {
-      modules[0].setBreakMode(false);
-      ;
-      isEnabled = driverStationStatus;
-    }
 
   }
 

@@ -29,13 +29,17 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    swerve.setBreakMode(false);
+  }
 
   @Override
   public void disabledPeriodic() {}
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+    swerve.setBreakMode(true);
+  }
 
   @Override
   public void autonomousInit() {
