@@ -13,7 +13,7 @@ public class MiscConstants {
       ? RobotType.REAL
       : RobotType.SIM;
 
-  public static final class Sim {
+  public static final class SimConstants {
     public static final double loopPeriodSec = 0.02;
   }
 
