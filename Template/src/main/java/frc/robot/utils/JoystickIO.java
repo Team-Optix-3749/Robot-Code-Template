@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
-import frc.robot.commands.swerve.SwerveTeleop;
+import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 /**
  * Util class for button bindings
@@ -64,7 +64,7 @@ public class JoystickIO {
     public static void setDefaultCommands() {
 
         Robot.swerve.setDefaultCommand(
-                new SwerveTeleop(
+                new SwerveDefaultCommand(
                         () -> -pilot.getLeftX(),
                         () -> -pilot.getLeftY(),
                         () -> -pilot.getRightX()));

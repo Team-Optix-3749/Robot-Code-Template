@@ -38,6 +38,11 @@ public class Subsystem extends SubsystemBase {
         return state;
     }
 
+    // returns true when the state is reached
+    public boolean getIsStableState(){
+        return true;
+    }
+
     public void setVoltage(double volts) {
         subsystemIO.setVoltage(volts);
     }

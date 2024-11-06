@@ -28,22 +28,20 @@ import java.util.function.Supplier;
  *         Default command to control the SwervedriveSubsystem with joysticks
  */
 
-public class SwerveTeleop extends Command {
+public class SwerveDefaultCommand extends Command {
 
-  private final Swerve swerve;
   private final Supplier<Double> xSpdFunction, ySpdFunction, xTurningSpdFunction;
 
-  public SwerveTeleop(
+  public SwerveDefaultCommand(
     Supplier<Double> xSpdFunction,
     Supplier<Double> ySpdFunction,
     Supplier<Double> xTurningSpdFunction
   ) {
-    this.swerve = Robot.swerve;
     this.xSpdFunction = xSpdFunction;
     this.ySpdFunction = ySpdFunction;
     this.xTurningSpdFunction = xTurningSpdFunction;
 
-    addRequirements(swerve);
+    super.addRequirements(Robot.swerve);
   }
 
   @Override
@@ -92,7 +90,7 @@ public class SwerveTeleop extends Command {
         ySpeed,
         xSpeed,
         turningSpeed,
-        swerve.getRotation2d()
+        Robot.swerve.getRotation2d()
       );
 
     if (UtilityFunctions.isRedAlliance()) {
@@ -101,17 +99,17 @@ public class SwerveTeleop extends Command {
           -ySpeed,
           -xSpeed,
           turningSpeed,
-          swerve.getRotation2d())
+          Robot.swerve.getRotation2d())
         ;
     }
 
     // set chassis speeds
-    swerve.setChassisSpeeds(chassisSpeeds);
+    Robot.swerve.setChassisSpeeds(chassisSpeeds);
   }
 
   @Override
   public void end(boolean interrupted) {
-    swerve.stopModules();
+    Robot.swerve.stopModules();
   }
 
   @Override
