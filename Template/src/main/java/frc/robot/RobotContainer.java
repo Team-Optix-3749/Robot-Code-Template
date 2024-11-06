@@ -4,17 +4,29 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.utils.JoystickIO;
 
 public class RobotContainer {
+
   public RobotContainer() {
+    DriverStation.silenceJoystickConnectionWarning(true);
+    DriverStation.removeRefreshedDataEventHandle(44000);
+
     configureBindings();
+
+    RobotController.setBrownoutVoltage(7.0);
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    JoystickIO.pilotAndOperatorBindings();
+    JoystickIO.setDefaultCommands();
+  }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return Commands.none();
   }
 }
