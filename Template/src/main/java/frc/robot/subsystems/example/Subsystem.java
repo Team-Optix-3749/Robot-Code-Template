@@ -15,7 +15,13 @@ public class Subsystem extends SubsystemBase {
     private SubsystemData data = new SubsystemData();
     private SubsystemStates state = SubsystemStates.STOP;
 
-    private ShuffleData<String> exampleDataLog = new ShuffleData<String>(this.getName(), "example data", "example");
+    public ShuffleData<Double> positionUnitsLog = new ShuffleData<Double>("Subsystem", "position units", 0.0);
+    public ShuffleData<Double> velocityUnitsLog = new ShuffleData<Double>("Subsystem", "velocity units", 0.0);
+    public ShuffleData<Double> inputVoltsLog = new ShuffleData<Double>("Subsystem", "input volts", 0.0);
+    public ShuffleData<Double> appliedVoltsLog = new ShuffleData<Double>("Subsystem", "applied volts", 0.0);
+    public ShuffleData<Double> currentAmpsLog = new ShuffleData<Double>("Subsystem", "current amps", 0.0);
+    public ShuffleData<Double> tempCelciusLog = new ShuffleData<Double>("Subsystem", "temp celcius", 0.0);
+
     private ShuffleData<String> stateLog = new ShuffleData<String>(this.getName(), "state", state.name());
 
     public Subsystem() {
@@ -28,11 +34,11 @@ public class Subsystem extends SubsystemBase {
     }
 
     public double getPositionRad() {
-        return data.positionUnitsLog.get();
+        return data.positionUnits;
     }
 
     public double getVelocityRadPerSec() {
-        return data.velocityUnitsLog.get();
+        return data.velocityUnits;
     }
 
     public SubsystemStates getState() {
@@ -56,9 +62,17 @@ public class Subsystem extends SubsystemBase {
         this.state = state;
     }
 
-    public void logOtherData() {
-        exampleDataLog.set("new value");
+    public void logData() {
+
+        positionUnitsLog.set(data.positionUnits);
+        velocityUnitsLog.set(data.velocityUnits);
+        inputVoltsLog.set(data.inputVolts);
+        appliedVoltsLog.set(data.appliedVolts);
+        currentAmpsLog.set(data.currentAmps);
+        tempCelciusLog.set(data.tempCelcius);
+
         stateLog.set(state.name());
+
     }
 
     public void runStateStop() {
@@ -79,7 +93,7 @@ public class Subsystem extends SubsystemBase {
             runStateStop();
         }
 
-        logOtherData();
+        logData();
     }
 
 }

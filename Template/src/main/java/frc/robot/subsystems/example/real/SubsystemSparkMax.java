@@ -28,12 +28,12 @@ public class SubsystemSparkMax implements SubsystemIO {
     @Override
     public void updateData(SubsystemData data) {
 
-        data.positionUnitsLog.set(encoder.getPosition());
-        data.velocityUnitsLog.set(encoder.getVelocity());
-        data.currentAmpsLog.set(motor.getOutputCurrent());
-        data.inputVoltsLog.set(inputVolts);
-        data.appliedVoltsLog.set(motor.getBusVoltage() * motor.getAppliedOutput());
-        data.tempCelciusLog.set(motor.getMotorTemperature());
+        data.positionUnits = encoder.getPosition();
+        data.velocityUnits = encoder.getVelocity();
+        data.currentAmps = motor.getOutputCurrent();
+        data.inputVolts = inputVolts;
+        data.appliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();
+        data.tempCelcius = motor.getMotorTemperature();
 
     }
 

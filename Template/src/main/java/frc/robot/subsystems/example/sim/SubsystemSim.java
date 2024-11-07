@@ -21,15 +21,15 @@ public class SubsystemSim implements SubsystemIO {
         simSystem.update(SimConstants.loopPeriodSec);
 
         // set these to your system's data
-        data.positionUnitsLog.set(0.0);
-        data.velocityUnitsLog.set(0.0);
-        data.currentAmpsLog.set(simSystem.getCurrentDrawAmps());
+        data.positionUnits = 0.0;
+        data.velocityUnits = 0.0;
+        data.currentAmps = simSystem.getCurrentDrawAmps();
 
-        data.inputVoltsLog.set(appliedVolts);
-        data.appliedVoltsLog.set(appliedVolts);
+        data.inputVolts = appliedVolts;
+        data.appliedVolts = appliedVolts;
 
         // sim has no temperature
-        data.tempCelciusLog.set(0.0);
+        data.tempCelcius = 0.0;
 
     }
 
