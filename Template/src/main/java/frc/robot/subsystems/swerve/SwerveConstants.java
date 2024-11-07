@@ -107,7 +107,8 @@ public class SwerveConstants {
                                 ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
                                 : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
                 // teleop speed
-                public static final double teleopMaxSpeedReduction = 0;
+                public static final double teleopMaxSpeedReduction = -0.15; // If we can drive a little faster in telop
+                                                                            // we may as well
                 public static final double teleopMaxSpeedMetersPerSecond = maxSpeedMetersPerSecond
                                 * (1 - teleopMaxSpeedReduction);
 
