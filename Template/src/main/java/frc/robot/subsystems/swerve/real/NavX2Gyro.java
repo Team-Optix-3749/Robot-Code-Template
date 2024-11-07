@@ -1,7 +1,10 @@
 package frc.robot.subsystems.swerve.real;
 
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
+import frc.robot.Robot;
 import frc.robot.subsystems.swerve.GyroIO;
 
 public class NavX2Gyro implements GyroIO {
@@ -28,16 +31,13 @@ public class NavX2Gyro implements GyroIO {
         data.isConnected = gyro.isConnected();
 
         if (data.isConnected && !data.isCalibrating) {
-            // negative to make it CCP  q
+            // negative to make it CCP q
             data.yawDeg = -gyro.getYaw();
             data.pitchDeg = gyro.getPitch();
             data.rollDeg = gyro.getRoll();
         } else {
-            // double angleDiffRad = Robot.swerve.getChassisSpeeds().omegaRadiansPerSecond * 0.02;
-            // Rotation2d currentRotationDiff = new Rotation2d(angleDiffRad);
-
-            // yaw = (yaw + currentRotationDiff.getDegrees() + 360) % 360;
-            // data.yawDeg = yaw;
+            double angleDiffRad = Robot.swerve.getChassisSpeeds().omegaRadiansPerSecond * 0.02;
+            data.yawDeg += (Units.radiansToDegrees(angleDiffRad) + 360) % 360;
         }
     }
 

@@ -1,4 +1,5 @@
 package frc.robot.subsystems.swerve.real;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.subsystems.swerve.GyroIO;
 
@@ -6,9 +7,12 @@ public class PigeonGyro implements GyroIO {
     private final Pigeon2 pigeonGyro = new Pigeon2(30);
 
     public PigeonGyro() {
+
         try {
             pigeonGyro.reset();
-        } catch (Exception e) {};
+        } catch (Exception e) {
+        }
+        ;
     }
 
     @Override
@@ -17,7 +21,10 @@ public class PigeonGyro implements GyroIO {
             data.yawDeg = pigeonGyro.getYaw().getValueAsDouble();
             data.pitchDeg = pigeonGyro.getPitch().getValueAsDouble();
             data.rollDeg = pigeonGyro.getRoll().getValueAsDouble();
-        } catch (Exception e) {};
+
+        } catch (Exception e) {
+        }
+        ;
     }
 
     @Override
