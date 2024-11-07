@@ -1,16 +1,21 @@
 package frc.robot.subsystems.example.sim;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import frc.robot.subsystems.example.SubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
 public class SubsystemSim implements SubsystemIO {
 
-    private LinearSystemSim simSystem = new LinearSystemSim<>(null);
+    private FlywheelSim simSystem = new FlywheelSim(
+            DCMotor.getNEO(1), 6, 0.04);
 
     private double appliedVolts = 0;
     private double previousVelocity = 0;
+    private double velocity = 0;
+    private double conversionFactor = 1;
 
     public SubsystemSim() {
         System.out.println("[Init] Creating SubsytemSim");
@@ -21,10 +26,12 @@ public class SubsystemSim implements SubsystemIO {
         simSystem.update(SimConstants.loopPeriodSec);
 
         // set these to your system's data
-        data.positionUnits = 0.0;
-        data.velocityUnits = 0.0;
+        previousVelocity = velocity;
+        velocity = simSystem.getAngularVelocityRadPerSec() * conversionFactor;
+        data.positionUnits += velocity * 0.02;
+        data.velocityUnits = velocity;
+        data.accelerationUnits = (velocity - previousVelocity) / 0.02;
         data.currentAmps = simSystem.getCurrentDrawAmps();
-
         data.inputVolts = appliedVolts;
         data.appliedVolts = appliedVolts;
 
@@ -36,7 +43,7 @@ public class SubsystemSim implements SubsystemIO {
     @Override
     public void setVoltage(double volts) {
         appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-        // simSystem.setInputVoltage(appliedVolts)
+        simSystem.setInputVoltage(appliedVolts);
 
     }
 }

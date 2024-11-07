@@ -7,6 +7,7 @@ public interface SubsystemIO {
   public static class SubsystemData {
     public double positionUnits = 0;
     public double velocityUnits = 0;
+    public double accelerationUnits = 0;
     public double inputVolts = 0;
     public double appliedVolts = 0;
     public double currentAmps = 0;

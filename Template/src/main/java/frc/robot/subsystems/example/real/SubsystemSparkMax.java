@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.example.SubsystemConstants;
 import frc.robot.subsystems.example.SubsystemIO;
+import frc.robot.utils.MiscConstants.SimConstants;
 
 public class SubsystemSparkMax implements SubsystemIO {
 
@@ -15,6 +16,8 @@ public class SubsystemSparkMax implements SubsystemIO {
     private RelativeEncoder encoder = motor.getEncoder();
 
     private double inputVolts = 0;
+    private double previousVelocity = 0;
+    private double velocity = 0;
 
     public SubsystemSparkMax() {
         motor.setSmartCurrentLimit(30, 50, 1);
@@ -27,9 +30,11 @@ public class SubsystemSparkMax implements SubsystemIO {
 
     @Override
     public void updateData(SubsystemData data) {
-
+        previousVelocity = velocity;
+        velocity = encoder.getVelocity();
         data.positionUnits = encoder.getPosition();
-        data.velocityUnits = encoder.getVelocity();
+        data.velocityUnits = velocity;
+        data.accelerationUnits = (velocity - previousVelocity) / 0.02;
         data.currentAmps = motor.getOutputCurrent();
         data.inputVolts = inputVolts;
         data.appliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();

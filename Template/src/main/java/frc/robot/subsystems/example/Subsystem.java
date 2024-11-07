@@ -17,6 +17,7 @@ public class Subsystem extends SubsystemBase {
 
     public ShuffleData<Double> positionUnitsLog = new ShuffleData<Double>("Subsystem", "position units", 0.0);
     public ShuffleData<Double> velocityUnitsLog = new ShuffleData<Double>("Subsystem", "velocity units", 0.0);
+    public ShuffleData<Double> accelerationUnitsLog = new ShuffleData<Double>("Subsystem", "acceleration units", 0.0);
     public ShuffleData<Double> inputVoltsLog = new ShuffleData<Double>("Subsystem", "input volts", 0.0);
     public ShuffleData<Double> appliedVoltsLog = new ShuffleData<Double>("Subsystem", "applied volts", 0.0);
     public ShuffleData<Double> currentAmpsLog = new ShuffleData<Double>("Subsystem", "current amps", 0.0);
