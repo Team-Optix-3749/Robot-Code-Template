@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+
 public class SwerveModuleSparkMax implements SwerveModuleIO {
     private CANSparkMax driveMotor;
     private CANSparkMax turnMotor;
@@ -34,7 +35,6 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
         turnMotor.getEncoder()
                 .setVelocityConversionFactor(
                         (1 / ModuleConstants.driveMotorGearRatio) * Units.rotationsPerMinuteToRadiansPerSecond(1));
-        // turnMotor.getEncoder().setPosition(Units.radiansToRotations(getAbsoluteTurningPositionRad()));
 
         driveMotor.setInverted(DriveConstants.driveMotorReversed[index]);
 
@@ -60,14 +60,13 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
     public void updateData(ModuleData data) {
 
         driveAppliedVolts = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
-        turnAppliedVolts = turnMotor.getBusVoltage() * turnMotor.getAppliedOutput();
-
         data.drivePositionM = getDrivePositionMeters();
         data.driveVelocityMPerSec = getDriveVelocityMetersPerSec();
         data.driveAppliedVolts = driveAppliedVolts;
         data.driveCurrentAmps = Math.abs(driveMotor.getOutputCurrent());
         data.driveTempCelcius = driveMotor.getMotorTemperature();
 
+        turnAppliedVolts = turnMotor.getBusVoltage() * turnMotor.getAppliedOutput();
         data.turnAbsolutePositionRad = getAbsoluteTurningPositionRad();
         data.turnVelocityRadPerSec = getAbsoluteTurninVelocityRadPerSec();
         data.turnAppliedVolts = turnAppliedVolts;
@@ -77,10 +76,8 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
 
     @Override
     public void setDriveVoltage(double volts) {
-
         driveAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
                 DriveConstants.maxMotorVolts);
-        // driveAppliedVolts = Math.signum(driveAppliedVolts) * 12;
         driveMotor.setVoltage(driveAppliedVolts);
     };
 
@@ -96,11 +93,12 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
     };
 
     private double getAbsoluteTurningPositionRad() {
-        double pos = Units.rotationsToRadians(absoluteEncoder.getPosition().getValueAsDouble()) - absoluteEncoderOffsetRad;
-        while (pos < 0){
-            pos += 2*Math.PI;
-        } 
-        while (pos > 2 * Math.PI){
+        double pos = Units.rotationsToRadians(absoluteEncoder.getPosition().getValueAsDouble())
+                - absoluteEncoderOffsetRad;
+        while (pos < 0) {
+            pos += 2 * Math.PI;
+        }
+        while (pos > 2 * Math.PI) {
             pos -= 2 * Math.PI;
         }
         return pos;
