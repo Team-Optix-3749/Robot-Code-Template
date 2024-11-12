@@ -1,5 +1,6 @@
 package frc.robot.subsystems.example;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.example.SubsystemConstants.SubsystemStates;
@@ -87,6 +88,11 @@ public class Subsystem extends SubsystemBase {
     @Override
     public void periodic() {
         subsystemIO.updateData(data);
+
+        SmartDashboard.putNumber("position", data.positionUnits);
+
+
+
 
         if (state == SubsystemStates.GO) {
             runStateGo();

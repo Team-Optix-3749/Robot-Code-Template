@@ -15,10 +15,14 @@ public class RobotContainer {
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
     DriverStation.removeRefreshedDataEventHandle(44000);
-
-    configureBindings();
+    
+    DataLogManager.start(); 
+    DataLogManager.logNetworkTables(true);
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
 
     RobotController.setBrownoutVoltage(7.0);
+    
+    configureBindings();
   }
 
   private void configureBindings() {
