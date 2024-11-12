@@ -4,11 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.hal.can.CANStatus;
+import edu.wpi.first.hal.simulation.DriverStationDataJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.example.Subsystem;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.utils.ShuffleData;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -16,6 +21,13 @@ public class Robot extends TimedRobot {
   public static Swerve swerve = new Swerve();
   public static Subsystem subsystem = new Subsystem();
 
+  private ShuffleData<Double> batteryVoltageLog = new ShuffleData<Double>("DS", "battery voltage", 0.0);
+  private ShuffleData<Boolean> isBrownedOutLog = new ShuffleData<Boolean>("DS", "brownout", false);
+  private ShuffleData<Double> cpuTempLog = new ShuffleData<Double>("DS", "cpu temp", 0.0);
+  private ShuffleData<Double> CANUtilizationLog = new ShuffleData<Double>("DS", "CAN utilizaition", 0.0);
+  private ShuffleData<String> radioStatusLog = new ShuffleData<String>("DS", "radio status", "kOff");
+  private ShuffleData<String> allianceLog = new ShuffleData<String>("DS", "alliance", "Red");
+  private ShuffleData<Boolean> FMSLog = new ShuffleData<Boolean>("DS", "FMS connected", false);
   private RobotContainer m_robotContainer;
 
   @Override
@@ -26,6 +38,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    batteryVoltageLog.set(RobotController.getBatteryVoltage());
+    cpuTempLog.set(RobotController.getCPUTemp());
+    CANUtilizationLog.set(RobotController.getCANStatus().percentBusUtilization);
+    radioStatusLog.set(RobotController.getRadioLEDState().name());
+    isBrownedOutLog.set(RobotController.isBrownedOut());
+    allianceLog.set(DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get().name() : "None");
+    FMSLog.set(DriverStation.isFMSAttached());
+
   }
 
   @Override
@@ -34,7 +54,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
   public void disabledExit() {
@@ -51,10 +72,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -64,10 +87,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -75,8 +100,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 }
