@@ -24,11 +24,6 @@ public class AutoUtils {
         setupChooser();
     }
 
-    public static Command getSelectedAuto() {
-
-        return chooser.getSelectedAutoRoutine();
-    }
-
     private static void setupFactory() {
         // what commands run on what markers
         AutoBindings bindings = new AutoFactory.AutoBindings();
