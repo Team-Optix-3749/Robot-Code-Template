@@ -52,10 +52,12 @@ public class SwerveDefaultCommand extends Command {
     // controllers are weird in what's positive, so we flip these
     double xMagnitude = -xSpdFunction.get();
     double yMagnitude = -ySpdFunction.get();
-    double turningSpeed = -xTurningSpdFunction.get();
+    double turningMagnitude = -xTurningSpdFunction.get();
 
     // one combined magnitutde
     double linearMagnitude = Math.hypot(xMagnitude, yMagnitude);
+    SmartDashboard.putNumber("lin mag", linearMagnitude);
+
     // one combined direction
     Rotation2d linearDirection = new Rotation2d(xMagnitude, yMagnitude);
 
@@ -63,17 +65,16 @@ public class SwerveDefaultCommand extends Command {
     // is always postive
     linearMagnitude = MathUtil.applyDeadband(linearMagnitude, ControllerConstants.deadband);
     // can be negative
-    turningSpeed = Math.abs(turningSpeed) > ControllerConstants.deadband
-        ? turningSpeed
+    turningMagnitude = Math.abs(turningMagnitude) > ControllerConstants.deadband
+        ? turningMagnitude
         : 0.0;
 
     // squaring the inputs for smoother driving at low speeds
     linearMagnitude = Math.copySign(linearMagnitude * linearMagnitude, linearMagnitude);
-    turningSpeed = Math.copySign(turningSpeed * turningSpeed, turningSpeed);
+    turningMagnitude = Math.copySign(turningMagnitude * turningMagnitude, turningMagnitude);
 
     double driveSpeedMPS = linearMagnitude * Robot.swerve.getMaxDriveSpeed();
-
-    turningSpeed = turningSpeed * Robot.swerve.getMaxAngularSpeed();
+    double turningSpeedRadPerSecond = turningMagnitude * Robot.swerve.getMaxAngularSpeed();
 
     // Calcaulate new linear components
     double xSpeed = driveSpeedMPS * Math.cos(linearDirection.getRadians());
@@ -83,7 +84,7 @@ public class SwerveDefaultCommand extends Command {
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
         UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,
-        turningSpeed,
+        turningSpeedRadPerSecond,
         Robot.swerve.getRotation2d());
 
     // set chassis speeds

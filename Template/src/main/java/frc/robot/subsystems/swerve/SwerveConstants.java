@@ -96,18 +96,18 @@ public class SwerveConstants {
 
                 // speed
                 private static final double realMaxSpeedMetersPerSecond = 4.3; // This is our actual top speed
-                private static final double simMaxSpeedMetersPerSecond = 3.707;
+                private static final double simMaxSpeedMetersPerSecond = 4.47;
                 public static final double maxSpeedMetersPerSecond = Robot.isReal()
                                 ? DriveConstants.realMaxSpeedMetersPerSecond
                                 : DriveConstants.simMaxSpeedMetersPerSecond;
                 // acceleration
                 private static final double realMaxAccelerationMetersPerSecondSquared = 3.3; // actual top acceleration
-                private static final double simMaxAccelerationMetersPerSecondSquared = 2.5;
+                private static final double simMaxAccelerationMetersPerSecondSquared = 2.5; // not entirely accurate
                 public static final double maxAccelerationMetersPerSecondSquared = Robot.isReal()
                                 ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
                                 : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
                 // teleop speed
-                public static final double teleopMaxSpeedReduction = -0.15; // If we can drive a little faster in telop
+                public static final double teleopMaxSpeedReduction = 0; // If we can drive a little faster in telop
                                                                             // we may as well
                 public static final double teleopMaxSpeedMetersPerSecond = maxSpeedMetersPerSecond
                                 * (1 - teleopMaxSpeedReduction);
@@ -133,12 +133,12 @@ public class SwerveConstants {
 
                 // teleop angluar speed
                 public static final double teleopMaxAngularSpeedReduction = 0.4;
-                public static final double teleopMaxAngularSpeedMetersPerSecond = maxAngularSpeedRadiansPerSecond
+                public static final double teleopMaxAngularSpeedRadPerSecond = maxAngularSpeedRadiansPerSecond
                                 * (1 - teleopMaxAngularSpeedReduction);
 
                 // auto angular speed
                 public static final double autoMaxAngularSpeedReduction = 0;
-                public static final double autoMaxAngularSpeedMetersPerSecond = maxAngularSpeedRadiansPerSecond
+                public static final double autoMaxAngularSpeedRadPerSecond = maxAngularSpeedRadiansPerSecond
                                 * (1 - autoMaxAngularSpeedReduction);
 
                 // motor volts

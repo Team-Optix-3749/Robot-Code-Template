@@ -181,8 +181,8 @@ public class Swerve extends SubsystemBase {
    *         or auto
    */
   public double getMaxAngularSpeed() {
-    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxAngularSpeedMetersPerSecond
-        : SwerveConstants.DriveConstants.autoMaxAngularSpeedMetersPerSecond;
+    return DriverStation.isTeleopEnabled() ? SwerveConstants.DriveConstants.teleopMaxAngularSpeedRadPerSecond
+        : SwerveConstants.DriveConstants.autoMaxAngularSpeedRadPerSecond;
   }
 
   /**
@@ -193,7 +193,6 @@ public class Swerve extends SubsystemBase {
    *                      velocity
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-
     // Convert chassis speeds to individual module states
     SwerveModuleState[] moduleStates = DriveConstants.driveKinematics.toSwerveModuleStates(
         chassisSpeeds);
