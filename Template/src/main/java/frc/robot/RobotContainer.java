@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.auto.AutoUtils;
 import frc.robot.utils.JoystickIO;
 
 public class RobotContainer {
@@ -16,21 +17,18 @@ public class RobotContainer {
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
     DriverStation.removeRefreshedDataEventHandle(44000);
-    
-    DataLogManager.start(); 
+
+    DataLogManager.start();
     DataLogManager.logNetworkTables(true);
     DriverStation.startDataLog(DataLogManager.getLog(), true);
 
     RobotController.setBrownoutVoltage(7.0);
-    
-    configureBindings();
-  }
 
-  private void configureBindings() {
     JoystickIO.getButtonBindings();
+    AutoUtils.initAuto();
   }
 
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return AutoUtils.getSelectedAuto();
   }
 }

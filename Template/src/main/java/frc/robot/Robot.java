@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.auto.AutoUtils;
 import frc.robot.subsystems.example.Subsystem;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.utils.ShuffleData;
@@ -43,6 +44,8 @@ public class Robot extends TimedRobot {
     allianceLog.set(DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get().name() : "None");
     FMSLog.set(DriverStation.isFMSAttached());
 
+    // update our auto selector
+    AutoUtils.getChooser().update();
   }
 
   @Override
