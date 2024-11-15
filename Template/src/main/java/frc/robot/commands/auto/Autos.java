@@ -12,8 +12,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import choreo.Choreo;
 
+/**
+ * Bassically AutoRoutineGenerator, I think. I just don't understand how to use
+ * that interface and this works
+ */
 public class Autos {
+    public static Command getPrint(AutoFactory factory) {
+        return Commands.print("Auto!");
+    }
 
-
-
+    public static Command getMyRoutine(AutoFactory factory) {
+        return factory.trajectory("My Routine", factory.newLoop("My Loop")).cmd();
+    }
 }

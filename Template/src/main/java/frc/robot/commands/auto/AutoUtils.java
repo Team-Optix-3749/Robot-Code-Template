@@ -44,14 +44,12 @@ public class AutoUtils {
 
     private static void setupChooser() {
         chooser = new AutoChooser(factory, "");
-        chooser.addAutoRoutine("My Routine", null);
+        chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getPrint(factory));
+
         chooser.choose("My Routine");
 
     }
 
-    public static AutoFactory getFactory() {
-        return factory;
-    }
 
     public static AutoChooser getChooser() {
         return chooser;
