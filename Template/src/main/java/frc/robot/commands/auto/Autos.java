@@ -26,6 +26,6 @@ public class Autos {
         AutoLoop loop = factory.newLoop("auto");
         AutoTrajectory trajectory = factory.trajectory("auto", loop);
         loop.enabled().onTrue(trajectory.cmd());
-        return Commands.print("Print then Traj!").andThen(loop.cmd());
+        return Commands.print("Print then Trajectory!").andThen(loop.cmd());
     }
 }
