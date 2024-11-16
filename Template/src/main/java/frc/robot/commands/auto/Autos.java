@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoLoop;
 import choreo.auto.AutoTrajectory;
 import choreo.auto.AutoChooser.AutoRoutineGenerator;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -22,6 +23,9 @@ public class Autos {
     }
 
     public static Command getMyRoutine(AutoFactory factory) {
-        return factory.trajectory("My Routine", factory.newLoop("My Loop")).cmd();
+        AutoLoop loop = factory.newLoop("auto");
+        AutoTrajectory trajectory = factory.trajectory("auto", loop);
+        loop.enabled().onTrue(trajectory.cmd());
+        return Commands.print("Print then Traj!").andThen(loop.cmd());
     }
 }

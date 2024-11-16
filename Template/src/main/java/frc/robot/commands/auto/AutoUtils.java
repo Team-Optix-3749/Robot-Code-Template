@@ -22,6 +22,10 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
+
+        // Set default auto
+        chooser.choose("My Routine");
+
     }
 
     private static void setupFactory() {
@@ -44,10 +48,7 @@ public class AutoUtils {
 
     private static void setupChooser() {
         chooser = new AutoChooser(factory, "");
-        chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getPrint(factory));
-
-        chooser.choose("My Routine");
-
+        chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
     }
 
 
