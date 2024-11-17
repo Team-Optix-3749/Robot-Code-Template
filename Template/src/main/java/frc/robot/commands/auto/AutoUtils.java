@@ -1,14 +1,18 @@
 package frc.robot.commands.auto;
 
+import java.util.function.Function;
+
 // import com.choreo.lib.Choreo;
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoChooser.AutoRoutineGenerator;
 import choreo.auto.AutoFactory.AutoBindings;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.utils.UtilityFunctions;
@@ -22,9 +26,9 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
+        // default auto
+        chooser.choose("Print");
 
-        // Set default auto
-        chooser.choose("My Routine");
 
     }
 
@@ -47,10 +51,14 @@ public class AutoUtils {
     }
 
     private static void setupChooser() {
-        chooser = new AutoChooser(factory, "");
+        String defautAuto = "Print";
+        // interface for choreo
+        chooser = new AutoChooser(factory, "Shuffleboard");
         chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
-    }
+        chooser.addAutoRoutine("Print", (AutoFactory factory) -> Autos.getPrint(factory));
 
+     
+    }
 
     public static AutoChooser getChooser() {
         return chooser;

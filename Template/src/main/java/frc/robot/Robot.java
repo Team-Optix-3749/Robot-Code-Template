@@ -44,8 +44,6 @@ public class Robot extends TimedRobot {
     allianceLog.set(DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get().name() : "None");
     FMSLog.set(DriverStation.isFMSAttached());
 
-    // update our auto selector
-    AutoUtils.getChooser().update();
   }
 
   @Override
@@ -55,6 +53,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+      // update our auto selector. Use when it shows up in shuffleboard properly
+      AutoUtils.getChooser().update();
+
   }
 
   @Override

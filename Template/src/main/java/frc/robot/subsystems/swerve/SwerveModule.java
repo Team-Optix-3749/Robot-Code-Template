@@ -47,35 +47,35 @@ public class SwerveModule {
 
         this.index = index;
         if (index == 0) {
-            name = "FL Module";
+            name = "FL module";
         } else if (index == 1) {
-            name = "FR Module";
+            name = "FR module";
         } else if (index == 2) {
-            name = "BL Module";
+            name = "BL module";
         } else if (index == 3) {
-            name = "BR Module";
+            name = "BR module";
         }
         // Tab, name, data
-        driveSpeed = new ShuffleData<>("swerve/" + name, name + " drive speed",
+        driveSpeed = new ShuffleData<>("Swerve/" + name, "drive speed",
                 moduleData.driveVelocityMPerSec);
-        drivePosition = new ShuffleData<>("swerve/" + name, name + " drive position",
+        drivePosition = new ShuffleData<>("Swerve/" + name, " drive position",
                 moduleData.driveVelocityMPerSec);
-        driveTemp = new ShuffleData<>("swerve/" + name, name + " drive temp",
+        driveTemp = new ShuffleData<>("Swerve/" + name, "drive temp",
                 moduleData.driveVelocityMPerSec);
-        driveVolts = new ShuffleData<>("swerve/" + name, name + " drive volts",
+        driveVolts = new ShuffleData<>("Swerve/" + name, "drive volts",
                 moduleData.driveVelocityMPerSec);
-        driveCurrent = new ShuffleData<>("swerve/" + name, name + " drive current",
+        driveCurrent = new ShuffleData<>("Swerve/" + name, "drive current",
                 moduleData.driveVelocityMPerSec);
 
-        turningSpeed = new ShuffleData<>("swerve/" + name, name + " turning speed",
+        turningSpeed = new ShuffleData<>("Swerve/" + name, "turning speed",
                 moduleData.driveVelocityMPerSec);
-        turningPosition = new ShuffleData<>("swerve/" + name, name + " turning position",
+        turningPosition = new ShuffleData<>("Swerve/" + name, "turning position",
                 moduleData.driveVelocityMPerSec);
-        turningTemp = new ShuffleData<>("swerve/" + name, name + " turning temp",
+        turningTemp = new ShuffleData<>("Swerve/" + name, "turning temp",
                 moduleData.driveVelocityMPerSec);
-        turningVolts = new ShuffleData<>("swerve/" + name, name + " turning volts",
+        turningVolts = new ShuffleData<>("Swerve/" + name, "turning volts",
                 moduleData.driveVelocityMPerSec);
-        turningCurrent = new ShuffleData<>("swerve/" + name, name + " turning current",
+        turningCurrent = new ShuffleData<>("Swerve/" + name, "turning current",
                 moduleData.turnCurrentAmps);
     }
 

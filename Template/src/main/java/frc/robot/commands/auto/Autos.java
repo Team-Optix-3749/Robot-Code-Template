@@ -19,7 +19,7 @@ import choreo.Choreo;
  */
 public class Autos {
     public static Command getPrint(AutoFactory factory) {
-        return Commands.print("Auto!");
+        return Commands.print("Print Auto!");
     }
 
     public static Command getMyRoutine(AutoFactory factory) {
