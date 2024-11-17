@@ -1,7 +1,6 @@
 package frc.robot.commands.auto;
 
 
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 
 public final class AutoConstants {
 

@@ -83,7 +83,7 @@ public class ShuffleData<T> {
         entry.setValue(val);
     }
 
-    public static void put(String tabName, Sendable sendableData) {
+    public static void  put(String tabName, Sendable sendableData) {
         ShuffleboardTab tab = Shuffleboard.getTab(tabName);
         tab.add(sendableData);
     }

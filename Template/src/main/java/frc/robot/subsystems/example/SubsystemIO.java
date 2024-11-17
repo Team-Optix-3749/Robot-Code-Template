@@ -1,7 +1,5 @@
 package frc.robot.subsystems.example;
 
-import frc.robot.utils.ShuffleData;
-
 public interface SubsystemIO {
 
   public static class SubsystemData {

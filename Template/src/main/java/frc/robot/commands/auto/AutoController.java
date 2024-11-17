@@ -4,7 +4,6 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.controller.PIDController;
 
 public class AutoController {

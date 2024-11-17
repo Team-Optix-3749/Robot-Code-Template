@@ -2,7 +2,6 @@ package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class UtilityFunctions {
 
@@ -14,8 +13,6 @@ public class UtilityFunctions {
         } else {
             isRed = DriverStation.getAlliance().get() == Alliance.Red;
         }
-
-        SmartDashboard.putBoolean("isRedAlliance", isRed);
         return isRed;
     }
 

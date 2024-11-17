@@ -34,7 +34,7 @@ public class SubsystemSparkMax implements SubsystemIO {
         velocity = encoder.getVelocity();
         data.positionUnits = encoder.getPosition();
         data.velocityUnits = velocity;
-        data.accelerationUnits = (velocity - previousVelocity) / 0.02;
+        data.accelerationUnits = (velocity - previousVelocity) / SimConstants.loopPeriodSec;
         data.currentAmps = motor.getOutputCurrent();
         data.inputVolts = inputVolts;
         data.appliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();

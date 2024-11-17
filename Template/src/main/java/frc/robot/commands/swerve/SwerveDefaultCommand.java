@@ -1,24 +1,12 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.utils.MiscConstants;
 import frc.robot.utils.UtilityFunctions;
 import frc.robot.utils.MiscConstants.*;
-import java.sql.Driver;
 import java.util.function.Supplier;
 
 /***
@@ -56,8 +44,6 @@ public class SwerveDefaultCommand extends Command {
 
     // one combined magnitutde
     double linearMagnitude = Math.hypot(xMagnitude, yMagnitude);
-    SmartDashboard.putNumber("lin mag", linearMagnitude);
-
     // one combined direction
     Rotation2d linearDirection = new Rotation2d(xMagnitude, yMagnitude);
 

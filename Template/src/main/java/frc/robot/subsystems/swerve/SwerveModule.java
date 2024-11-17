@@ -4,7 +4,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveModuleIO.ModuleData;
 import frc.robot.utils.ShuffleData;
@@ -46,6 +45,7 @@ public class SwerveModule {
         turningPidController.enableContinuousInput(0, 2 * Math.PI);
 
         this.index = index;
+        
         if (index == 0) {
             name = "FL module";
         } else if (index == 1) {

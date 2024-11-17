@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.swerve;
 
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -12,7 +11,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.GyroIO.GyroData;
@@ -55,8 +53,14 @@ public class Swerve extends SubsystemBase {
       "desired states",
       new Double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
 
-  private ShuffleData<Double> velocityLog = new ShuffleData<Double>(this.getName(), "velocity", 0.0);
-  private ShuffleData<Double> accelerationLog = new ShuffleData<Double>(this.getName(), "acceleration", 0.0);
+  private ShuffleData<Double> velocityLog = new ShuffleData<Double>(
+      this.getName(),
+      "velocity",
+      0.0);
+  private ShuffleData<Double> accelerationLog = new ShuffleData<Double>(
+      this.getName(),
+      "acceleration",
+      0.0);
 
   private ShuffleData<Double> yawLog = new ShuffleData<Double>(
       this.getName(),
@@ -92,6 +96,7 @@ public class Swerve extends SubsystemBase {
   private boolean utilizeVision = true;
 
   public Swerve() {
+
     // if simulation
     if (Robot.isSimulation()) {
       gyro = new GyroSim();
@@ -124,7 +129,6 @@ public class Swerve extends SubsystemBase {
     // put us on the field with a default orientation
     resetGyro();
     setOdometry(new Pose2d(1.33, 5.53, new Rotation2d(0)));
-
   }
 
   /**
@@ -277,7 +281,6 @@ public class Swerve extends SubsystemBase {
    */
   public void visionUpdateOdometry(Pose2d pose, double timestamp) {
     if (utilizeVision) {
-      SmartDashboard.putBoolean("use vision", utilizeVision);
       swerveDrivePoseEstimator.addVisionMeasurement(pose,
           timestamp);
     }
