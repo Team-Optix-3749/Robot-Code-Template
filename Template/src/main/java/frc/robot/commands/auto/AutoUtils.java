@@ -26,6 +26,9 @@ public class AutoUtils {
     private static AutoFactory factory;
     private static AutoChooser chooser;
 
+    /**
+     * run all necessary auto setup methods
+     */
     public static void initAuto() {
         setupFactory();
         setupChooser();
@@ -34,16 +37,30 @@ public class AutoUtils {
 
     }
 
+    /**
+     * 
+     * @return the auto selector object
+     */
     public static AutoChooser getChooser() {
         return chooser;
     }
 
+    /**
+     * @param trajectory the trajectory that should be made into a command
+     * @return that command, but with a setOdometry preface assigned to the
+     *         trajectory's initial pose
+     */
     public static Command makeStartingTrajectoryCommand(AutoTrajectory trajectory) {
         return Commands.runOnce(
                 () -> Robot.swerve.setOdometry(trajectory.getInitialPose().orElseGet(() -> Robot.swerve.getPose())))
                 .andThen(trajectory.cmd());
     }
 
+    /**
+     * @param cmd the command to add the reset to the end of
+     * @return the command, ending with setting all setpoint logs to 0 or far
+     *         negatives
+     */
     public static Command addResetLoggingCommand(Command cmd) {
         return cmd.andThen(
                 Commands.runOnce(() -> Robot.swerve.logSetpoints(
@@ -51,6 +68,9 @@ public class AutoUtils {
                                 0, 0, new double[] { 0.0, 0.0, 0.0, 0.0 }, new double[] { 0.0, 0.0, 0.0, 0.0 }))));
     }
 
+    /**
+     * setup the choreo factor object with bindings, controller, etc.
+     */
     private static void setupFactory() {
         // what commands run on what markers
         AutoBindings bindings = new AutoFactory.AutoBindings();
@@ -69,6 +89,10 @@ public class AutoUtils {
 
     }
 
+    /**
+     * setup the choreo auto chooser and assign it to the Shuffleboard/Auto tab of
+     * networktables
+     */
     private static void setupChooser() {
         // interface for choreo
         chooser = new AutoChooser(factory, "Shuffleboard/Auto");

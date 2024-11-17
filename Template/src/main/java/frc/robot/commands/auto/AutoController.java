@@ -23,6 +23,13 @@ public class AutoController {
     private static PIDController yController = new PIDController(AutoConstants.kPDrive, 0, AutoConstants.kDDrive);
     private static PIDController turnController = new PIDController(AutoConstants.kPTurn, 0, AutoConstants.kDTurn);
 
+    /**
+     * 
+     * @param curPose the current pose of the robot in meters, used for measuring
+     *                error
+     * @param sample  the setpoint sample with position, velocity, acceleration, and
+     *                forces
+     */
     public static void choreoController(Pose2d curPose, SwerveSample sample) {
         Robot.swerve.logSetpoints(sample);
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(

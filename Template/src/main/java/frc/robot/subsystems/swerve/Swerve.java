@@ -100,6 +100,11 @@ public class Swerve extends SubsystemBase {
       "heading",
       0.0);
 
+  private ShuffleData<Boolean> utilizeVisionLog = new ShuffleData<Boolean>(
+      this.getName(),
+      "utilize vision",
+      true);
+
   private ShuffleData<Double[]> setpointPositionLog = new ShuffleData<Double[]>(
       this.getName(),
       "setpoint position",
@@ -335,6 +340,11 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  /**
+   * logs all setpoints for the swerve subsystem in autonomous functions
+   * 
+   * @param sample the swerve sample of setpoints
+   */
   public void logSetpoints(SwerveSample sample) {
     // setpoint logging for automated driving
     Double[] positions = new Double[] { sample.x, sample.y, sample.heading };
@@ -350,6 +360,9 @@ public class Swerve extends SubsystemBase {
     setpointAccelerationLog.set(accelerations);
   }
 
+  /**
+   * log all serve data
+   */
   private void logData() {
     // logging of our module states
     Double[] realStates = {
@@ -384,6 +397,7 @@ public class Swerve extends SubsystemBase {
             getPose().getY(),
             getPose().getRotation().getDegrees()
         });
+    utilizeVisionLog.set(utilizeVision);
 
     // gyro logging
     yawLog.set(gyroData.yawDeg);
