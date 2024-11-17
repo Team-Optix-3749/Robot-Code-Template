@@ -24,8 +24,10 @@ public class Autos {
 
     public static Command getMyRoutine(AutoFactory factory) {
         AutoLoop loop = factory.newLoop("auto");
-        AutoTrajectory trajectory = factory.trajectory("auto", loop);
+        AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
         loop.enabled().onTrue(trajectory.cmd());
-        return Commands.print("Print then Trajectory!").andThen(loop.cmd());
+        Command cmd = Commands.print("Print then Trajectory!");
+        cmd = cmd.andThen(loop.cmd());
+        return cmd;
     }
 }
