@@ -5,6 +5,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
 
+/**
+ * @author Noah Simon
+ * @author Neel Adem
+ * @author Rohin Sood
+ * @author Raadwan Masum
+ * @description
+ *              All constants for the swerve subsystem and swerve modules
+ */
 public class SwerveConstants {
         public static final class ModuleConstants {
 
@@ -108,7 +116,7 @@ public class SwerveConstants {
                                 : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
                 // teleop speed
                 public static final double teleopMaxSpeedReduction = 0; // If we can drive a little faster in telop
-                                                                            // we may as well
+                                                                        // we may as well
                 public static final double teleopMaxSpeedMetersPerSecond = maxSpeedMetersPerSecond
                                 * (1 - teleopMaxSpeedReduction);
 

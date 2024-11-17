@@ -10,6 +10,11 @@ import frc.robot.subsystems.example.SubsystemConstants;
 import frc.robot.subsystems.example.SubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              IO implementation for an example subsystem's sparkmax
+ */
 public class SubsystemSparkMax implements SubsystemIO {
 
     private CANSparkMax motor = new CANSparkMax(SubsystemConstants.motorId, MotorType.kBrushless);

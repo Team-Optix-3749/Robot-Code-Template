@@ -7,6 +7,11 @@ import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.GyroIO;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              NavX2 gyroscope implementation
+ */
 public class NavX2Gyro implements GyroIO {
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
@@ -31,7 +36,7 @@ public class NavX2Gyro implements GyroIO {
         data.isConnected = gyro.isConnected();
 
         if (data.isConnected && !data.isCalibrating) {
-            // negative to make it CCP 
+            // negative to make it CCP
             data.yawDeg = -gyro.getYaw();
             data.pitchDeg = gyro.getPitch();
             data.rollDeg = gyro.getRoll();

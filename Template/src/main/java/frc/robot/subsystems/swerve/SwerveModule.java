@@ -8,6 +8,14 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveModuleIO.ModuleData;
 import frc.robot.utils.ShuffleData;
 
+/**
+ * @author Noah Simon
+ * @author Rohin Sood
+ * @author Raadwan Masum
+ * @description
+ *              General class for swerve modules that interacts with the
+ *              interface. Handles all logic relating to individual modules
+ */
 public class SwerveModule {
 
     private double index;
@@ -45,7 +53,7 @@ public class SwerveModule {
         turningPidController.enableContinuousInput(0, 2 * Math.PI);
 
         this.index = index;
-        
+
         if (index == 0) {
             name = "FL module";
         } else if (index == 1) {

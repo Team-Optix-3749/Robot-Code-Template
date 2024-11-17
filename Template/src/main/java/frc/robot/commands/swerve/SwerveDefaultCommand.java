@@ -13,7 +13,8 @@ import java.util.function.Supplier;
  * @author Noah Simon
  * @author Raadwan Masum
  * @author Rohin Sood
- *         Default command to control the SwervedriveSubsystem with joysticks
+ * @description
+ *              Default command to control the swerve subsystem with joysticks
  */
 
 public class SwerveDefaultCommand extends Command {
@@ -40,7 +41,7 @@ public class SwerveDefaultCommand extends Command {
     // controllers are weird in what's positive, so we flip these
     double xMagnitude = xSpdFunction.get();
     double yMagnitude = ySpdFunction.get();
-    double turningMagnitude = - xTurningSpdFunction.get();
+    double turningMagnitude = -xTurningSpdFunction.get();
 
     // one combined magnitutde
     double linearMagnitude = Math.hypot(xMagnitude, yMagnitude);

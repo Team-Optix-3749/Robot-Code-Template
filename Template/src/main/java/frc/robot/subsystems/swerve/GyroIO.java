@@ -1,5 +1,10 @@
 package frc.robot.subsystems.swerve;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              IO interface for gyroscopes
+ */
 public interface GyroIO {
   public class GyroData {
     public boolean isConnected = false;

@@ -1,18 +1,18 @@
 package frc.robot.commands.auto;
 
-import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoLoop;
 import choreo.auto.AutoTrajectory;
-import choreo.trajectory.SwerveSample;
-import frc.robot.Robot;
-import frc.robot.subsystems.swerve.Swerve;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
- * Bassically AutoRoutineGenerator, I think. I just don't understand how to use
- * that interface and this works
+ * @author Noah Simon
+ * @description
+ *              Class containing our auto routines. Referenced by the auto
+ *              selector
+ *              and
+ *              potentially robot container
  */
 public class Autos {
     public static Command getPrint(AutoFactory factory) {
@@ -24,7 +24,8 @@ public class Autos {
         AutoLoop loop = factory.newLoop("auto");
         AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
 
-        // create our trajectory commands, setting odometry and resetting logging when finished
+        // create our trajectory commands, setting odometry and resetting logging when
+        // finished
         Command trajectoryCommand = AutoUtils.addResetLoggingCommand(
                 AutoUtils.makeStartingTrajectoryCommand(trajectory));
 

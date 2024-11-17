@@ -3,6 +3,11 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              Methods that are helpful throughout the code base
+ */
 public class UtilityFunctions {
 
     public static boolean isRedAlliance() {
@@ -31,8 +36,23 @@ public class UtilityFunctions {
         return false;
     }
 
+    /**
+     * @param velocity
+     * @return whether or not the velocity is below 0.01, which we consider to be
+     *         stopped
+     */
     public static boolean isStopped(double velocity) {
-        return withinMargin(0.05, velocity, 0);
+        return withinMargin(0.01, velocity, 0);
+    }
+
+    /**
+     * @param velocity
+     * @param minSpeed
+     * @return whether or not the velocity is below the minimum speed to be
+     *         considered stopped
+     */
+    public static boolean isStopped(double velocity, double minSpeed) {
+        return withinMargin(minSpeed, velocity, 0);
     }
 
 }

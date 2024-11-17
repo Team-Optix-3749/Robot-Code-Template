@@ -8,7 +8,11 @@ import frc.robot.subsystems.example.real.SubsystemSparkMax;
 import frc.robot.subsystems.example.sim.SubsystemSim;
 import frc.robot.utils.ShuffleData;
 
-// Example Subsystem
+/**
+ * @author Noah Simon
+ * @description
+ *              An example subsystem to model
+ */
 public class Subsystem extends SubsystemBase {
 
     private SubsystemIO subsystemIO;

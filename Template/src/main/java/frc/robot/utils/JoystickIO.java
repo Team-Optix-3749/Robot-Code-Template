@@ -8,9 +8,11 @@ import frc.robot.commands.subsytem.SubsystemCommand;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 /**
+ * @author Rohin Sood
+ * @author Noah Simon
  * Util class for button bindings
  *
- * @author Rohin Sood
+ * 
  */
 public class JoystickIO {
 

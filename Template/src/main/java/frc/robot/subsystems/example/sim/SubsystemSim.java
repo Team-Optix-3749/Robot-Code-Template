@@ -6,6 +6,11 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.subsystems.example.SubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              IO implementation for an example subsystem's simulation
+ */
 public class SubsystemSim implements SubsystemIO {
 
     private FlywheelSim simSystem = new FlywheelSim(

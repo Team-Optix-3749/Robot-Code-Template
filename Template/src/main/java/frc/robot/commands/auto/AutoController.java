@@ -3,11 +3,20 @@ package frc.robot.commands.auto;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
-import frc.robot.utils.ShuffleData;
 import edu.wpi.first.math.controller.PIDController;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              Contains the PID controllers and logic for taking a pose and a
+ *              swerve
+ *              sample
+ *              and having swerve follow it. Potentially should be made non
+ *              static
+ *              and placed
+ *              as an object in the swerve subsystem
+ */
 public class AutoController {
 
     private static PIDController xController = new PIDController(AutoConstants.kPDrive, 0, AutoConstants.kDDrive);

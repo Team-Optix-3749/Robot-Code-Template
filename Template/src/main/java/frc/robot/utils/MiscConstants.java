@@ -2,6 +2,11 @@ package frc.robot.utils;
 
 import frc.robot.Robot;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              Constants not specific to any given subsystem or commadn
+ */
 public class MiscConstants {
 
   public static enum RobotType {
@@ -22,5 +27,4 @@ public class MiscConstants {
     public static final double deadband = 0.05;
   }
 
- 
 }

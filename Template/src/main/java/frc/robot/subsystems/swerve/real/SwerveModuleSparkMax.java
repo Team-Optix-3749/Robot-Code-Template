@@ -10,6 +10,11 @@ import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
+/**
+ * @author Noah Simon
+ * @description
+ *              sparkmax implementation for swerve mdoules
+ */
 public class SwerveModuleSparkMax implements SwerveModuleIO {
     private CANSparkMax driveMotor;
     private CANSparkMax turnMotor;
