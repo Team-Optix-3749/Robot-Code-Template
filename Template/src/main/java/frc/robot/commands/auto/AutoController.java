@@ -41,19 +41,15 @@ public class AutoController {
 
     private static void logSetpoints(SwerveSample sample) {
         Double[] positions = new Double[] { sample.x, sample.y, sample.heading };
-        for (Double num : positions) {
-            num = Units.radiansToDegrees(num.doubleValue());
-        }
+        positions[2] = Units.radiansToDegrees(positions[2]);
         setpointPositionLog.set(positions);
+
         Double[] velocities = new Double[] { sample.vx, sample.vy, sample.omega };
-        for (Double num : velocities) {
-            num = Units.radiansToDegrees(num.doubleValue());
-        }
+        velocities[2] = Units.radiansToDegrees(velocities[2]);
         setpointVelocityLog.set(velocities);
+
         Double[] accelerations = new Double[] { sample.ax, sample.ay, sample.alpha };
-        for (Double num : accelerations) {
-            num = Units.radiansToDegrees(num.doubleValue());
-        }
+        accelerations[2] = Units.radiansToDegrees(accelerations[2]);
         setpointAccelerationLog.set(accelerations);
     }
 }

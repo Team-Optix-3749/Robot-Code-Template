@@ -20,7 +20,7 @@ public class AutoUtils {
         setupFactory();
         setupChooser();
         // default auto choice
-        chooser.choose("Print");
+        chooser.choose("My Routine");
 
     }
 
@@ -44,11 +44,13 @@ public class AutoUtils {
 
     private static void setupChooser() {
         // interface for choreo
-        chooser = new AutoChooser(factory, "Shuffleboard");
+        chooser = new AutoChooser(factory, "Shuffleboard/Auto");
         chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
         chooser.addAutoRoutine("Print", (AutoFactory factory) -> Autos.getPrint(factory));
 
     }
+
+
 
     public static AutoChooser getChooser() {
         return chooser;

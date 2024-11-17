@@ -27,6 +27,9 @@ import frc.robot.utils.*;
  *         Subsystem class for swerve drive, used to manage four swerve modules
  *         and set their states. Also includes a pose estimator, gyro, and
  *         logging information
+ * 
+ *         Rotation standard: everything is relative to blue alliance. 0 is away
+ *         from blue alliance wall, CCP
  */
 public class Swerve extends SubsystemBase {
 
@@ -35,13 +38,16 @@ public class Swerve extends SubsystemBase {
   private GyroIO gyro;
   private GyroData gyroData = new GyroData();
 
+  private double prevVelocity = 0;
+  private boolean utilizeVision = true;
+
   // equivilant to a odometer, but also intakes vision
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
   private ShuffleData<Double[]> odometryLog = new ShuffleData<Double[]>(
       this.getName(),
       "odometry",
-      new Double[] { 0.0, 0.0, 0.0, 0.0 });
+      new Double[] { 0.0, 0.0, 0.0 });
 
   private ShuffleData<Double[]> realStatesLog = new ShuffleData<Double[]>(
       this.getName(),
@@ -91,9 +97,6 @@ public class Swerve extends SubsystemBase {
       this.getName(),
       "heading",
       0.0);
-
-  private double prevVelocity = 0;
-  private boolean utilizeVision = true;
 
   public Swerve() {
 
@@ -158,7 +161,7 @@ public class Swerve extends SubsystemBase {
     // return rotation;
     double heading = rotation.getDegrees();
 
-    if (heading < 0) {
+    while (heading < 0) {
       heading += 360;
     }
     return new Rotation2d(heading / 180 * Math.PI);
@@ -246,7 +249,9 @@ public class Swerve extends SubsystemBase {
    * @param pose - Pose2d object of what to set our position to
    */
   public void setOdometry(Pose2d pose) {
-    Rotation2d gyroHeading = new Rotation2d(gyroData.yawDeg / 180 * Math.PI);
+    System.out.println("Set Odometry: " + pose.getX() + ", " + pose.getY() + ", " + pose.getRotation().getDegrees());
+    Rotation2d gyroHeading = Rotation2d.fromDegrees(gyroData.yawDeg);
+
     swerveDrivePoseEstimator.resetPosition(
         gyroHeading,
         new SwerveModulePosition[] {
@@ -263,11 +268,9 @@ public class Swerve extends SubsystemBase {
    */
   public void updateOdometry() {
     // convert to -pi to pi
-    Rotation2d gyroHeading = Rotation2d.fromRadians(
-        MathUtil.angleModulus(Units.degreesToRadians(gyroData.yawDeg)));
 
     swerveDrivePoseEstimator.update(
-        gyroHeading,
+        Rotation2d.fromDegrees(gyroData.yawDeg),
         new SwerveModulePosition[] {
             modules[0].getPosition(),
             modules[1].getPosition(),

@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoLoop;
 import choreo.auto.AutoTrajectory;
@@ -17,10 +18,23 @@ public class Autos {
     }
 
     public static Command getMyRoutine(AutoFactory factory) {
+        // instaniate our auto loop and trajectories
         AutoLoop loop = factory.newLoop("auto");
         AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
-        loop.enabled().onTrue(trajectory.cmd());
-        Command cmd = Commands.print("Print then Trajectory!");
+        
+        // create our trajectory commands, setting odometry if needed
+        Command trajectoryCommand = Commands.runOnce(
+                () -> Robot.swerve.setOdometry(trajectory.getInitialPose().orElseGet(() -> Robot.swerve.getPose())));
+        trajectoryCommand = trajectoryCommand.andThen(trajectory.cmd());
+
+        // set the command to begin when the loop enables
+        loop.enabled().onTrue(trajectoryCommand);
+        
+        // our final, total command
+        Command cmd;
+
+        // adding things together
+        cmd = Commands.print("Print then Trajectory!");
         cmd = cmd.andThen(loop.cmd());
         return cmd;
     }
