@@ -17,12 +17,15 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     DriverStation.removeRefreshedDataEventHandle(44000);
 
+    // data logs
     DataLogManager.start();
     DataLogManager.logNetworkTables(true);
     DriverStation.startDataLog(DataLogManager.getLog(), true);
 
+    // When to go into brownout protection
     RobotController.setBrownoutVoltage(7.0);
 
+    // robot setup
     JoystickIO.getButtonBindings();
     AutoUtils.initAuto();
   }

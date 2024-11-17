@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.swerve;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -44,6 +45,7 @@ public class Swerve extends SubsystemBase {
   // equivilant to a odometer, but also intakes vision
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
+  // Logging
   private ShuffleData<Double[]> odometryLog = new ShuffleData<Double[]>(
       this.getName(),
       "odometry",
@@ -97,6 +99,19 @@ public class Swerve extends SubsystemBase {
       this.getName(),
       "heading",
       0.0);
+
+  private ShuffleData<Double[]> setpointPositionLog = new ShuffleData<Double[]>(
+      this.getName(),
+      "setpoint position",
+      new Double[] { 0.0, 0.0, 0.0 });
+  private ShuffleData<Double[]> setpointVelocityLog = new ShuffleData<Double[]>(
+      this.getName(),
+      "setpoint velocity",
+      new Double[] { 0.0, 0.0, 0.0 });
+  private ShuffleData<Double[]> setpointAccelerationLog = new ShuffleData<Double[]>(
+      this.getName(),
+      "setpoint acceleration",
+      new Double[] { 0.0, 0.0, 0.0 });
 
   public Swerve() {
 
@@ -320,16 +335,22 @@ public class Swerve extends SubsystemBase {
     }
   }
 
-  @Override
-  public void periodic() {
-    gyro.updateData(gyroData);
-    updateOdometry();
+  public void logSetpoints(SwerveSample sample) {
+    // setpoint logging for automated driving
+    Double[] positions = new Double[] { sample.x, sample.y, sample.heading };
+    positions[2] = Units.radiansToDegrees(positions[2]);
+    setpointPositionLog.set(positions);
 
-    // periodic method for individual modules
-    for (int i = 0; i < 4; i++) {
-      modules[i].periodic();
-    }
+    Double[] velocities = new Double[] { sample.vx, sample.vy, sample.omega };
+    velocities[2] = Units.radiansToDegrees(velocities[2]);
+    setpointVelocityLog.set(velocities);
 
+    Double[] accelerations = new Double[] { sample.ax, sample.ay, sample.alpha };
+    accelerations[2] = Units.radiansToDegrees(accelerations[2]);
+    setpointAccelerationLog.set(accelerations);
+  }
+
+  private void logData() {
     // logging of our module states
     Double[] realStates = {
         modules[0].getState().angle.getDegrees(),
@@ -378,6 +399,19 @@ public class Swerve extends SubsystemBase {
     velocityLog.set(robotVelocity);
     accelerationLog.set((robotVelocity - prevVelocity) / .02);
     prevVelocity = robotVelocity;
+  }
+
+  @Override
+  public void periodic() {
+    gyro.updateData(gyroData);
+    updateOdometry();
+
+    // periodic method for individual modules
+    for (int i = 0; i < 4; i++) {
+      modules[i].periodic();
+    }
+
+    logData();
 
   }
 

@@ -4,7 +4,9 @@ import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoLoop;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
 import frc.robot.Robot;
+import frc.robot.subsystems.swerve.Swerve;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -21,15 +23,14 @@ public class Autos {
         // instaniate our auto loop and trajectories
         AutoLoop loop = factory.newLoop("auto");
         AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
-        
-        // create our trajectory commands, setting odometry if needed
-        Command trajectoryCommand = Commands.runOnce(
-                () -> Robot.swerve.setOdometry(trajectory.getInitialPose().orElseGet(() -> Robot.swerve.getPose())));
-        trajectoryCommand = trajectoryCommand.andThen(trajectory.cmd());
+
+        // create our trajectory commands, setting odometry and resetting logging when finished
+        Command trajectoryCommand = AutoUtils.addResetLoggingCommand(
+                AutoUtils.makeStartingTrajectoryCommand(trajectory));
 
         // set the command to begin when the loop enables
         loop.enabled().onTrue(trajectoryCommand);
-        
+
         // our final, total command
         Command cmd;
 
