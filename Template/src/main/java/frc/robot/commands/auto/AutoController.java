@@ -7,15 +7,12 @@ import frc.robot.Robot;
 import edu.wpi.first.math.controller.PIDController;
 
 /**
+ * Contains the PID controllers and logic for taking a pose and a swerve sample
+ * and having swerve follow it. Potentially should be made non static and placed
+ * as an object in the swerve subsystem
+ * 
  * @author Noah Simon
- * @description
- *              Contains the PID controllers and logic for taking a pose and a
- *              swerve
- *              sample
- *              and having swerve follow it. Potentially should be made non
- *              static
- *              and placed
- *              as an object in the swerve subsystem
+ * 
  */
 public class AutoController {
 

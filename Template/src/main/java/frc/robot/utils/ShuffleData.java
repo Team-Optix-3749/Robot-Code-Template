@@ -11,9 +11,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
+ * Stores data that can be seen/edited in ShuffleBoard
+ * 
  * @author Rohin Sood
  * 
- *         Stores data that can be seen/edited in ShuffleBoard
  * @param <T> Type of data: Supported types include String, Double, and Boolean
  */
 public class ShuffleData<T> {
@@ -83,7 +84,7 @@ public class ShuffleData<T> {
         entry.setValue(val);
     }
 
-    public static void  put(String tabName, Sendable sendableData) {
+    public static void put(String tabName, Sendable sendableData) {
         ShuffleboardTab tab = Shuffleboard.getTab(tabName);
         tab.add(sendableData);
     }

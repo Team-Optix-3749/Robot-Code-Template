@@ -1,9 +1,9 @@
 package frc.robot.commands.auto;
 
 /**
+ * Constants unique to autonomous actions
+ * 
  * @author Noah Simon
- * @description
- *         Constants unique to autonomous actions
  */
 public final class AutoConstants {
 

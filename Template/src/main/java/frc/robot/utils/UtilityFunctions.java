@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
+ * Methods that are helpful throughout the code base
+ * 
  * @author Noah Simon
- * @description
- *              Methods that are helpful throughout the code base
  */
 public class UtilityFunctions {
 

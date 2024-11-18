@@ -9,12 +9,12 @@ import frc.robot.subsystems.swerve.SwerveModuleIO.ModuleData;
 import frc.robot.utils.ShuffleData;
 
 /**
+ * General class for swerve modules that interacts with the
+ * interface. Handles all logic relating to individual modules
+ * 
  * @author Noah Simon
  * @author Rohin Sood
  * @author Raadwan Masum
- * @description
- *              General class for swerve modules that interacts with the
- *              interface. Handles all logic relating to individual modules
  */
 public class SwerveModule {
 

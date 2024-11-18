@@ -6,12 +6,13 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Robot;
 
 /**
+ * All constants for the swerve subsystem and swerve modules
+ * 
  * @author Noah Simon
  * @author Neel Adem
  * @author Rohin Sood
  * @author Raadwan Masum
- * @description
- *              All constants for the swerve subsystem and swerve modules
+ * 
  */
 public class SwerveConstants {
         public static final class ModuleConstants {

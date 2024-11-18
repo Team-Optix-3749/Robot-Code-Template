@@ -4,9 +4,9 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.subsystems.swerve.GyroIO;
 
 /**
+ * Pigeon 2.0 implementation
+ * 
  * @author Noah Simon
- * @description
- *              Pigeon 2.0 implementation
  */
 public class PigeonGyro implements GyroIO {
     private final Pigeon2 pigeonGyro = new Pigeon2(30);

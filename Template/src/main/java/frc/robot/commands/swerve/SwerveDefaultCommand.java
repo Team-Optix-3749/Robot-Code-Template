@@ -10,11 +10,11 @@ import frc.robot.utils.MiscConstants.*;
 import java.util.function.Supplier;
 
 /***
+ * Default command to control the swerve subsystem with joysticks
+ * 
  * @author Noah Simon
  * @author Raadwan Masum
  * @author Rohin Sood
- * @description
- *              Default command to control the swerve subsystem with joysticks
  */
 
 public class SwerveDefaultCommand extends Command {

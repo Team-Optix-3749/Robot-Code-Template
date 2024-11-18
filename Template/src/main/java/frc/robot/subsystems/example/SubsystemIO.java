@@ -1,9 +1,8 @@
 package frc.robot.subsystems.example;
 
 /**
- * @author Noah Simon
- * @description
  *              Example subsystsem IO interfaces
+ * @author Noah Simon
  */
 public interface SubsystemIO {
 

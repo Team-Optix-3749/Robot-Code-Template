@@ -1,9 +1,9 @@
 package frc.robot.subsystems.swerve;
 
 /**
+ * IO interface for gyroscopes
+ * 
  * @author Noah Simon
- * @description
- *              IO interface for gyroscopes
  */
 public interface GyroIO {
   public class GyroData {

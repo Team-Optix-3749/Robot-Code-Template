@@ -9,9 +9,9 @@ import frc.robot.subsystems.example.sim.SubsystemSim;
 import frc.robot.utils.ShuffleData;
 
 /**
+ * An example subsystem to model
+ * 
  * @author Noah Simon
- * @description
- *              An example subsystem to model
  */
 public class Subsystem extends SubsystemBase {
 

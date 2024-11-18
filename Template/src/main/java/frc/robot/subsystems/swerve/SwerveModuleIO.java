@@ -1,11 +1,11 @@
 package frc.robot.subsystems.swerve;
 
 /**
+ * IO interface for swerve modules. This exists for modules, not
+ * the subsystem, as that is what the motors are connected to and
+ * interact with
+ * 
  * @author Noah Simon
- * @description
- *              IO interface for swerve modules. This exists for modules, not
- *              the subsystem, as that is what the motors are connected to and
- *              interact with
  */
 public interface SwerveModuleIO {
   public static class ModuleData {

@@ -11,9 +11,9 @@ import frc.robot.subsystems.example.SubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
 /**
+ * IO implementation for an example subsystem's sparkmax
+ * 
  * @author Noah Simon
- * @description
- *              IO implementation for an example subsystem's sparkmax
  */
 public class SubsystemSparkMax implements SubsystemIO {
 

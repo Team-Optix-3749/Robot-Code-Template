@@ -3,9 +3,9 @@ package frc.robot.utils;
 import frc.robot.Robot;
 
 /**
+ * Constants not specific to any given subsystem or commadn
+ * 
  * @author Noah Simon
- * @description
- *              Constants not specific to any given subsystem or commadn
  */
 public class MiscConstants {
 

@@ -5,9 +5,10 @@ import frc.robot.Robot;
 import frc.robot.subsystems.swerve.GyroIO;
 
 /**
+ * Simualtion implementatation for a gyroscope
+ * 
  * @author Noah Simon
- * @description
- *              simualtion implementatation for a gyroscope
+ * 
  */
 public class GyroSim implements GyroIO {
   private double yaw = 0;

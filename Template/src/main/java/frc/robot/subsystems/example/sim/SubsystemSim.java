@@ -7,9 +7,9 @@ import frc.robot.subsystems.example.SubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
 /**
+ * IO implementation for an example subsystem's simulation
+ * 
  * @author Noah Simon
- * @description
- *              IO implementation for an example subsystem's simulation
  */
 public class SubsystemSim implements SubsystemIO {
 

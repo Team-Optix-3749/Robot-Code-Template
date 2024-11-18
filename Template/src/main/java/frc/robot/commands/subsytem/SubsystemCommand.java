@@ -5,9 +5,9 @@ import frc.robot.Robot;
 import frc.robot.subsystems.example.SubsystemConstants.SubsystemStates;
 
 /**
+ * An example subsystem command
+ * 
  * @author Noah Simon
- * @description
- *              An example subsystem command
  */
 public class SubsystemCommand extends Command {
 

@@ -1,9 +1,9 @@
 package frc.robot.subsystems.example;
 
 /**
+ * Example constants file for an example subsystem
+ * 
  * @author Noah Simon
- * @description
- *              Example constants file for an example subsystem
  * 
  */
 public class SubsystemConstants {

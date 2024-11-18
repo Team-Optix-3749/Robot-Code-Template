@@ -21,16 +21,19 @@ import frc.robot.subsystems.swerve.sim.*;
 import frc.robot.utils.*;
 
 /***
+ * Subsystem class for swerve drive, used to manage four swerve
+ * modules and set their states. Also includes a pose estimator,
+ * gyro, and logging information
+ * 
+ * Rotation standard: everything is relative to blue alliance. 0 is
+ * from blue alliance wall, CCP
+ * 
  * @author Noah Simon
+ * @author Neel Adem
  * @author Rohin Sood
  * @author Raadwan Masum
- * @description
- *              Subsystem class for swerve drive, used to manage four swerve
- *              modules and set their states. Also includes a pose estimator,
- *              gyro, and logging information
  * 
- *              Rotation standard: everything is relative to blue alliance. 0 is
- *              from blue alliance wall, CCP
+ *              
  */
 public class Swerve extends SubsystemBase {
 

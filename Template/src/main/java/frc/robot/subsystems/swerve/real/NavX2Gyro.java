@@ -8,9 +8,10 @@ import frc.robot.Robot;
 import frc.robot.subsystems.swerve.GyroIO;
 
 /**
+ * NavX2 gyroscope implementation
+ * 
  * @author Noah Simon
- * @description
- *              NavX2 gyroscope implementation
+ * 
  */
 public class NavX2Gyro implements GyroIO {
 

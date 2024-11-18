@@ -13,12 +13,10 @@ import frc.robot.Robot;
 import frc.robot.utils.UtilityFunctions;
 
 /**
+ * All setup and helper methods for auto routines, including the
+ * choreo factory and auto selector
+ * 
  * @author Noah Simon
- * @description
- *              All setup and helper methods for auto routines, including the
- *              choreo
- *              factory
- *              and auto selector
  */
 public class AutoUtils {
     // make sure to properly log the robot's setpoints
