@@ -33,7 +33,7 @@ import frc.robot.utils.*;
  * @author Rohin Sood
  * @author Raadwan Masum
  * 
- *              
+ * 
  */
 public class Swerve extends SubsystemBase {
 
@@ -155,6 +155,9 @@ public class Swerve extends SubsystemBase {
     // put us on the field with a default orientation
     resetGyro();
     setOdometry(new Pose2d(1.33, 5.53, new Rotation2d(0)));
+    logSetpoints(
+        new SwerveSample(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new double[] { 0, 0, 0, 0 }, new double[] { 0, 0, 0, 0 }));
+
   }
 
   /**

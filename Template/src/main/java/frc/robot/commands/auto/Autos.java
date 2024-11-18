@@ -21,11 +21,12 @@ public class Autos {
         // instaniate our auto loop and trajectories
         AutoLoop loop = factory.newLoop("auto");
         AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
+        AutoTrajectory splitPath = factory.trajectory("splitTrajectory", loop);
+        trajectory.atPose("Marker").onTrue(AutoUtils.addResetLoggingCommand(splitPath.cmd()));
 
         // create our trajectory commands, setting odometry and resetting logging when
         // finished
-        Command trajectoryCommand = AutoUtils.addResetLoggingCommand(
-                AutoUtils.makeStartingTrajectoryCommand(trajectory));
+        Command trajectoryCommand = AutoUtils.makeStartingTrajectoryCommand(trajectory);
 
         // set the command to begin when the loop enables
         loop.enabled().onTrue(trajectoryCommand);
