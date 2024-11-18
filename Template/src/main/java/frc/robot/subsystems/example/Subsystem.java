@@ -19,6 +19,7 @@ public class Subsystem extends SubsystemBase {
     private SubsystemData data = new SubsystemData();
     private SubsystemStates state = SubsystemStates.STOP;
 
+    private ShuffleData<String> currentCommandLog = new ShuffleData<String>(this.getName(), "current command", "None");
     public ShuffleData<Double> positionUnitsLog = new ShuffleData<Double>("Subsystem", "position units", 0.0);
     public ShuffleData<Double> velocityUnitsLog = new ShuffleData<Double>("Subsystem", "velocity units", 0.0);
     public ShuffleData<Double> accelerationUnitsLog = new ShuffleData<Double>("Subsystem", "acceleration units", 0.0);
@@ -68,7 +69,7 @@ public class Subsystem extends SubsystemBase {
     }
 
     public void logData() {
-
+        currentCommandLog.set(this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
         positionUnitsLog.set(data.positionUnits);
         velocityUnitsLog.set(data.velocityUnits);
         inputVoltsLog.set(data.inputVolts);

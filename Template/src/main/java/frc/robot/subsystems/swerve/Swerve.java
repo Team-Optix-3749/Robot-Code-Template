@@ -49,6 +49,8 @@ public class Swerve extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
   // Logging
+  private ShuffleData<String> currentCommandLog = new ShuffleData<String>(this.getName(), "current command", "None");
+
   private ShuffleData<Double[]> odometryLog = new ShuffleData<Double[]>(
       this.getName(),
       "odometry",
@@ -419,6 +421,8 @@ public class Swerve extends SubsystemBase {
     velocityLog.set(robotVelocity);
     accelerationLog.set((robotVelocity - prevVelocity) / .02);
     prevVelocity = robotVelocity;
+
+    currentCommandLog.set(this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
   }
 
   @Override
