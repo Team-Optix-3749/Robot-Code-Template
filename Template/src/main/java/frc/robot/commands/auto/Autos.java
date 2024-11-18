@@ -19,14 +19,13 @@ public class Autos {
 
     public static Command getMyRoutine(AutoFactory factory) {
         // instaniate our auto loop and trajectories
-        AutoLoop loop = factory.newLoop("auto");
+        AutoLoop loop = factory.newLoop("my routine");
         AutoTrajectory trajectory = factory.trajectory("trajectoryName", loop);
-        AutoTrajectory splitPath = factory.trajectory("splitTrajectory", loop);
-        trajectory.atPose("Marker").onTrue(AutoUtils.addResetLoggingCommand(splitPath.cmd()));
 
         // create our trajectory commands, setting odometry and resetting logging when
         // finished
-        Command trajectoryCommand = AutoUtils.makeStartingTrajectoryCommand(trajectory);
+        Command trajectoryCommand = AutoUtils.makeStartingTrajectoryCommand(trajectory)
+                .andThen(AutoUtils.getResetLoggingCommand());
 
         // set the command to begin when the loop enables
         loop.enabled().onTrue(trajectoryCommand);
@@ -38,5 +37,20 @@ public class Autos {
         cmd = Commands.print("Print then Trajectory!");
         cmd = cmd.andThen(loop.cmd());
         return cmd;
+    }
+
+    public static Command getSplitRoutine(AutoFactory factory) {
+        AutoLoop loop = factory.newLoop("split routine");
+        AutoTrajectory trajectory1 = factory.trajectory("split1", loop);
+        AutoTrajectory trajectory2a = factory.trajectory("split2a", loop);
+        AutoTrajectory trajectory2b = factory.trajectory("split2b", loop);
+
+        Command trajectoy1Command = AutoUtils.makeStartingTrajectoryCommand(trajectory1);
+        loop.enabled().onTrue(trajectoy1Command);
+
+        trajectory1.done().and(() -> true).onTrue(trajectory2a.cmd());
+        trajectory1.done().and(() -> false).onTrue(trajectory2b.cmd());
+        return Commands.print("split trajectory auto!").andThen(loop.cmd());
+
     }
 }

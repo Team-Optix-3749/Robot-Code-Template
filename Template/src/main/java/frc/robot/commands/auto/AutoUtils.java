@@ -31,7 +31,7 @@ public class AutoUtils {
         setupFactory();
         setupChooser();
         // default auto choice
-        chooser.choose("My Routine");
+        chooser.choose("Split");
 
     }
 
@@ -59,11 +59,10 @@ public class AutoUtils {
      * @return the command, ending with setting all setpoint logs to 0 or far
      *         negatives
      */
-    public static Command addResetLoggingCommand(Command cmd) {
-        return cmd.andThen(
-                Commands.runOnce(() -> Robot.swerve.logSetpoints(
-                        new SwerveSample(-100, 0, -100, 0, 0, 0, 0, 0,
-                                0, 0, new double[] { 0.0, 0.0, 0.0, 0.0 }, new double[] { 0.0, 0.0, 0.0, 0.0 }))));
+    public static Command getResetLoggingCommand() {
+        return Commands.runOnce(() -> Robot.swerve.logSetpoints(
+                new SwerveSample(-100, 0, -100, 0, 0, 0, 0, 0,
+                        0, 0, new double[] { 0.0, 0.0, 0.0, 0.0 }, new double[] { 0.0, 0.0, 0.0, 0.0 })));
     }
 
     /**
@@ -96,6 +95,7 @@ public class AutoUtils {
         chooser = new AutoChooser(factory, "Shuffleboard/Auto");
         chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
         chooser.addAutoRoutine("Print", (AutoFactory factory) -> Autos.getPrint(factory));
+        chooser.addAutoRoutine("Split", (AutoFactory factory) -> Autos.getSplitRoutine(factory));
 
     }
 
