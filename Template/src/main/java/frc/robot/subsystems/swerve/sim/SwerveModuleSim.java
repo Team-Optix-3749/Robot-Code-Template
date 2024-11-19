@@ -11,13 +11,14 @@ import frc.robot.utils.MiscConstants.SimConstants;
 /**
  * Simulation implementation for swerve modules
  * Very closely inspired by 6328's Swerve Sim code,
+ * 
  * @see https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/subsystems/drive/ModuleIOSim.java
  * 
  * @author Noah Simon
  */
 public class SwerveModuleSim implements SwerveModuleIO {
     private FlywheelSim driveSim = new FlywheelSim(DCMotor.getNEO(1), ModuleConstants.driveMotorGearRatio,
-            0.045);
+            0.09);
     private FlywheelSim turnSim = new FlywheelSim(DCMotor.getNEO(1), ModuleConstants.turnMotorGearRatio,
             0.04);
 
@@ -66,6 +67,8 @@ public class SwerveModuleSim implements SwerveModuleIO {
     public void setDriveVoltage(double volts) {
         driveAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
                 DriveConstants.maxMotorVolts);
+        // driveAppliedVolts = Math.abs(driveAppliedVolts) > 0 ? 12 : 0;
+
         driveSim.setInputVoltage(driveAppliedVolts);
     }
 

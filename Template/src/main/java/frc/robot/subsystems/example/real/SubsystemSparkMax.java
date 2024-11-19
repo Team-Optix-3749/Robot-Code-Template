@@ -50,6 +50,7 @@ public class SubsystemSparkMax implements SubsystemIO {
     @Override
     public void setVoltage(double volts) {
         inputVolts = MathUtil.clamp(volts, -12.0, 12.0);
+        inputVolts = MathUtil.applyDeadband(inputVolts, 0.05);
         motor.setVoltage(inputVolts);
 
     }

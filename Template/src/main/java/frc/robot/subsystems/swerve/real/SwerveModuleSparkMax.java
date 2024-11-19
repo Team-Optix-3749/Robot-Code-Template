@@ -83,6 +83,7 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
     public void setDriveVoltage(double volts) {
         driveAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
                 DriveConstants.maxMotorVolts);
+        driveAppliedVolts = MathUtil.applyDeadband(driveAppliedVolts, 0.05);
         driveMotor.setVoltage(driveAppliedVolts);
     };
 
@@ -90,6 +91,8 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
     public void setTurnVoltage(double volts) {
         turnAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
                 DriveConstants.maxMotorVolts);
+        turnAppliedVolts = MathUtil.applyDeadband(turnAppliedVolts, 0.05);
+
         turnMotor.setVoltage(turnAppliedVolts);
     };
 

@@ -32,7 +32,7 @@ public class SwerveConstants {
 
                 private static final double kPTurningSim = 4;
                 private static final double kPDrivingSim = 0.0;
-                private static final double kVDrivingSim = 3.19;
+                private static final double kVDrivingSim = 12 / DriveConstants.simMaxSpeedMetersPerSecond;
                 private static final double kSDrivingSim = 0.0;
 
                 // our PID values
@@ -105,13 +105,13 @@ public class SwerveConstants {
 
                 // speed
                 private static final double realMaxSpeedMetersPerSecond = 4.3; // This is our actual top speed
-                private static final double simMaxSpeedMetersPerSecond = 4.47;
+                private static final double simMaxSpeedMetersPerSecond = 4.55;
                 public static final double maxSpeedMetersPerSecond = Robot.isReal()
                                 ? DriveConstants.realMaxSpeedMetersPerSecond
                                 : DriveConstants.simMaxSpeedMetersPerSecond;
                 // acceleration
                 private static final double realMaxAccelerationMetersPerSecondSquared = 3.3; // actual top acceleration
-                private static final double simMaxAccelerationMetersPerSecondSquared = 2.5; // not entirely accurate
+                private static final double simMaxAccelerationMetersPerSecondSquared = 4.03; // not entirely accurate
                 public static final double maxAccelerationMetersPerSecondSquared = Robot.isReal()
                                 ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
                                 : DriveConstants.simMaxAccelerationMetersPerSecondSquared;
