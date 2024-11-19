@@ -21,6 +21,7 @@ public class JoystickIO {
     private static final CommandXboxController operator = new CommandXboxController(1);
     private static final Command sample = new SubsystemCommand();
     private static final Command DriveStraight = new DriveStraight();
+
     public JoystickIO() {
     }
 
@@ -36,7 +37,7 @@ public class JoystickIO {
             // if only one xbox controller is connected
             pilotBindings();
         } else if (Robot.isSimulation()) {
-            // will show not connected if on 
+            // will show not connected if on
             pilotAndOperatorBindings();
             // simBindings();
         } else {
@@ -75,12 +76,33 @@ public class JoystickIO {
      * Sets the default commands
      */
     public static void setDefaultCommands() {
+        if (Robot.isSimulation()) {
+            setSimDefaultCommands();
+        } else {
+            setRealDefaultCommands();
+        }
+    }
 
+    private static void setRealDefaultCommands() {
         Robot.swerve.setDefaultCommand(
                 new SwerveDefaultCommand(
                         () -> pilot.getLeftX(),
                         () -> pilot.getLeftY(),
                         () -> pilot.getRightX()));
+    }
+
+    private static void setSimDefaultCommands() {
+        Robot.swerve
+                .setDefaultCommand(
+                        new SwerveDefaultCommand(
+                                () -> pilot.getLeftX(),
+                                () -> pilot.getLeftY(),
+                                () -> {
+                                    if (pilot.y().getAsBoolean()) {
+                                        return 1.0;
+                                    }
+                                    return 0.0;
+                                }));
     }
 
 }

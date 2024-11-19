@@ -42,7 +42,6 @@ public class Swerve extends SubsystemBase {
   private GyroIO gyro;
   private GyroData gyroData = new GyroData();
 
-  private double prevVelocity = 0;
   private boolean utilizeVision = true;
 
   // equivilant to a odometer, but also intakes vision
@@ -88,6 +87,11 @@ public class Swerve extends SubsystemBase {
   private ShuffleData<Double> rollLog = new ShuffleData<Double>(
       this.getName(),
       "roll",
+      0.0);
+
+  private ShuffleData<Double> rotationalVelocityLog = new ShuffleData<Double>(
+      this.getName(),
+      "rotational velocity",
       0.0);
 
   private ShuffleData<Boolean> gyroConnectedLog = new ShuffleData<Boolean>(
@@ -408,6 +412,7 @@ public class Swerve extends SubsystemBase {
     utilizeVisionLog.set(utilizeVision);
 
     // gyro logging
+    rotationalVelocityLog.set((gyroData.yawDeg - yawLog.get()) / 0.02);
     yawLog.set(gyroData.yawDeg);
     pitchLog.set(gyroData.pitchDeg);
     rollLog.set(gyroData.rollDeg);
@@ -418,9 +423,8 @@ public class Swerve extends SubsystemBase {
     // velocity and acceleration logging
     double robotVelocity = Math.hypot(getChassisSpeeds().vxMetersPerSecond,
         getChassisSpeeds().vyMetersPerSecond);
+    accelerationLog.set((robotVelocity - velocityLog.get()) / .02);
     velocityLog.set(robotVelocity);
-    accelerationLog.set((robotVelocity - prevVelocity) / .02);
-    prevVelocity = robotVelocity;
 
     currentCommandLog.set(this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
   }

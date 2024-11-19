@@ -128,7 +128,7 @@ public class SwerveConstants {
 
                 // angular speed
                 private static final double realMaxAngularSpeedRadiansPerSecond = 12.162;
-                private static final double simMaxAngularSpeedRadiansPerSecond = 9.94;
+                private static final double simMaxAngularSpeedRadiansPerSecond = 12.98;
                 public static final double maxAngularSpeedRadiansPerSecond = Robot.isReal()
                                 ? DriveConstants.realMaxAngularSpeedRadiansPerSecond
                                 : DriveConstants.simMaxAngularSpeedRadiansPerSecond;
