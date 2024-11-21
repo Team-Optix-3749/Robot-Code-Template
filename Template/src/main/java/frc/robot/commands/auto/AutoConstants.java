@@ -7,10 +7,10 @@ package frc.robot.commands.auto;
  */
 public final class AutoConstants {
 
-        public static double kPDrive = 3; // 3
-        public static double kDDrive = 0.1; // 0.5
+        public static double kPDrive = 0; // 3
+        public static double kDDrive = 0; // 0.5
 
-        public static double kPTurn = 0.; // 4.75
+        public static double kPTurn = 0; // 4.75
         public static double kDTurn = 0.0; // 0.2
 
 }

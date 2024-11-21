@@ -53,4 +53,15 @@ public class Autos {
         return Commands.print("split trajectory auto!").andThen(loop.cmd());
 
     }
+
+    public static Command getStraight(AutoFactory factory) {
+        AutoLoop loop = factory.newLoop("straight");
+        AutoTrajectory trajectory1 = factory.trajectory("straight", loop);
+
+        Command trajectoy1Command = AutoUtils.makeStartingTrajectoryCommand(trajectory1);
+        loop.enabled().onTrue(trajectoy1Command);
+
+        return Commands.print("straight").andThen(loop.cmd());
+
+    }
 }

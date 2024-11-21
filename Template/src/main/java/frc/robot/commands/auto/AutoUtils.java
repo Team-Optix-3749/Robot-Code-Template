@@ -31,7 +31,7 @@ public class AutoUtils {
         setupFactory();
         setupChooser();
         // default auto choice
-        chooser.choose("Split");
+        chooser.choose("Straight");
 
     }
 
@@ -96,6 +96,7 @@ public class AutoUtils {
         chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
         chooser.addAutoRoutine("Print", (AutoFactory factory) -> Autos.getPrint(factory));
         chooser.addAutoRoutine("Split", (AutoFactory factory) -> Autos.getSplitRoutine(factory));
+        chooser.addAutoRoutine("Straight", (AutoFactory factory) -> Autos.getStraight(factory));
 
     }
 
