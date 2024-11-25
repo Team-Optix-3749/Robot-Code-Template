@@ -24,16 +24,21 @@ public class SwerveConstants {
 
                 private static final double kPTurningReal = 3.75;
                 private static final double kDTurningReal = 0;
-
                 private static final double kPDrivingReal = 0.27;
                 private static final double kSDrivingReal = 0.26;
                 private static final double kVDrivingReal = 2.765;
                 private static final double kADrivingReal = 0.0;
 
                 private static final double kPTurningSim = 4;
+                private static final double kDTurningSim = 0;
                 private static final double kPDrivingSim = 0.0;
-                private static final double kVDrivingSim = 12 / DriveConstants.simMaxSpeedMetersPerSecond;
                 private static final double kSDrivingSim = 0.0;
+                private static final double kVDrivingSim = 12 / DriveConstants.simMaxSpeedMetersPerSecond;
+                private static final double kADrivingSim = 12 / DriveConstants.simMaxAccelerationMetersPerSecondSquared;
+                // Or have have it be non-constant, (12 - Velocity*kVDrivingSim)/maxAcceleration
+                // private static final double kADrivingSim = (12 - 2.94 * kVDrivingSim)
+                //                 / DriveConstants.simMaxAccelerationMetersPerSecondSquared;
+
 
                 // our PID values
                 public static double kPturning = Robot.isReal()
@@ -41,7 +46,7 @@ public class SwerveConstants {
                                 : kPTurningSim;
                 public static double kDTurning = Robot.isReal()
                                 ? kDTurningReal
-                                : 0;
+                                : kDTurningSim;
                 public static double kPDriving = Robot.isReal()
                                 ? kPDrivingReal
                                 : kPDrivingSim;
@@ -53,7 +58,7 @@ public class SwerveConstants {
                                 : kVDrivingSim;
                 public static double kADriving = Robot.isReal()
                                 ? kADrivingReal
-                                : 0;
+                                : kADrivingSim;
         }
 
         public static final class DriveConstants {
@@ -111,7 +116,7 @@ public class SwerveConstants {
                                 : DriveConstants.simMaxSpeedMetersPerSecond;
                 // acceleration
                 private static final double realMaxAccelerationMetersPerSecondSquared = 3.3; // actual top acceleration
-                private static final double simMaxAccelerationMetersPerSecondSquared = 4.03; // not entirely accurate
+                private static final double simMaxAccelerationMetersPerSecondSquared = 6; // not entirely accurate
                 public static final double maxAccelerationMetersPerSecondSquared = Robot.isReal()
                                 ? DriveConstants.realMaxAccelerationMetersPerSecondSquared
                                 : DriveConstants.simMaxAccelerationMetersPerSecondSquared;

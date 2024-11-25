@@ -53,7 +53,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-      // update our auto selector. Use when it shows up in shuffleboard properly
       AutoUtils.getChooser().update();
 
   }

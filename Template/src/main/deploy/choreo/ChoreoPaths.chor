@@ -48,8 +48,8 @@
    "val":583.0
   },
   "tmax":{
-   "exp":"0.5 N m",
-   "val":0.5
+   "exp":"0.7312 N m",
+   "val":0.7312
   },
   "bumper":{
    "front":{

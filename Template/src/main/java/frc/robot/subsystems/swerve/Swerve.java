@@ -122,11 +122,19 @@ public class Swerve extends SubsystemBase {
       this.getName(),
       "setpoint velocity",
       0.0);
-  
+  private ShuffleData<Double> setpointRotationalVelocityLog = new ShuffleData<Double>(
+      this.getName(),
+      "setpoint rotational velocity",
+      0.0);
   private ShuffleData<Double> setpointAccelerationLog = new ShuffleData<Double>(
       this.getName(),
       "setpoint acceleration",
-       0.0);
+      0.0);
+
+  private ShuffleData<Double> setpointRotationalAccelerationLog = new ShuffleData<Double>(
+      this.getName(),
+      "setpoint rotational acceleration",
+      0.0);
 
   public Swerve() {
 
@@ -366,22 +374,25 @@ public class Swerve extends SubsystemBase {
 
     Double[] velocities = new Double[] { sample.vx, sample.vy, sample.omega };
     velocities[2] = Units.radiansToDegrees(velocities[2]);
-    double velocity =0;
-    for (int i = 0; i<3; i++){
+    double velocity = 0;
+    for (int i = 0; i < 2; i++) {
       velocity += Math.pow(velocities[i], 2);
     }
     velocity = Math.sqrt(velocity);
     setpointVelocityLog.set(velocity);
+    setpointRotationalVelocityLog.set(velocities[2]);
 
     Double[] accelerations = new Double[] { sample.ax, sample.ay, sample.alpha };
     accelerations[2] = Units.radiansToDegrees(accelerations[2]);
-
-    double acceleration =0;
-    for (int i = 0; i<3; i++){
+    double acceleration = 0;
+    for (int i = 0; i < 2; i++) {
       acceleration += Math.pow(accelerations[i], 2);
     }
     acceleration = Math.sqrt(acceleration);
-    setpointAccelerationLog.set(acceleration);  }
+    setpointAccelerationLog.set(acceleration);
+    setpointRotationalAccelerationLog.set(accelerations[2]);
+
+  }
 
   /**
    * log all serve data

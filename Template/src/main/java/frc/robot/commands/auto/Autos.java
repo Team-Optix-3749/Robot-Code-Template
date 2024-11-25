@@ -34,7 +34,7 @@ public class Autos {
         Command cmd;
 
         // adding things together
-        cmd = Commands.print("Print then Trajectory!");
+        cmd = Commands.waitSeconds(1).andThen(Commands.print("Print then Trajectory!"));
         cmd = cmd.andThen(loop.cmd());
         return cmd;
     }
@@ -59,7 +59,8 @@ public class Autos {
         AutoTrajectory trajectory1 = factory.trajectory("straight", loop);
 
         Command trajectoy1Command = AutoUtils.makeStartingTrajectoryCommand(trajectory1);
-        loop.enabled().onTrue(trajectoy1Command);
+        
+        loop.enabled().onTrue(Commands.waitSeconds(1).andThen(trajectoy1Command));
 
         return Commands.print("straight").andThen(loop.cmd());
 

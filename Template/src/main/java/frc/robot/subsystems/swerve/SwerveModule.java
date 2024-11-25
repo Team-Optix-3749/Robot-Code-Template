@@ -28,6 +28,8 @@ public class SwerveModule {
     private ModuleData moduleData = new ModuleData();
     private SwerveModuleIO moduleIO;
 
+    private double previousSetpointVelocity = 0;
+
     // private double previousSetpointVelocity = 0;
 
     private ShuffleData<Double> driveSpeed;
@@ -146,10 +148,14 @@ public class SwerveModule {
      * @param speedMetersPerSecond - the drive speed setpoint for the module
      */
     public void setDriveSpeed(double speedMetersPerSecond) {
+        
         double drive_volts = 0;
-        drive_volts = drivingFeedFordward.calculate(speedMetersPerSecond)
+        double setpointAcceleration = (speedMetersPerSecond-previousSetpointVelocity)/0.02;
+
+        drive_volts = drivingFeedFordward.calculate(speedMetersPerSecond, setpointAcceleration)
                 + drivingPidController.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
         setDriveVoltage(drive_volts);
+        previousSetpointVelocity = speedMetersPerSecond;
 
     }
 
