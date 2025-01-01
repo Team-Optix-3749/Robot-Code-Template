@@ -56,19 +56,15 @@ public class Subsystem extends SubsystemBase {
         return true;
     }
 
-    public void setVoltage(double volts) {
-        subsystemIO.setVoltage(volts);
-    }
-
-    public void stop() {
-        subsystemIO.setVoltage(0);
-    }
-
     public void setState(SubsystemStates state) {
         this.state = state;
     }
 
-    public void logData() {
+    private void setVoltage(double volts) {
+        subsystemIO.setVoltage(volts);
+    }
+
+    private void logData() {
         currentCommandLog.set(this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName());
         positionUnitsLog.set(data.positionUnits);
         velocityUnitsLog.set(data.velocityUnits);
@@ -81,11 +77,22 @@ public class Subsystem extends SubsystemBase {
 
     }
 
-    public void runStateStop() {
+    private void runState() {
+        switch (state) {
+            case STOP:
+                runStateStop();
+                break;
+            case GO:
+                runStateGo();
+                break;
+        }
+    }
+
+    private void runStateStop() {
         setVoltage(0);
     }
 
-    public void runStateGo() {
+    private void runStateGo() {
         setVoltage(6);
     }
 
@@ -93,11 +100,7 @@ public class Subsystem extends SubsystemBase {
     public void periodic() {
         subsystemIO.updateData(data);
 
-        if (state == SubsystemStates.GO) {
-            runStateGo();
-        } else if (state == SubsystemStates.STOP) {
-            runStateStop();
-        }
+        runState();
 
         logData();
     }
