@@ -2,8 +2,8 @@ package frc.robot.subsystems.example;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.example.SubsystemConstants.SubsystemStates;
-import frc.robot.subsystems.example.SubsystemIO.SubsystemData;
+import frc.robot.subsystems.example.ExampleSubsystemConstants.SubsystemStates;
+import frc.robot.subsystems.example.ExampleSubsystemIO.SubsystemData;
 import frc.robot.subsystems.example.real.SubsystemSparkMax;
 import frc.robot.subsystems.example.sim.SubsystemSim;
 import frc.robot.utils.ShuffleData;
@@ -13,9 +13,9 @@ import frc.robot.utils.ShuffleData;
  * 
  * @author Noah Simon
  */
-public class Subsystem extends SubsystemBase {
+public class ExampleSubsystem extends SubsystemBase {
 
-    private SubsystemIO subsystemIO;
+    private ExampleSubsystemIO subsystemIO;
     private SubsystemData data = new SubsystemData();
     private SubsystemStates state = SubsystemStates.STOP;
 
@@ -30,7 +30,7 @@ public class Subsystem extends SubsystemBase {
 
     private ShuffleData<String> stateLog = new ShuffleData<String>(this.getName(), "state", state.name());
 
-    public Subsystem() {
+    public ExampleSubsystem() {
         if (Robot.isSimulation()) {
             subsystemIO = new SubsystemSim();
 
@@ -53,7 +53,15 @@ public class Subsystem extends SubsystemBase {
 
     // returns true when the state is reached
     public boolean getIsStableState() {
-        return true;
+
+        switch (state) {
+            case STOP:
+                return data.velocityUnits == 0;
+            case GO:
+                return data.appliedVolts == 6;
+            default:
+                return false;
+        }
     }
 
     public void setState(SubsystemStates state) {

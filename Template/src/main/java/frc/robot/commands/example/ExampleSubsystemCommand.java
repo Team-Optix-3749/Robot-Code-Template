@@ -1,17 +1,17 @@
-package frc.robot.commands.subsytem;
+package frc.robot.commands.example;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.example.SubsystemConstants.SubsystemStates;
+import frc.robot.subsystems.example.ExampleSubsystemConstants.SubsystemStates;
 
 /**
  * An example subsystem command
  * 
  * @author Noah Simon
  */
-public class SubsystemCommand extends Command {
+public class ExampleSubsystemCommand extends Command {
 
-    public SubsystemCommand() {
+    public ExampleSubsystemCommand() {
         super.addRequirements(Robot.subsystem);
     }
 
@@ -23,6 +23,9 @@ public class SubsystemCommand extends Command {
     // if further state change are needed over time, put them here with conditionals
     @Override
     public void execute() {
+        if (Robot.subsystem.getIsStableState()) {
+            Robot.subsystem.setState(SubsystemStates.STOP);
+        }
 
     }
 

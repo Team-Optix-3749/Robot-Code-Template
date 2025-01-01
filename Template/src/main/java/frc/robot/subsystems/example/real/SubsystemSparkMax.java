@@ -6,8 +6,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import frc.robot.subsystems.example.SubsystemConstants;
-import frc.robot.subsystems.example.SubsystemIO;
+import frc.robot.subsystems.example.ExampleSubsystemConstants;
+import frc.robot.subsystems.example.ExampleSubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
 /**
@@ -15,9 +15,9 @@ import frc.robot.utils.MiscConstants.SimConstants;
  * 
  * @author Noah Simon
  */
-public class SubsystemSparkMax implements SubsystemIO {
+public class SubsystemSparkMax implements ExampleSubsystemIO {
 
-    private CANSparkMax motor = new CANSparkMax(SubsystemConstants.motorId, MotorType.kBrushless);
+    private CANSparkMax motor = new CANSparkMax(ExampleSubsystemConstants.motorId, MotorType.kBrushless);
     private RelativeEncoder encoder = motor.getEncoder();
 
     private double inputVolts = 0;

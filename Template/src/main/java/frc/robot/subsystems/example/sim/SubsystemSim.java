@@ -3,7 +3,7 @@ package frc.robot.subsystems.example.sim;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.subsystems.example.SubsystemIO;
+import frc.robot.subsystems.example.ExampleSubsystemIO;
 import frc.robot.utils.MiscConstants.SimConstants;
 
 /**
@@ -11,7 +11,7 @@ import frc.robot.utils.MiscConstants.SimConstants;
  * 
  * @author Noah Simon
  */
-public class SubsystemSim implements SubsystemIO {
+public class SubsystemSim implements ExampleSubsystemIO {
 
     private FlywheelSim simSystem = new FlywheelSim(
             DCMotor.getNEO(1), 6, 0.04);

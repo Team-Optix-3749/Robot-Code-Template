@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.auto.AutoUtils;
-import frc.robot.subsystems.example.Subsystem;
+import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.utils.ShuffleData;
 
@@ -17,7 +17,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   public static Swerve swerve = new Swerve();
-  public static Subsystem subsystem = new Subsystem();
+  public static ExampleSubsystem subsystem = new ExampleSubsystem();
 
   private ShuffleData<Double> batteryVoltageLog = new ShuffleData<Double>("DS", "battery voltage", 0.0);
   private ShuffleData<Boolean> isBrownedOutLog = new ShuffleData<Boolean>("DS", "brownout", false);

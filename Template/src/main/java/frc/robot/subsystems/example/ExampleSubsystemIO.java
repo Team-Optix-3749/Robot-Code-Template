@@ -4,7 +4,7 @@ package frc.robot.subsystems.example;
  *              Example subsystsem IO interfaces
  * @author Noah Simon
  */
-public interface SubsystemIO {
+public interface ExampleSubsystemIO {
 
   public static class SubsystemData {
     public double positionUnits = 0;
