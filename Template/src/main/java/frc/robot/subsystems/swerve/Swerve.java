@@ -7,6 +7,7 @@ package frc.robot.subsystems.swerve;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
+import frc.robot.commands.auto.AutoConstants;
 import frc.robot.subsystems.swerve.GyroIO.GyroData;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.real.*;
@@ -42,10 +44,15 @@ public class Swerve extends SubsystemBase {
   private GyroIO gyro;
   private GyroData gyroData = new GyroData();
 
+  private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+
+  private PIDController xController = new PIDController(AutoConstants.kPDrive, 0, AutoConstants.kDDrive);
+  private PIDController yController = new PIDController(AutoConstants.kPDrive, 0, AutoConstants.kDDrive);
+  private PIDController turnController = new PIDController(AutoConstants.kPTurn, 0, AutoConstants.kDTurn);
+
   private boolean utilizeVision = true;
 
   // equivilant to a odometer, but also intakes vision
-  private SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
   // Logging
   private ShuffleData<String> currentCommandLog = new ShuffleData<String>(this.getName(), "current command", "None");
@@ -266,6 +273,28 @@ public class Swerve extends SubsystemBase {
     modules[2].setDesiredState(desiredStates[2]);
     modules[3].setDesiredState(desiredStates[3]);
 
+  }
+
+  /**
+   * 
+   * @param curPose the current pose of the robot in meters, used for measuring
+   *                error
+   * @param sample  the setpoint sample with position, velocity, acceleration, and
+   *                forces
+   * 
+   * @see https://choreo.autos/choreolib/getting-started/#setting-up-the-drive-subsystem
+   */
+
+  public void followSample(SwerveSample sample) {
+    Robot.swerve.logSetpoints(sample);
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(
+            xController.calculate(getPose().getX(), sample.x) + sample.vx,
+            yController.calculate(getPose().getY(), sample.y) + sample.vy,
+            turnController.calculate(getPose().getRotation().getRadians(), sample.heading) + sample.omega),
+        getPose().getRotation());
+
+    Robot.swerve.setChassisSpeeds(speeds);
   }
 
   public void setBreakMode(boolean enable) {

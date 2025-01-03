@@ -1,5 +1,7 @@
 package frc.robot.commands.auto;
 
+import java.util.function.Consumer;
+
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -7,6 +9,7 @@ import choreo.auto.AutoTrajectory;
 import choreo.auto.AutoFactory.AutoBindings;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
@@ -30,8 +33,6 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
-        // default auto choice
-        chooser.choose("Straight");
 
     }
 
@@ -43,27 +44,6 @@ public class AutoUtils {
         return chooser;
     }
 
-    /**
-     * @param trajectory the trajectory that should be made into a command
-     * @return that command, but with a setOdometry preface assigned to the
-     *         trajectory's initial pose
-     */
-    public static Command makeStartingTrajectoryCommand(AutoTrajectory trajectory) {
-        return Commands.runOnce(
-                () -> Robot.swerve.setOdometry(trajectory.getInitialPose().orElseGet(() -> Robot.swerve.getPose())))
-                .andThen(trajectory.cmd());
-    }
-
-    /**
-     * @param cmd the command to add the reset to the end of
-     * @return the command, ending with setting all setpoint logs to 0 or far
-     *         negatives
-     */
-    public static Command getResetLoggingCommand() {
-        return Commands.runOnce(() -> Robot.swerve.logSetpoints(
-                new SwerveSample(-100, 0, -100, 0, 0, 0, 0, 0,
-                        0, 0, new double[] { 0.0, 0.0, 0.0, 0.0 }, new double[] { 0.0, 0.0, 0.0, 0.0 })));
-    }
 
     /**
      * setup the choreo factor object with bindings, controller, etc.
@@ -74,15 +54,22 @@ public class AutoUtils {
         bindings.bind("Marker", Commands.print("Marker Passed"));
 
         /**
-         * Swerve Subsystem for scheduling
          * Swerve Pose Supplier
+         * Reset Odometry Method
          * Swerve Controller (PID and set chassis speeds)
          * Alliance Supplier for swapping
+         * Swerve Subsystem for scheduling
          * Bindings, created above
          */
-        factory = Choreo.createAutoFactory(Robot.swerve, () -> Robot.swerve.getPose(),
-                (Pose2d curPose, SwerveSample sample) -> AutoController.choreoController(curPose, sample),
-                () -> UtilityFunctions.isRedAlliance(), bindings);
+
+        // will now take a reset odometry
+
+        factory = new AutoFactory(() -> Robot.swerve.getPose(),
+                (Pose2d startingPose) -> Robot.swerve.setOdometry(startingPose),
+                (SwerveSample sample) -> Robot.swerve.followSample(sample), 
+                true, 
+                Robot.swerve, 
+                bindings);
 
     }
 
@@ -92,11 +79,15 @@ public class AutoUtils {
      */
     private static void setupChooser() {
         // interface for choreo
-        chooser = new AutoChooser(factory, "Shuffleboard/Auto");
-        chooser.addAutoRoutine("My Routine", (AutoFactory factory) -> Autos.getMyRoutine(factory));
-        chooser.addAutoRoutine("Print", (AutoFactory factory) -> Autos.getPrint(factory));
-        chooser.addAutoRoutine("Split", (AutoFactory factory) -> Autos.getSplitRoutine(factory));
-        chooser.addAutoRoutine("Straight", (AutoFactory factory) -> Autos.getStraight(factory));
+
+        // Made sendable, use SmartDashbaord now
+        chooser = new AutoChooser();
+        // this makes a folder?
+        SmartDashboard.putData("Auto: Auto Chooser", chooser);
+        chooser.addCmd("My Routine", () -> Autos.getMyRoutine(factory));
+        chooser.addCmd("Print", () -> Autos.getPrint(factory));
+        chooser.addCmd("Split", () -> Autos.getSplitRoutine(factory));
+        chooser.addCmd("Straight", () -> Autos.getStraight(factory));
 
     }
 
