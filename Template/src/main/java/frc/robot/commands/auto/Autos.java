@@ -14,14 +14,30 @@ import edu.wpi.first.wpilibj2.command.Commands;
  */
 public class Autos {
 
+    /***
+     * 
+     * @return The command current selected by the auto chooser
+     */
     public static Command getSelectedCommand() {
         return AutoUtils.getChooser().selectedCommand();
     }
 
+    /***
+     * A do nothing auto
+     * 
+     * @param factory the AutoFactory from AutoUtils
+     * @return Print Command
+     */
     public static Command getPrint(AutoFactory factory) {
         return Commands.print("Print Auto!");
     }
 
+    /***
+     * An example, single route auto path
+     * 
+     * @param factory the AutoFactory from AutoUtils
+     * @return "My Routine" Command
+     */
     public static Command getMyRoutine(AutoFactory factory) {
         // instaniate our auto loop and trajectories
         AutoRoutine routine = factory.newRoutine("my routine");
@@ -43,6 +59,13 @@ public class Autos {
         return cmd;
     }
 
+    /***
+     * An example muli-route auto path.
+     * Based on the results of a boolean supplier, a different 2nd half will occur
+     * 
+     * @param factory the AutoFactory from AutoUtils
+     * @return "Split Routine" Command
+     */
     public static Command getSplitRoutine(AutoFactory factory) {
         // becomes AutoRoutine
         AutoRoutine routine = factory.newRoutine("split routine");
@@ -60,7 +83,13 @@ public class Autos {
         return Commands.print("split trajectory auto!").andThen(routine.cmd());
 
     }
-
+    
+    /***
+     * A routine that drives straight
+     * 
+     * @param factory the AutoFactory from AutoUtils
+     * @return "Straight" Command
+     */
     public static Command getStraight(AutoFactory factory) {
         AutoRoutine routine = factory.newRoutine("straight");
         AutoTrajectory trajectory1 = routine.trajectory("straight");
