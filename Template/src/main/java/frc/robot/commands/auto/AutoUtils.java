@@ -33,6 +33,7 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
+        
 
     }
 
@@ -82,12 +83,13 @@ public class AutoUtils {
 
         // Made sendable, use SmartDashbaord now
         chooser = new AutoChooser();
-        // this makes a folder?
-        // SmartDashboard.putData("Auto: Auto Chooser", chooser);
-        // chooser.addCmd("My Routine", () -> Autos.getMyRoutine(factory));
-        // chooser.addCmd("Print", () -> Autos.getPrint(factory));
-        // chooser.addCmd("Split", () -> Autos.getSplitRoutine(factory));
-        // chooser.addCmd("Straight", () -> Autos.getStraight(factory));
+        SmartDashboard.putData("Auto: Auto Chooser", chooser);
+        chooser.addCmd("My Routine", () -> Autos.getMyRoutine(factory));
+        chooser.addCmd("Print", () -> Autos.getPrint(factory));
+        chooser.addCmd("Split", () -> Autos.getSplitRoutine(factory));
+        chooser.addCmd("Straight", () -> Autos.getStraight(factory));
+        // Default
+        chooser.select("Straight");
 
     }
 
