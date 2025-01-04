@@ -1,7 +1,12 @@
 package frc.robot.subsystems.swerve.sim;
 
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -17,10 +22,27 @@ import frc.robot.utils.MiscConstants.SimConstants;
  * @author Noah Simon
  */
 public class SwerveModuleSim implements SwerveModuleIO {
-    private FlywheelSim driveSim = new FlywheelSim(DCMotor.getNEO(1), ModuleConstants.driveMotorGearRatio,
-            0.09);
-    private FlywheelSim turnSim = new FlywheelSim(DCMotor.getNEO(1), ModuleConstants.turnMotorGearRatio,
-            0.04);
+
+    LinearSystem<N1, N1, N1> drivePlant = LinearSystemId.createFlywheelSystem(
+            DCMotor.getNEO(1), // Motor
+            0.09, // J (moment of inertia)
+            ModuleConstants.driveMotorGearRatio // Gear ratio
+    );
+    FlywheelSim driveSim = new FlywheelSim(
+            drivePlant, // The linear system
+            DCMotor.getNEO(1), // The motor (gearbox) model
+            0.0 // Optional noise in sensor measurements
+    );
+    LinearSystem<N1, N1, N1> turnPlant = LinearSystemId.createFlywheelSystem(
+            DCMotor.getNEO(1), // Motor
+            0.04, // J (moment of inertia)
+            ModuleConstants.turnMotorGearRatio // Gear ratio
+    );
+    FlywheelSim turnSim = new FlywheelSim(
+            turnPlant, // The linear system
+            DCMotor.getNEO(1), // The motor (gearbox) model
+            0.0 // Optional noise in sensor measurements
+    );
 
     private double turnPositionRad = 0;
     private double driveAppliedVolts = 0.0;

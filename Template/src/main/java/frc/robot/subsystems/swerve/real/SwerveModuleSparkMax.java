@@ -1,8 +1,11 @@
 package frc.robot.subsystems.swerve.real;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
@@ -16,8 +19,8 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
  * @author Noah Simon
  */
 public class SwerveModuleSparkMax implements SwerveModuleIO {
-    private CANSparkMax driveMotor;
-    private CANSparkMax turnMotor;
+    private SparkMax driveMotor;
+    private SparkMax turnMotor;
 
     private CANcoder absoluteEncoder;
     private double absoluteEncoderOffsetRad;
@@ -28,35 +31,36 @@ public class SwerveModuleSparkMax implements SwerveModuleIO {
     private int index;
 
     public SwerveModuleSparkMax(int index) {
-        driveMotor = new CANSparkMax(DriveConstants.driveMotorPorts[index], CANSparkMax.MotorType.kBrushless);
-        turnMotor = new CANSparkMax(DriveConstants.turningMotorPorts[index],
-                CANSparkMax.MotorType.kBrushless);
+        driveMotor = new SparkMax(DriveConstants.driveMotorPorts[index], SparkMax.MotorType.kBrushless);
+        SparkMaxConfig driveConfig = new SparkMaxConfig();
+        driveConfig.inverted(DriveConstants.driveMotorReversed[index]);
+        driveConfig.encoder.positionConversionFactor((1 / ModuleConstants.driveMotorGearRatio) * Math.PI
+                * ModuleConstants.wheelDiameterMeters);
+        driveConfig.encoder.velocityConversionFactor(
+                (1 / ModuleConstants.driveMotorGearRatio) * Units.rotationsPerMinuteToRadiansPerSecond(1)
+                        * (ModuleConstants.wheelDiameterMeters / 2.0));
+        driveConfig.smartCurrentLimit(DriveConstants.driveMotorStallLimit,
+                DriveConstants.driveMotorFreeLimit);
+        driveConfig.idleMode(IdleMode.kBrake);
+        driveMotor.configure(driveConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+
+        turnMotor = new SparkMax(DriveConstants.turningMotorPorts[index],
+                SparkMax.MotorType.kBrushless);
+        SparkMaxConfig turnConfig = new SparkMaxConfig();
+        turnConfig.inverted(DriveConstants.turningMotorReversed[index]);
+        turnConfig.encoder.positionConversionFactor(1 / ModuleConstants.turnMotorGearRatio * (2 * Math.PI));
+        turnConfig.encoder.velocityConversionFactor(
+                (1 / ModuleConstants.driveMotorGearRatio) * Units.rotationsPerMinuteToRadiansPerSecond(1));
+        turnConfig.smartCurrentLimit(DriveConstants.turnMotorStallLimit,
+                DriveConstants.turnMotorFreeLimit);
+        turnConfig.idleMode(IdleMode.kBrake);
+
+        turnMotor.configure(turnConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
 
         absoluteEncoder = new CANcoder(DriveConstants.absoluteEncoderPorts[index]);
         absoluteEncoderOffsetRad = Units.degreesToRadians(DriveConstants.absoluteEncoderOffsetDeg[index]);
-
-        turnMotor.setInverted(DriveConstants.turningMotorReversed[index]);
-        turnMotor.getEncoder().setPositionConversionFactor(1 / ModuleConstants.turnMotorGearRatio * (2 * Math.PI));
-        turnMotor.getEncoder()
-                .setVelocityConversionFactor(
-                        (1 / ModuleConstants.driveMotorGearRatio) * Units.rotationsPerMinuteToRadiansPerSecond(1));
-
-        driveMotor.setInverted(DriveConstants.driveMotorReversed[index]);
-
-        driveMotor.getEncoder().setPositionConversionFactor((1 / ModuleConstants.driveMotorGearRatio) * Math.PI
-                * ModuleConstants.wheelDiameterMeters);
-
-        driveMotor.getEncoder().setVelocityConversionFactor(
-                (1 / ModuleConstants.driveMotorGearRatio) * Units.rotationsPerMinuteToRadiansPerSecond(1)
-                        * (ModuleConstants.wheelDiameterMeters / 2.0));
-
-        driveMotor.setSmartCurrentLimit(DriveConstants.driveMotorStallLimit,
-                DriveConstants.driveMotorFreeLimit);
-        turnMotor.setSmartCurrentLimit(DriveConstants.turnMotorStallLimit,
-                DriveConstants.turnMotorFreeLimit);
-
-        driveMotor.setIdleMode(IdleMode.kBrake);
-        turnMotor.setIdleMode(IdleMode.kBrake);
 
         this.index = index;
     };

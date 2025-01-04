@@ -1,9 +1,12 @@
 package frc.robot.subsystems.example.real;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.example.ExampleSubsystemConstants;
@@ -17,27 +20,29 @@ import frc.robot.utils.MiscConstants.SimConstants;
  */
 public class SubsystemSparkMax implements ExampleSubsystemIO {
 
-    private CANSparkMax motor = new CANSparkMax(ExampleSubsystemConstants.motorId, MotorType.kBrushless);
-    private RelativeEncoder encoder = motor.getEncoder();
+    private SparkMax motor = new SparkMax(ExampleSubsystemConstants.motorId, MotorType.kBrushless);
+    private SparkMaxConfig config = new SparkMaxConfig();
 
     private double inputVolts = 0;
     private double previousVelocity = 0;
     private double velocity = 0;
 
     public SubsystemSparkMax() {
-        motor.setSmartCurrentLimit(30, 50, 1);
-        motor.setInverted(false);
-        motor.setIdleMode(IdleMode.kCoast);
-        encoder.setPositionConversionFactor(2 * Math.PI);
-        encoder.setVelocityConversionFactor(encoder.getPositionConversionFactor() / 60.0);
+
+        config.smartCurrentLimit(30, 50);
+        config.encoder.inverted(false);
+        config.idleMode(IdleMode.kBrake);
+        config.encoder.positionConversionFactor(2 * Math.PI);
+        config.encoder.velocityConversionFactor(2 * Math.PI / 60.0);
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
 
     @Override
     public void updateData(SubsystemData data) {
         previousVelocity = velocity;
-        velocity = encoder.getVelocity();
-        data.positionUnits = encoder.getPosition();
+        velocity = motor.getEncoder().getVelocity();
+        data.positionUnits = motor.getEncoder().getPosition();
         data.velocityUnits = velocity;
         data.accelerationUnits = (velocity - previousVelocity) / SimConstants.loopPeriodSec;
         data.currentAmps = motor.getOutputCurrent();
