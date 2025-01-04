@@ -91,14 +91,20 @@ public class Autos {
      * @return "Straight" Command
      */
     public static Command getStraight(AutoFactory factory) {
-        AutoRoutine routine = factory.newRoutine("straight");
-        AutoTrajectory trajectory1 = routine.trajectory("straight");
+        System.out.println("STRAIGHT");
+        System.out.println("STRAIGHT");
+        System.out.println("STRAIGHT");
+        System.out.println("STRAIGHT");
+        System.out.println("STRAIGHT");
+
+        AutoRoutine routine = factory.newRoutine("Straight");
+        AutoTrajectory trajectory1 = routine.trajectory("Straight");
 
         Command trajectoy1Command = trajectory1.cmd();
 
         routine.active().onTrue(Commands.waitSeconds(1).andThen(trajectoy1Command));
-
-        return Commands.print("straight").andThen(routine.cmd());
+        System.out.println(trajectory1.getInitialPose().get());
+        return Commands.print("Straight").andThen(routine.cmd());
 
     }
 }

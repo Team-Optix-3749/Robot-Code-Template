@@ -33,7 +33,6 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
-        
 
     }
 
@@ -45,6 +44,9 @@ public class AutoUtils {
         return chooser;
     }
 
+    public static AutoFactory geAutoFactory() {
+        return factory;
+    }
 
     /**
      * setup the choreo factor object with bindings, controller, etc.
@@ -67,9 +69,9 @@ public class AutoUtils {
 
         factory = new AutoFactory(() -> Robot.swerve.getPose(),
                 (Pose2d startingPose) -> Robot.swerve.setOdometry(startingPose),
-                (SwerveSample sample) -> Robot.swerve.followSample(sample), 
-                true, 
-                Robot.swerve, 
+                (SwerveSample sample) -> Robot.swerve.followSample(sample),
+                true,
+                Robot.swerve,
                 bindings);
 
     }
