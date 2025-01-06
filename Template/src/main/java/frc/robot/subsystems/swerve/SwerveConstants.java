@@ -34,7 +34,7 @@ public class SwerveConstants {
                 private static final double kPDrivingSim = 0.0;
                 private static final double kSDrivingSim = 0.0;
                 private static final double kVDrivingSim = 12 / DriveConstants.simMaxSpeedMetersPerSecond;
-                private static final double kADrivingSim = 12 / DriveConstants.simMaxAccelerationMetersPerSecondSquared;
+                private static final double kADrivingSim = 1.2;
                 // Or have have it be non-constant, (12 - Velocity*kVDrivingSim)/maxAcceleration
                 // private static final double kADrivingSim = (12 - 2.94 * kVDrivingSim)
                 //                 / DriveConstants.simMaxAccelerationMetersPerSecondSquared;

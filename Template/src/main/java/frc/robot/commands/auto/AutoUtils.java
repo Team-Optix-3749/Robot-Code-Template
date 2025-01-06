@@ -7,6 +7,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoTrajectory;
 import choreo.auto.AutoFactory.AutoBindings;
+import choreo.auto.AutoRoutine;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +45,7 @@ public class AutoUtils {
         return chooser;
     }
 
-    public static AutoFactory geAutoFactory() {
+    public static AutoFactory getAutoFactory() {
         return factory;
     }
 
@@ -86,12 +87,27 @@ public class AutoUtils {
         // Made sendable, use SmartDashbaord now
         chooser = new AutoChooser();
         SmartDashboard.putData("Auto: Auto Chooser", chooser);
-        chooser.addCmd("My Routine", () -> Autos.getMyRoutine(factory));
-        chooser.addCmd("Print", () -> Autos.getPrint(factory));
-        chooser.addCmd("Split", () -> Autos.getSplitRoutine(factory));
-        chooser.addCmd("Straight", () -> Autos.getStraight(factory));
+        chooser.addCmd("My Routine", () -> Autos.getMyRoutine());
+        chooser.addCmd("Print", () -> Autos.getPrint());
+        chooser.addCmd("Split", () -> Autos.getSplitRoutine());
+        chooser.addCmd("Straight", () -> Autos.getStraight());
         // Default
         chooser.select("Straight");
+
+    }
+
+    public static Command getSingleTrajectory(String trajectoryName) {
+        AutoRoutine routine = factory.newRoutine(trajectoryName);
+        AutoTrajectory trajectory1 = routine.trajectory(trajectoryName);
+
+        Command trajectoy1Command = trajectory1.cmd();
+
+        routine.active().onTrue(
+                factory.resetOdometry(trajectoryName).andThen(
+                        trajectoy1Command));
+        
+        System.out.println(trajectory1.getInitialPose().get());
+        return Commands.print(trajectoryName).andThen(routine.cmd());
 
     }
 

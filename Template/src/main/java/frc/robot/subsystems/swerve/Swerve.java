@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Robot;
 import frc.robot.commands.auto.AutoConstants;
@@ -398,11 +399,9 @@ public class Swerve extends SubsystemBase {
   public void logSetpoints(SwerveSample sample) {
     // setpoint logging for automated driving
     Double[] positions = new Double[] { sample.x, sample.y, sample.heading };
-    positions[2] = Units.radiansToDegrees(positions[2]);
     setpointPositionLog.set(positions);
 
     Double[] velocities = new Double[] { sample.vx, sample.vy, sample.omega };
-    velocities[2] = Units.radiansToDegrees(velocities[2]);
     double velocity = 0;
     for (int i = 0; i < 2; i++) {
       velocity += Math.pow(velocities[i], 2);
@@ -412,7 +411,6 @@ public class Swerve extends SubsystemBase {
     setpointRotationalVelocityLog.set(velocities[2]);
 
     Double[] accelerations = new Double[] { sample.ax, sample.ay, sample.alpha };
-    accelerations[2] = Units.radiansToDegrees(accelerations[2]);
     double acceleration = 0;
     for (int i = 0; i < 2; i++) {
       acceleration += Math.pow(accelerations[i], 2);
@@ -429,24 +427,26 @@ public class Swerve extends SubsystemBase {
   private void logData() {
     // logging of our module states
     Double[] realStates = {
-        modules[0].getState().angle.getDegrees(),
+        modules[0].getState().angle.getRadians(),
         modules[0].getState().speedMetersPerSecond,
-        modules[1].getState().angle.getDegrees(),
+        modules[1].getState().angle.getRadians(),
         modules[1].getState().speedMetersPerSecond,
-        modules[2].getState().angle.getDegrees(),
+        modules[2].getState().angle.getRadians(),
         modules[2].getState().speedMetersPerSecond,
-        modules[3].getState().angle.getDegrees(),
+        modules[3].getState().angle.getRadians(),
         modules[3].getState().speedMetersPerSecond
     };
 
+
+    // SmartDashboard.puTarr("Swerve: Real States",realSwerveModuleStates);
     Double[] desiredStates = {
-        modules[0].getDesiredState().angle.getDegrees(),
+        modules[0].getDesiredState().angle.getRadians(),
         modules[0].getDesiredState().speedMetersPerSecond,
-        modules[1].getDesiredState().angle.getDegrees(),
+        modules[1].getDesiredState().angle.getRadians(),
         modules[1].getDesiredState().speedMetersPerSecond,
-        modules[2].getDesiredState().angle.getDegrees(),
+        modules[2].getDesiredState().angle.getRadians(),
         modules[2].getDesiredState().speedMetersPerSecond,
-        modules[3].getDesiredState().angle.getDegrees(),
+        modules[3].getDesiredState().angle.getRadians(),
         modules[3].getDesiredState().speedMetersPerSecond
     };
 
@@ -458,7 +458,7 @@ public class Swerve extends SubsystemBase {
         new Double[] {
             getPose().getX(),
             getPose().getY(),
-            getPose().getRotation().getDegrees()
+            getPose().getRotation().getRadians()
         });
     utilizeVisionLog.set(utilizeVision);
 

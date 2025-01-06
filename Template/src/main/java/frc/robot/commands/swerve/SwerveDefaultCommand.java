@@ -72,6 +72,12 @@ public class SwerveDefaultCommand extends Command {
     double ySpeed = driveSpeedMPS * Math.sin(linearDirection.getRadians());
     ChassisSpeeds chassisSpeeds;
 
+    // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+    //     UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
+    //     UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,
+    //     turningSpeedRadPerSecond,
+    //     Robot.swerve.getRotation2d());
+
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
         UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,

@@ -28,7 +28,7 @@ public class Autos {
      * @param factory the AutoFactory from AutoUtils
      * @return Print Command
      */
-    public static Command getPrint(AutoFactory factory) {
+    public static Command getPrint() {
         return Commands.print("Print Auto!");
     }
 
@@ -38,9 +38,9 @@ public class Autos {
      * @param factory the AutoFactory from AutoUtils
      * @return "My Routine" Command
      */
-    public static Command getMyRoutine(AutoFactory factory) {
+    public static Command getMyRoutine() {
         // instaniate our auto loop and trajectories
-        AutoRoutine routine = factory.newRoutine("my routine");
+        AutoRoutine routine = AutoUtils.getAutoFactory().newRoutine("my routine");
         AutoTrajectory trajectory = routine.trajectory("trajectoryName");
 
         // create our trajectory commands, setting odometry and resetting logging when
@@ -66,9 +66,10 @@ public class Autos {
      * @param factory the AutoFactory from AutoUtils
      * @return "Split Routine" Command
      */
-    public static Command getSplitRoutine(AutoFactory factory) {
+    public static Command getSplitRoutine() {
+        
         // becomes AutoRoutine
-        AutoRoutine routine = factory.newRoutine("split routine");
+        AutoRoutine routine = AutoUtils.getAutoFactory().newRoutine("split routine");
         // loop.trajectory, or the new name
         AutoTrajectory trajectory1 = routine.trajectory("split1");
         AutoTrajectory trajectory2a = routine.trajectory("split2a");
@@ -83,28 +84,20 @@ public class Autos {
         return Commands.print("split trajectory auto!").andThen(routine.cmd());
 
     }
-    
+
     /***
      * A routine that drives straight
      * 
      * @param factory the AutoFactory from AutoUtils
      * @return "Straight" Command
      */
-    public static Command getStraight(AutoFactory factory) {
-        System.out.println("STRAIGHT");
-        System.out.println("STRAIGHT");
-        System.out.println("STRAIGHT");
-        System.out.println("STRAIGHT");
-        System.out.println("STRAIGHT");
+    public static Command getStraight(){
+        return AutoUtils.getSingleTrajectory("Straight");
 
-        AutoRoutine routine = factory.newRoutine("Straight");
-        AutoTrajectory trajectory1 = routine.trajectory("Straight");
+    }
 
-        Command trajectoy1Command = trajectory1.cmd();
-
-        routine.active().onTrue(Commands.waitSeconds(1).andThen(trajectoy1Command));
-        System.out.println(trajectory1.getInitialPose().get());
-        return Commands.print("Straight").andThen(routine.cmd());
+    public static Command getChairGame() {
+       return AutoUtils.getSingleTrajectory("Chair Game");
 
     }
 }
