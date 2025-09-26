@@ -26,7 +26,6 @@ public class RobotContainer {
     // When to go into brownout protection
     RobotController.setBrownoutVoltage(7.0);
 
-    // robot setup
     JoystickIO.getButtonBindings();
     AutoUtils.initAuto();
   }
@@ -34,5 +33,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // return new DriveStraight();
     return Autos.getChairGame();
+
+    // return null;
   }
 }

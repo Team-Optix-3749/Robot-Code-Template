@@ -2,9 +2,11 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.utils.UtilityFunctions;
 import frc.robot.utils.MiscConstants.*;
 import java.util.function.Supplier;
@@ -19,15 +21,15 @@ import java.util.function.Supplier;
 
 public class SwerveDefaultCommand extends Command {
 
-  private final Supplier<Double> xSpdFunction, ySpdFunction, xTurningSpdFunction;
+  private final Supplier<Double> xSupplier, ySupplier, turnSupplier;
 
   public SwerveDefaultCommand(
-      Supplier<Double> xSpdFunction,
-      Supplier<Double> ySpdFunction,
-      Supplier<Double> xTurningSpdFunction) {
-    this.xSpdFunction = xSpdFunction;
-    this.ySpdFunction = ySpdFunction;
-    this.xTurningSpdFunction = xTurningSpdFunction;
+      Supplier<Double> xSupplier,
+      Supplier<Double> ySupplier,
+      Supplier<Double> turnSupplier) {
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
+    this.turnSupplier = turnSupplier;
 
     super.addRequirements(Robot.swerve);
   }
@@ -39,58 +41,54 @@ public class SwerveDefaultCommand extends Command {
   @Override
   public void execute() {
     // controllers are weird in what's positive, so we flip these
-    double xMagnitude = xSpdFunction.get();
-    double yMagnitude = ySpdFunction.get();
-    double turningMagnitude = -xTurningSpdFunction.get();
+    double xMagnitude = xSupplier.get();
+    double yMagnitude = ySupplier.get();
+    double turningMagnitude = -turnSupplier.get();
 
-    // one combined magnitutde
-    double linearMagnitude = Math.hypot(xMagnitude, yMagnitude);
-    // to make a 0,0 rotation 2d not throw an error
-    if (xMagnitude==0 && yMagnitude==0){
-      yMagnitude=0.0001;
+    // deadband
+    xMagnitude = UtilityFunctions.signedDeadband(xMagnitude, ControllerConstants.deadbandLX);
+    yMagnitude = UtilityFunctions.signedDeadband(yMagnitude, ControllerConstants.deadbandLY);
+    turningMagnitude = UtilityFunctions.signedDeadband(turningMagnitude, ControllerConstants.deadbandRX);
+
+    xMagnitude = Math.copySign(xMagnitude, Math.pow(xMagnitude, ControllerConstants.expoFactorTranslate));
+    yMagnitude = Math.copySign(yMagnitude, Math.pow(yMagnitude, ControllerConstants.expoFactorTranslate));
+    turningMagnitude = Math.copySign(turningMagnitude,
+        Math.pow(turningMagnitude, ControllerConstants.expoFactorRotate));
+
+    Translation2d movement = new Translation2d(xMagnitude, yMagnitude);
+
+    // If the magnitude is greater than 1, normalize it
+    // shouldn't be possible with XBox controller but just in case :))
+    if (movement.getNorm() > 1) {
+      movement = movement.div(movement.getNorm());
     }
-    // one combined direction
-    Rotation2d linearDirection = new Rotation2d(xMagnitude, yMagnitude);
 
-    // deadbands
-    // is always postive
-    linearMagnitude = MathUtil.applyDeadband(linearMagnitude, ControllerConstants.deadband);
-    // can be negative
-    turningMagnitude = Math.abs(turningMagnitude) > ControllerConstants.deadband
-        ? turningMagnitude
-        : 0.0;
+    // convert to field relative speeds
+    // divide by their "contribution" to the total speed
+    double xVelocity = movement.getX() * SwerveConstants.DriveConstants.maxSpeedMetersPerSecond
+        / Math.cos(movement.getAngle().getRadians());
+    double yVelocity = movement.getY() * SwerveConstants.DriveConstants.maxSpeedMetersPerSecond
+        / Math.cos(movement.getAngle().getRadians());
+    double turningVelocity = turningMagnitude * SwerveConstants.DriveConstants.maxAngularSpeedRadiansPerSecond;
 
-    // squaring the inputs for smoother driving at low speeds
-    linearMagnitude = Math.copySign(linearMagnitude * linearMagnitude, linearMagnitude);
-    turningMagnitude = Math.copySign(turningMagnitude * turningMagnitude, turningMagnitude);
+    // flip for red alliance
+    if (UtilityFunctions.isRedAlliance()) {
+      xVelocity *= -1;
+      yVelocity *= -1;
+    }
 
-    double driveSpeedMPS = linearMagnitude * Robot.swerve.getMaxDriveSpeed();
-    double turningSpeedRadPerSecond = turningMagnitude * Robot.swerve.getMaxAngularSpeed();
+    ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        xVelocity,
+        yVelocity,
+        turningVelocity,
+        Robot.swerve.getRotation());
 
-    // Calcaulate new linear components
-    double xSpeed = driveSpeedMPS * Math.cos(linearDirection.getRadians());
-    double ySpeed = driveSpeedMPS * Math.sin(linearDirection.getRadians());
-    ChassisSpeeds chassisSpeeds;
-
-    // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //     UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
-    //     UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,
-    //     turningSpeedRadPerSecond,
-    //     Robot.swerve.getRotation2d());
-
-    chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        UtilityFunctions.isRedAlliance() ? ySpeed : -ySpeed,
-        UtilityFunctions.isRedAlliance() ? xSpeed : -xSpeed,
-        turningSpeedRadPerSecond,
-        Robot.swerve.getRotation2d());
-
-    // set chassis speeds
     Robot.swerve.setChassisSpeeds(chassisSpeeds);
   }
 
   @Override
   public void end(boolean interrupted) {
-    Robot.swerve.stopModules();
+    Robot.swerve.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
   }
 
   @Override

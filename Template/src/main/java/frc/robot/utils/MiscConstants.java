@@ -11,7 +11,8 @@ public class MiscConstants {
 
   public static enum RobotType {
     REAL,
-    SIM
+    SIM,
+    REPLAY
   }
 
   public static final RobotType ROBOT_TYPE = Robot.isReal()
@@ -23,8 +24,13 @@ public class MiscConstants {
   }
 
   public static final class ControllerConstants {
+    public static final double deadbandRX = 0.05;
+    public static final double deadbandRY = 0.05;
 
-    public static final double deadband = 0.05;
+    public static final double deadbandLX = 0.05;
+    public static final double deadbandLY = 0.05;
+
+    public static final double expoFactorTranslate = 1.5;
+    public static final double expoFactorRotate = 1.5;
   }
-
 }
