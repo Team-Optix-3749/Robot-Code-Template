@@ -3,24 +3,50 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.auto.AutoUtils;
-import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.utils.ShuffleData;
+import frc.robot.utils.MiscConfig;
 
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   public static Swerve swerve = new Swerve();
 
   private RobotContainer m_robotContainer;
+  
+
+  public Robot() {
+    MiscConfig.init();
+
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+
+    if (MiscConfig.ROBOT_TYPE == MiscConfig.RobotType.REAL) {
+      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    } else {
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    }
+
+    LoggedPowerDistribution.getInstance(MiscConfig.CAN.PDH_ID, ModuleType.kRev);
+
+    Logger.start();
+  }
 
   @Override
   public void robotInit() {
@@ -91,8 +117,9 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {
   }
+
   @Override
-  public void simulationInit(){
+  public void simulationInit() {
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
   }
 }

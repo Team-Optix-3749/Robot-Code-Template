@@ -7,8 +7,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.subsystems.example.ExampleSubsystemIO;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.utils.MiscConstants.SimConstants;
+import frc.robot.subsystems.swerve.SwerveConfig.ModuleConstants;
+import frc.robot.utils.MiscConfig.Sim;
 
 /**
  * IO implementation for an example subsystem's simulation
@@ -38,7 +38,7 @@ public class SubsystemSim implements ExampleSubsystemIO {
 
     @Override
     public void updateData(SubsystemData data) {
-        sim.update(SimConstants.loopPeriodSec);
+        sim.update(Sim.loopPeriodSec);
 
         // set these to your system's data
         previousVelocity = velocity;

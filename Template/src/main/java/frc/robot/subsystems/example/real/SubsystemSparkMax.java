@@ -1,6 +1,5 @@
 package frc.robot.subsystems.example.real;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -11,7 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.example.ExampleSubsystemConstants;
 import frc.robot.subsystems.example.ExampleSubsystemIO;
-import frc.robot.utils.MiscConstants.SimConstants;
+import frc.robot.utils.MiscConfig.Sim;
 
 /**
  * IO implementation for an example subsystem's sparkmax
@@ -44,7 +43,7 @@ public class SubsystemSparkMax implements ExampleSubsystemIO {
         velocity = motor.getEncoder().getVelocity();
         data.positionUnits = motor.getEncoder().getPosition();
         data.velocityUnits = velocity;
-        data.accelerationUnits = (velocity - previousVelocity) / SimConstants.loopPeriodSec;
+        data.accelerationUnits = (velocity - previousVelocity) / Sim.loopPeriodSec;
         data.currentAmps = motor.getOutputCurrent();
         data.inputVolts = inputVolts;
         data.appliedVolts = motor.getBusVoltage() * motor.getAppliedOutput();

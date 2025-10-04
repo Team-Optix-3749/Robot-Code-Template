@@ -6,9 +6,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveConfig;
 import frc.robot.utils.UtilityFunctions;
-import frc.robot.utils.MiscConstants.*;
+import frc.robot.utils.MiscConfig.*;
 import java.util.function.Supplier;
 
 /***
@@ -46,30 +46,30 @@ public class SwerveDefaultCommand extends Command {
     double turningMagnitude = -turnSupplier.get();
 
     // deadband
-    xMagnitude = UtilityFunctions.signedDeadband(xMagnitude, ControllerConstants.deadbandLX);
-    yMagnitude = UtilityFunctions.signedDeadband(yMagnitude, ControllerConstants.deadbandLY);
-    turningMagnitude = UtilityFunctions.signedDeadband(turningMagnitude, ControllerConstants.deadbandRX);
+    xMagnitude = UtilityFunctions.signedDeadband(xMagnitude, Controller.deadbandLX);
+    yMagnitude = UtilityFunctions.signedDeadband(yMagnitude, Controller.deadbandLY);
+    turningMagnitude = UtilityFunctions.signedDeadband(turningMagnitude, Controller.deadbandRX);
 
-    xMagnitude = Math.copySign(xMagnitude, Math.pow(xMagnitude, ControllerConstants.expoFactorTranslate));
-    yMagnitude = Math.copySign(yMagnitude, Math.pow(yMagnitude, ControllerConstants.expoFactorTranslate));
+    xMagnitude = Math.copySign(xMagnitude, Math.pow(xMagnitude, Controller.expoFactorTranslate));
+    yMagnitude = Math.copySign(yMagnitude, Math.pow(yMagnitude, Controller.expoFactorTranslate));
     turningMagnitude = Math.copySign(turningMagnitude,
-        Math.pow(turningMagnitude, ControllerConstants.expoFactorRotate));
+        Math.pow(turningMagnitude, Controller.expoFactorRotate));
 
     Translation2d movement = new Translation2d(xMagnitude, yMagnitude);
 
     // If the magnitude is greater than 1, normalize it
     // shouldn't be possible with XBox controller but just in case :))
-    if (movement.getNorm() > 1) {
+    if (movement.getNorm() > 1.0) {
       movement = movement.div(movement.getNorm());
     }
 
     // convert to field relative speeds
     // divide by their "contribution" to the total speed
-    double xVelocity = movement.getX() * SwerveConstants.DriveConstants.maxSpeedMetersPerSecond
+    double xVelocity = movement.getX() * SwerveConstants.SwerveConfig.maxSpeedMetersPerSecond
         / Math.cos(movement.getAngle().getRadians());
-    double yVelocity = movement.getY() * SwerveConstants.DriveConstants.maxSpeedMetersPerSecond
+    double yVelocity = movement.getY() * SwerveConstants.SwerveConfig.maxSpeedMetersPerSecond
         / Math.cos(movement.getAngle().getRadians());
-    double turningVelocity = turningMagnitude * SwerveConstants.DriveConstants.maxAngularSpeedRadiansPerSecond;
+    double turningVelocity = turningMagnitude * SwerveConstants.SwerveConfig.maxAngularSpeedRadiansPerSecond;
 
     // flip for red alliance
     if (UtilityFunctions.isRedAlliance()) {

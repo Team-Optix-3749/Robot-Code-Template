@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
-import frc.robot.commands.swerve.DriveStraight;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 /**
@@ -18,7 +17,6 @@ public class JoystickIO {
 
     private static final CommandXboxController pilot = new CommandXboxController(0);
     private static final CommandXboxController operator = new CommandXboxController(1);
-    private static final Command DriveStraight = new DriveStraight();
 
     public JoystickIO() {
     }
@@ -49,14 +47,11 @@ public class JoystickIO {
      * If both controllers are plugged in (pi and op)
      */
     public static void pilotAndOperatorBindings() {
-        // gyro reset
-        pilot.start().onTrue(Commands.runOnce(() -> Robot.swerve.resetGyro()));
-        pilot.a().whileTrue(DriveStraight);
+
     }
 
     public static void pilotBindings() {
-        // gyro reset
-        pilot.start().onTrue(Commands.runOnce(() -> Robot.swerve.resetGyro()));
+
     }
 
     public static void simBindings() {

@@ -15,17 +15,6 @@ import frc.robot.utils.JoystickIO;
 public class RobotContainer {
 
   public RobotContainer() {
-    DriverStation.silenceJoystickConnectionWarning(true);
-    DriverStation.removeRefreshedDataEventHandle(44000);
-
-    // data logs
-    DataLogManager.start();
-    DataLogManager.logNetworkTables(true);
-    DriverStation.startDataLog(DataLogManager.getLog(), true);
-
-    // When to go into brownout protection
-    RobotController.setBrownoutVoltage(7.0);
-
     JoystickIO.getButtonBindings();
     AutoUtils.initAuto();
   }
