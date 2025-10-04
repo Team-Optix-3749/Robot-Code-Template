@@ -16,8 +16,14 @@ public class GyroSim implements GyroIO {
 
   private double prevTimestamp = -1.0;
 
+  public GyroData data;
+
+  public GyroSim(GyroData moduleData) {
+    data = moduleData;
+  }
+
   @Override
-  public void update(GyroData moduleData) {
+  public void updateData() {
     double deltaT = 0.02;
     double currTimestamp = Timer.getTimestamp();
 
@@ -30,7 +36,6 @@ public class GyroSim implements GyroIO {
     yaw = yaw.plus(Rotation2d.fromRadians(angleDiffRad));
 
     data.orientation = new Rotation3d(0, 0, yaw.getRadians());
-    moduleData = data;
   }
 
   @Override

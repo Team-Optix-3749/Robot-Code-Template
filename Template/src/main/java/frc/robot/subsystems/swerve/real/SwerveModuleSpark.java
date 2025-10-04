@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
 import frc.robot.subsystems.swerve.SwerveConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
@@ -19,9 +20,11 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
     private CANcoder absoluteEncoder;
 
-    public ModuleData data = new ModuleData();
+    private ModuleDataAutoLogged data;
 
-    public SwerveModuleSpark(int index) {
+    public SwerveModuleSpark(int index, ModuleDataAutoLogged moduleData) {
+        data = moduleData;
+
         data.index = index;
 
         drive = OptixSpark.ofSparkMax(Motor.driveMotorIds[index]);
@@ -55,11 +58,6 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         absoluteEncoder.optimizeBusUtilization();
         absoluteEncoder.getAbsolutePosition().setUpdateFrequency(MiscConfig.Optimizations.nonEssentialCanRefreshRateHz);
-    }
-
-    @Override
-    public ModuleData getData() {
-        return data;
     }
 
     @Override
@@ -106,7 +104,7 @@ public class SwerveModuleSpark implements SwerveModuleIO {
     }
 
     @Override
-    public void updateData(ModuleData newData) {
+    public void updateData() {
         data.drivePositionM = drive.getPosition();
         data.driveVelocityMPerSec = drive.getVelocity();
         data.driveAppliedVolts = drive.getAppliedVolts();
@@ -119,7 +117,5 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         data.turnAppliedVolts = turn.getAppliedVolts();
         data.turnCurrentAmps = turn.getCurrent();
         data.turnTempCelcius = turn.getTemperature();
-
-        newData = this.data;
     };
 }

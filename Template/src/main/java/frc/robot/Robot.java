@@ -18,29 +18,57 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.utils.JoystickIO;
 import frc.robot.utils.MiscConfig;
 
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
-
   public static Swerve swerve = new Swerve();
 
-  private RobotContainer m_robotContainer;
-  
+  Command autoCommand = null;
 
   public Robot() {
-    MiscConfig.init();
-
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
 
-    if (MiscConfig.ROBOT_TYPE == MiscConfig.RobotType.REAL) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    Logger.recordOutput("Robot Type", MiscConfig.ROBOT_TYPE);
+
+    // Set up data receivers & replay source
+    switch (MiscConfig.ROBOT_TYPE) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new WPILOGWriter());
+        
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        // Replaying a log, set up replay source
+        // setUseTiming(false); // Run as fast as possible
+        // String logPath = LogFileUtil.findReplayLog();
+        // Logger.setReplaySource(new WPILOGReader(logPath));
+        // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
+        // "_sim")));
+        break;
     }
 
     LoggedPowerDistribution.getInstance(MiscConfig.CAN.PDH_ID, ModuleType.kRev);
@@ -50,7 +78,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-    m_robotContainer = new RobotContainer();
+    JoystickIO.getButtonBindings();
+    // AutoUtils.initAuto();
   }
 
   @Override
@@ -75,10 +104,10 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // autoCommand = Autos.getChairGame();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autoCommand != null) {
+      autoCommand.schedule();
     }
   }
 
@@ -92,8 +121,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autoCommand != null) {
+      autoCommand.cancel();
     }
   }
 

@@ -9,13 +9,13 @@ import frc.robot.Robot;
  */
 public class MiscConfig {
 
-  public static void init() {
+  public static RobotType getRobotType() {
     if (Robot.isReal()) {
-      ROBOT_TYPE = RobotType.REAL;
+      return RobotType.REAL;
     } else if (Robot.isSimulation()) {
-      ROBOT_TYPE = RobotType.SIM;
+      return RobotType.SIM;
     } else {
-      ROBOT_TYPE = RobotType.REPLAY;
+      return RobotType.REPLAY;
     }
   }
 
@@ -25,7 +25,7 @@ public class MiscConfig {
     REPLAY
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.REAL;
+  public static RobotType ROBOT_TYPE = getRobotType();
 
   public static final class CAN {
     public static final int timeoutMs = 250;

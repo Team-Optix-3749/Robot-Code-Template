@@ -22,7 +22,7 @@ public class SwerveConfig {
                 public static final double[] turnPID = new double[] {
                                 3, 0, 0 };
                 public static final double[] drivePID = new double[] {
-                                0.27, 0, 0 };
+                                12, 0, 0 };
                 // // our FF values
                 // public static LoggedTunableNumber kSDriving = new
                 // LoggedTunableNumber("swerve/kSDriving",
@@ -40,8 +40,8 @@ public class SwerveConfig {
                 // public static LoggedTunableNumber maxAcceleration = new LoggedTunableNumber(
                 // "swerve/maxAcceleration", 3.3);
 
-                public static final double teleopMaxSpeedMetersPerSecond = 4.3;
-                public static final double autoMaxSpeedMetersPerSecond = 4.3;
+                public static final double maxSpeedMPS = 4.3;
+                public static final double speedDeadbandMPS = 0.005;
 
                 public static final double maxAngularSpeedRadsPS = 11;
                 public static final double maxAngularAccelRadsPSS = 9.0;
@@ -71,9 +71,9 @@ public class SwerveConfig {
         public static final class Drivetrain {
                 public static final double wheelDiameterMeters = Units.inchesToMeters(4);
                 // Distance between right and left wheels
-                public static final double trackWidth = Units.inchesToMeters(26.5);
+                public static final double trackWidth = Units.inchesToMeters(26);
                 // Distance between front and back wheels
-                public static final double wheelBase = Units.inchesToMeters(20.5);
+                public static final double wheelBase = Units.inchesToMeters(26);
                 public static final SwerveDriveKinematics driveKinematics = new SwerveDriveKinematics(
                                 new Translation2d(wheelBase / 2, trackWidth / 2), // front left
                                 new Translation2d(wheelBase / 2, -trackWidth / 2), // front right
@@ -86,8 +86,8 @@ public class SwerveConfig {
                                 3, "Back Right");
 
                 // Moment of inertia for simulation (kg*m^2)
-                public static final double driveMomentOfInertia = 0.09;
-                public static final double turnMomentOfInertia = 0.04;
+                public static final double driveMomentOfInertia = 0.025;
+                public static final double turnMomentOfInertia = 0.004;
         }
 
 }

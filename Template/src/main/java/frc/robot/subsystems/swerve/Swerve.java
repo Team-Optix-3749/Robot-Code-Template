@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,17 +44,22 @@ public class Swerve extends SubsystemBase {
   private ChassisSpeeds desiredChassisSpeeds = new ChassisSpeeds();
 
   public Swerve() {
-    // Initialize modules and gyro
-    if (MiscConfig.ROBOT_TYPE == MiscConfig.RobotType.SIM) {
-      gyro = new GyroSim();
-      for (int i = 0; i < 4; i++) {
-        modules[i] = new SwerveModule(i, new SwerveModuleSim(i));
-      }
-    } else {
-      gyro = new PigeonGyro();
-      for (int i = 0; i < 4; i++) {
-        modules[i] = new SwerveModule(i, new SwerveModuleSpark(i));
-      }
+    System.out.println(MiscConfig.ROBOT_TYPE);
+    switch (MiscConfig.ROBOT_TYPE) {
+      case SIM:
+        gyro = new GyroSim(gyroData);
+        for (int i = 0; i < 4; i++) {
+          modules[i] = new SwerveModule(i, SwerveModuleType.SIM);
+          System.out.println("Initialized swerve in SIM mode");
+        }
+        break;
+
+      default:
+        gyro = new PigeonGyro(gyroData);
+        for (int i = 0; i < 4; i++) {
+          modules[i] = new SwerveModule(i, SwerveModuleType.SPARK);
+        }
+        break;
     }
 
     // Initialize pose estimator
@@ -78,6 +84,8 @@ public class Swerve extends SubsystemBase {
     // autoYController.setTolerance(AutoConstants.driveToleranceMeters / 3);
     // autoXController.setIZone(AutoConstants.driveIZone);
     // autoYController.setIZone(AutoConstants.driveIZone);
+
+    resetGyro();
   }
 
   public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
@@ -115,8 +123,8 @@ public class Swerve extends SubsystemBase {
    * @return Max speed in meters per second
    */
   public double getMaxDriveSpeed() {
-    return DriverStation.isTeleopEnabled() ? Control.teleopMaxSpeedMetersPerSecond
-        : Control.autoMaxSpeedMetersPerSecond;
+    return DriverStation.isTeleopEnabled() ? Control.maxSpeedMPS
+        : Control.maxSpeedMPS;
   }
 
   /**
@@ -131,9 +139,6 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] moduleStates = Drivetrain.driveKinematics.toSwerveModuleStates(chassisSpeeds);
-    setModuleStates(moduleStates);
-
     desiredChassisSpeeds = chassisSpeeds;
   }
 
@@ -171,6 +176,19 @@ public class Swerve extends SubsystemBase {
             modules[3].getPosition()
         },
         pose);
+  }
+
+  public void followSample(SwerveSample sample) {
+    // Pose2d pose = getPose();
+
+    // ChassisSpeeds speeds = new ChassisSpeeds(
+    // sample.vx + xController.calculate(pose.getX(), sample.x),
+    // sample.vy + yController.calculate(pose.getY(), sample.y),
+    // sample.omega + headingController.calculate(pose.getRotation().getRadians(),
+    // sample.heading));
+
+    // // Apply the generated speeds
+    // driveFieldRelative(speeds);
   }
 
   public void lockModules() {
@@ -234,14 +252,13 @@ public class Swerve extends SubsystemBase {
       moduleRealStates[i] = modules[i].getState();
     }
 
-    Logger.recordOutput("Swerve/DesiredStates", moduleRealStates);
     Logger.recordOutput("Swerve/RealStates", moduleRealStates);
+    Logger.recordOutput("Swerve/DesiredStates", moduleDesiredStates);
 
     Logger.recordOutput("Swerve/Pose", getPose());
-    Logger.recordOutput("Swerve/Heading", getRotation());
 
-    Logger.recordOutput("Swerve/DesiredChassisSpeeds", desiredChassisSpeeds);
     Logger.recordOutput("Swerve/RealChassisSpeeds", getChassisSpeeds());
+    Logger.recordOutput("Swerve/DesiredChassisSpeeds", desiredChassisSpeeds);
 
     // Current command
     String currentCommand = this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName();
@@ -250,8 +267,11 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    gyro.update(gyroData);
+    gyro.updateData();
     Logger.processInputs("Swerve/GyroData", gyroData);
+
+    SwerveModuleState[] desiredStates = Drivetrain.driveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    setModuleStates(desiredStates);
 
     for (SwerveModule module : modules) {
       module.periodic();

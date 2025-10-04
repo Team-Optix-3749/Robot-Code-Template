@@ -9,6 +9,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
+import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
 import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.SwerveConfig.Motor;
 import frc.robot.utils.MiscConfig.Sim;
@@ -31,27 +32,23 @@ public class SwerveModuleSim implements SwerveModuleIO {
             Motor.turnMotorGearRatio);
     FlywheelSim turnSim = new FlywheelSim(turnPlant, DCMotor.getNEO(1), 0.0);
 
+    public ModuleDataAutoLogged data = new ModuleDataAutoLogged();
+
     private double prevDriveVelMps = 0.0;
     private double prevTimestamp = -1.0;
 
-    public ModuleData data = new ModuleData();
-
-    public SwerveModuleSim(int index) {
+    public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
+        data = moduleData;
         data.index = index;
     }
 
     @Override
-    public ModuleData getData() {
-        return data;
-    }
-
-    @Override
-    public void updateData(ModuleData newData) {
+    public void updateData() {
         double deltaT = 0.02;
         double currTimestamp = Timer.getTimestamp();
 
         if (prevTimestamp > 0.0) {
-            deltaT = currTimestamp - prevTimestamp;
+        deltaT = currTimestamp - prevTimestamp;
         }
         prevTimestamp = currTimestamp;
 
@@ -70,13 +67,11 @@ public class SwerveModuleSim implements SwerveModuleIO {
         data.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
         data.driveTempCelcius = 0.0;
 
-        data.turnPosition.plus(angleDiff);
+        data.turnPosition = data.turnPosition.plus(angleDiff);
         data.absoluteEncoderPosition = data.turnPosition;
         data.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
         data.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
         data.turnTempCelcius = 0.0;
-
-        newData = this.data;
     }
 
     @Override
@@ -90,8 +85,8 @@ public class SwerveModuleSim implements SwerveModuleIO {
     @Override
     public void setTurnVoltage(double volts) {
         double apply = MathUtil.clamp(volts, -12, 12);
-        data.driveDesiredVolts = apply;
-        data.driveAppliedVolts = apply;
+        data.turnDesiredVolts = apply;
+        data.turnAppliedVolts = apply;
         turnSim.setInputVoltage(apply);
     }
 

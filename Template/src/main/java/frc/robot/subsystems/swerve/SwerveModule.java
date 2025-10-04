@@ -8,7 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import frc.robot.subsystems.swerve.SwerveConfig.Control;
 import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
-import frc.robot.subsystems.swerve.SwerveModuleIO.ModuleData;
+import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
+import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
 
 /**
  * General class for swerve modules that interacts with the
@@ -33,9 +34,24 @@ public class SwerveModule {
      * @param index        The module index (0-3)
      * @param SwerveModule The hardware IO implementation
      */
-    public SwerveModule(int index, SwerveModuleIO SwerveModule) {
+    public SwerveModule(int index, SwerveModuleType type) {
         name = Drivetrain.moduleNames.get(index);
-        moduleIO = SwerveModule;
+
+        switch (type) {
+            case SIM:
+                moduleIO = new SwerveModuleSim(index, moduleData);
+                System.out.println("Initialized " + name + " swerve module in SIM mode");
+                break;
+            // case FLEX:
+            // moduleIO = new SwerveModuleFlex(index, moduleData);
+            // System.out.println("Initialized " + name + " swerve module in FLEX mode");
+            // break;
+            case SPARK:
+            default:
+                moduleIO = new SwerveModuleSpark(index, moduleData);
+                System.out.println("Initialized " + name + " swerve module in SPARK mode");
+                break;
+        }
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -59,14 +75,13 @@ public class SwerveModule {
         return desiredState;
     }
 
-    public ModuleData getModuleData() {
-        return moduleIO.getData();
+    public ModuleDataAutoLogged getModuleData() {
+        return moduleData;
     }
 
     public void setDesiredState(SwerveModuleState state) {
-        state.optimize(moduleData.turnPosition);
-        setDriveSpeed(desiredState.speedMetersPerSecond);
-        setTurnPosition(desiredState.angle);
+        desiredState = state;
+        desiredState.optimize(moduleData.turnPosition);
     }
 
     /**
@@ -138,7 +153,10 @@ public class SwerveModule {
      * Called periodically by the swerve subsystem.
      */
     public void periodic() {
-        moduleIO.updateData(moduleData);
+        setDriveSpeed(desiredState.speedMetersPerSecond);
+        setTurnPosition(desiredState.angle);
+
+        moduleIO.updateData();
         Logger.processInputs("Swerve/Module " + moduleData.index, moduleData);
     }
 }

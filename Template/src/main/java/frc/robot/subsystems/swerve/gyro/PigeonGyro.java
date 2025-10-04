@@ -18,7 +18,9 @@ public class PigeonGyro implements GyroIO {
 
     public GyroData data = new GyroData();
 
-    public PigeonGyro() {
+    public PigeonGyro(GyroData moduleData) {
+        data = moduleData;
+
         Rotation3d mountOrientation = GyroConfig.mountOrientation;
 
         mountConfig
@@ -34,9 +36,8 @@ public class PigeonGyro implements GyroIO {
     }
 
     @Override
-    public void update(GyroData moduleData) {
+    public void updateData() {
         data.orientation = pigeonGyro.getRotation3d();
-        moduleData = data;
     }
 
     @Override

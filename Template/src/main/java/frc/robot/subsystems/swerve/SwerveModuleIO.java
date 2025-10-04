@@ -4,6 +4,10 @@ import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+enum SwerveModuleType {
+  SIM, SPARK, FLEX
+}
+
 /**
  * IO interface for swerve modules. Implementations provide motor, encoder,
  * and control bindings for a single module.
@@ -50,16 +54,10 @@ public interface SwerveModuleIO {
   }
 
   /**
-   * Gets the module's data object.
-   * 
-   * @return The module data
-   */
-  public ModuleData getData();
-
-  /**
    * Updates sensor data from hardware.
    */
-  public default void updateData(ModuleData data) {
+  public default void updateData() {
+
   }
 
   /**

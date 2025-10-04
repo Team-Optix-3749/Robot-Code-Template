@@ -1,15 +1,23 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConfig;
 import frc.robot.utils.UtilityFunctions;
 import frc.robot.utils.MiscConfig.*;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 /***
  * Default command to control the swerve subsystem with joysticks
@@ -41,35 +49,36 @@ public class SwerveDefaultCommand extends Command {
   @Override
   public void execute() {
     // controllers are weird in what's positive, so we flip these
-    double xMagnitude = xSupplier.get();
-    double yMagnitude = ySupplier.get();
-    double turningMagnitude = -turnSupplier.get();
+    double controllerX = xSupplier.get();
+    double controllerY = -ySupplier.get();
+    double controllerTurn = -turnSupplier.get();
 
     // deadband
-    xMagnitude = UtilityFunctions.signedDeadband(xMagnitude, Controller.deadbandLX);
-    yMagnitude = UtilityFunctions.signedDeadband(yMagnitude, Controller.deadbandLY);
-    turningMagnitude = UtilityFunctions.signedDeadband(turningMagnitude, Controller.deadbandRX);
+    controllerX = UtilityFunctions.signedDeadband(controllerX, Controller.deadbandLX);
+    controllerY = UtilityFunctions.signedDeadband(controllerY, Controller.deadbandLY);
+    controllerTurn = UtilityFunctions.signedDeadband(controllerTurn, Controller.deadbandRX);
 
-    xMagnitude = Math.copySign(xMagnitude, Math.pow(xMagnitude, Controller.expoFactorTranslate));
-    yMagnitude = Math.copySign(yMagnitude, Math.pow(yMagnitude, Controller.expoFactorTranslate));
-    turningMagnitude = Math.copySign(turningMagnitude,
-        Math.pow(turningMagnitude, Controller.expoFactorRotate));
+    controllerX = Math.copySign(controllerX, Math.pow(controllerX, Controller.expoFactorTranslate));
+    controllerY = Math.copySign(controllerY, Math.pow(controllerY, Controller.expoFactorTranslate));
+    controllerTurn = Math.copySign(controllerTurn,
+        Math.pow(controllerTurn, Controller.expoFactorRotate));
 
-    Translation2d movement = new Translation2d(xMagnitude, yMagnitude);
+    // field relative
+    double x = controllerX;
+    double y = -controllerY;
+    double omega = controllerTurn;
 
-    // If the magnitude is greater than 1, normalize it
-    // shouldn't be possible with XBox controller but just in case :))
-    if (movement.getNorm() > 1.0) {
+    Translation2d movement = new Translation2d(x, y);
+
+    if (movement.getNorm() > 1) {
       movement = movement.div(movement.getNorm());
     }
 
     // convert to field relative speeds
     // divide by their "contribution" to the total speed
-    double xVelocity = movement.getX() * SwerveConstants.SwerveConfig.maxSpeedMetersPerSecond
-        / Math.cos(movement.getAngle().getRadians());
-    double yVelocity = movement.getY() * SwerveConstants.SwerveConfig.maxSpeedMetersPerSecond
-        / Math.cos(movement.getAngle().getRadians());
-    double turningVelocity = turningMagnitude * SwerveConstants.SwerveConfig.maxAngularSpeedRadiansPerSecond;
+    double xVelocity = movement.getX() * Robot.swerve.getMaxDriveSpeed();
+    double yVelocity = movement.getY() * Robot.swerve.getMaxDriveSpeed();
+    double turningVelocity = omega * Robot.swerve.getMaxAngularSpeed();
 
     // flip for red alliance
     if (UtilityFunctions.isRedAlliance()) {
@@ -78,8 +87,8 @@ public class SwerveDefaultCommand extends Command {
     }
 
     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        xVelocity,
         yVelocity,
+        xVelocity,
         turningVelocity,
         Robot.swerve.getRotation());
 
@@ -88,7 +97,7 @@ public class SwerveDefaultCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    Robot.swerve.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
+    Robot.swerve.setChassisSpeeds(new ChassisSpeeds());
   }
 
   @Override
