@@ -3,7 +3,10 @@ package frc.robot.subsystems.swerve;
 import org.littletonrobotics.junction.Logger;
 
 import choreo.trajectory.SwerveSample;
+import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,6 +45,13 @@ public class Swerve extends SubsystemBase {
   private final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
   private ChassisSpeeds desiredChassisSpeeds = new ChassisSpeeds();
+
+  private final ProfiledPIDController autoTranslateController = new ProfiledPIDController(
+      SwerveConfig.Control.drivetrainTranslatePID[0], SwerveConfig.Control.drivetrainTranslatePID[1],
+      SwerveConfig.Control.drivetrainTranslatePID[2], Control.translateControllerConstants);
+  private final ProfiledPIDController autoTurnController = new ProfiledPIDController(
+      SwerveConfig.Control.drivetrainTurnPID[0], SwerveConfig.Control.drivetrainTurnPID[1],
+      SwerveConfig.Control.drivetrainTurnPID[2], Control.turnControllerConstants);
 
   public Swerve() {
     System.out.println(MiscConfig.ROBOT_TYPE);
@@ -84,6 +94,8 @@ public class Swerve extends SubsystemBase {
     // autoYController.setTolerance(AutoConstants.driveToleranceMeters / 3);
     // autoXController.setIZone(AutoConstants.driveIZone);
     // autoYController.setIZone(AutoConstants.driveIZone);
+
+    autoTurnController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetGyro();
   }
@@ -138,10 +150,6 @@ public class Swerve extends SubsystemBase {
     return swerveDrivePoseEstimator;
   }
 
-  public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    desiredChassisSpeeds = chassisSpeeds;
-  }
-
   /**
    * Sets individual module states with desaturation.
    * 
@@ -178,17 +186,31 @@ public class Swerve extends SubsystemBase {
         pose);
   }
 
-  public void followSample(SwerveSample sample) {
-    // Pose2d pose = getPose();
+  public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
+    desiredChassisSpeeds = chassisSpeeds;
+  }
 
-    // ChassisSpeeds speeds = new ChassisSpeeds(
-    // sample.vx + xController.calculate(pose.getX(), sample.x),
-    // sample.vy + yController.calculate(pose.getY(), sample.y),
-    // sample.omega + headingController.calculate(pose.getRotation().getRadians(),
-    // sample.heading));
+  public void driveToSample(SwerveSample sample) {
+    double vx = sample.vx + autoTranslateController.calculate(
+        swerveDrivePoseEstimator.getEstimatedPosition().getX(), sample.x);
+    double vy = sample.vy + autoTranslateController.calculate(
+        swerveDrivePoseEstimator.getEstimatedPosition().getY(), sample.y);
+    double targetAngle = UtilityFunctions.isRedAlliance()
+        ? sample.heading + Math.PI
+        : sample.heading;
+    double currentAngle = swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians();
+    double omega = sample.omega + autoTurnController.calculate(currentAngle, targetAngle);
 
-    // // Apply the generated speeds
-    // driveFieldRelative(speeds);
+    ChassisSpeeds speeds = new ChassisSpeeds(vx, vy, omega);
+
+    driveFieldRelative(speeds);
+  }
+
+  public void driveToPose(Pose2d pose) {
+    SwerveSample sample = new SwerveSample(0, pose.getX(), pose.getY(), pose.getRotation().getRadians(), 0, 0, 0, 0, 0,
+        0, new double[4], new double[4]);
+
+    driveToSample(sample);
   }
 
   public void lockModules() {

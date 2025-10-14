@@ -57,7 +57,6 @@ public class Robot extends LoggedRobot {
       case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new WPILOGWriter());
-        
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -89,7 +88,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-
+    
   }
 
   @Override

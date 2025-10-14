@@ -92,12 +92,12 @@ public class SwerveDefaultCommand extends Command {
         turningVelocity,
         Robot.swerve.getRotation());
 
-    Robot.swerve.setChassisSpeeds(chassisSpeeds);
+    Robot.swerve.driveFieldRelative(chassisSpeeds);
   }
 
   @Override
   public void end(boolean interrupted) {
-    Robot.swerve.setChassisSpeeds(new ChassisSpeeds());
+    Robot.swerve.driveFieldRelative(new ChassisSpeeds());
   }
 
   @Override

@@ -20,10 +20,10 @@ public class SwerveModule {
     private SwerveModuleState desiredState = new SwerveModuleState();
 
     private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0, 0, 0);;
-    private final PIDController drivePID = new PIDController(Control.drivePID[0], Control.drivePID[1],
-            Control.drivePID[2]);
-    private final PIDController turnPID = new PIDController(Control.turnPID[0], Control.turnPID[1],
-            Control.turnPID[2]);
+    private final PIDController drivePID = new PIDController(Control.moduleDrivePID[0], Control.moduleDrivePID[1],
+            Control.moduleDrivePID[2]);
+    private final PIDController turnPID = new PIDController(Control.moduleTurnPID[0], Control.moduleTurnPID[1],
+            Control.moduleTurnPID[2]);
 
     private final SwerveModuleIO moduleIO;
     private ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();

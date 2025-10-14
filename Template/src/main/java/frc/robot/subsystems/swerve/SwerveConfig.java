@@ -5,6 +5,7 @@ import java.util.Map;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -19,10 +20,16 @@ import edu.wpi.first.math.util.Units;
 public class SwerveConfig {
 
         public static final class Control {
-                public static final double[] turnPID = new double[] {
-                                3, 0, 0 };
-                public static final double[] drivePID = new double[] {
+                public static final double[] moduleDrivePID = new double[] {
                                 12, 0, 0 };
+                public static final double[] moduleTurnPID = new double[] {
+                                3, 0, 0 };
+
+                public static final double[] drivetrainTranslatePID = new double[] {
+                                4.5, 0, 0 };
+                public static final double[] drivetrainTurnPID = new double[] {
+                                3, 0, 0 };
+
                 // // our FF values
                 // public static LoggedTunableNumber kSDriving = new
                 // LoggedTunableNumber("swerve/kSDriving",
@@ -41,10 +48,16 @@ public class SwerveConfig {
                 // "swerve/maxAcceleration", 3.3);
 
                 public static final double maxSpeedMPS = 4.3;
+                public static final double maxAccelerationMPS2 = 3.3;
                 public static final double speedDeadbandMPS = 0.005;
 
                 public static final double maxAngularSpeedRadsPS = 11;
                 public static final double maxAngularAccelRadsPSS = 9.0;
+
+                public static final Constraints translateControllerConstants = new Constraints(maxSpeedMPS,
+                                maxAccelerationMPS2);
+                public static final Constraints turnControllerConstants = new Constraints(maxAngularSpeedRadsPS,
+                                maxAngularAccelRadsPSS);
         }
 
         public static final class Motor {
@@ -65,7 +78,6 @@ public class SwerveConfig {
                                 Rotation2d.fromRadians(4.790622),
                                 Rotation2d.fromRadians(3.518839)
                 };
-
         }
 
         public static final class Drivetrain {
