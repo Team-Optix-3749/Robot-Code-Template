@@ -1,103 +1,126 @@
 package frc.robot.subsystems.swerve.sim;
 
-import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.utils.MiscConstants.SimConstants;
+import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
+import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
+import frc.robot.subsystems.swerve.SwerveConfig.Motor;
+import frc.robot.utils.MiscConfig.Sim;
 
 /**
- * Simulation implementation for swerve modules
- * Very closely inspired by 6328's Swerve Sim code,
- * 
- * @see https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/subsystems/drive/ModuleIOSim.java
- * 
- * @author Noah Simon
+ * Simulation implementation for swerve modules.
+ * Inspired by 6328's Swerve Sim.
  */
 public class SwerveModuleSim implements SwerveModuleIO {
 
     LinearSystem<N1, N1, N1> drivePlant = LinearSystemId.createFlywheelSystem(
-            DCMotor.getNEO(1), // Motor
-            0.09, // J (moment of inertia)
-            ModuleConstants.driveMotorGearRatio // Gear ratio
-    );
-    FlywheelSim driveSim = new FlywheelSim(
-            drivePlant, // The linear system
-            DCMotor.getNEO(1), // The motor (gearbox) model
-            0.0 // Optional noise in sensor measurements
-    );
+            DCMotor.getNEO(1),
+            Drivetrain.driveMomentOfInertia,
+            Motor.driveMotorGearRatio);
+    FlywheelSim driveSim = new FlywheelSim(drivePlant, DCMotor.getNEO(1), 0.0);
+
     LinearSystem<N1, N1, N1> turnPlant = LinearSystemId.createFlywheelSystem(
-            DCMotor.getNEO(1), // Motor
-            0.04, // J (moment of inertia)
-            ModuleConstants.turnMotorGearRatio // Gear ratio
-    );
-    FlywheelSim turnSim = new FlywheelSim(
-            turnPlant, // The linear system
-            DCMotor.getNEO(1), // The motor (gearbox) model
-            0.0 // Optional noise in sensor measurements
-    );
+            DCMotor.getNEO(1),
+            Drivetrain.turnMomentOfInertia,
+            Motor.turnMotorGearRatio);
+    FlywheelSim turnSim = new FlywheelSim(turnPlant, DCMotor.getNEO(1), 0.0);
 
-    private double turnPositionRad = 0;
-    private double driveAppliedVolts = 0.0;
-    private double turnAppliedVolts = 0.0;
+    public ModuleDataAutoLogged data = new ModuleDataAutoLogged();
 
-    public SwerveModuleSim() {
-        System.out.println("[Init] Creating ModuleIOSim");
+    private double prevDriveVelMps = 0.0;
+    private double prevTimestamp = -1.0;
+
+    public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
+        data = moduleData;
+        data.index = index;
     }
 
     @Override
-    public void updateData(ModuleData data) {
-        // update sim values
-        driveSim.update(SimConstants.loopPeriodSec);
-        turnSim.update(SimConstants.loopPeriodSec);
+    public void updateData() {
+        double deltaT = 0.02;
+        double currTimestamp = Timer.getTimestamp();
 
-        // how far have we turned in the previous loop?
-        double angleDiffRad = turnSim.getAngularVelocityRadPerSec() * SimConstants.loopPeriodSec;
-        // update our angle variables
-        turnPositionRad += angleDiffRad;
-        // keep our absolute position within 0-2 pi
-        while (turnPositionRad < 0) {
-            turnPositionRad += 2.0 * Math.PI;
+        if (prevTimestamp > 0.0) {
+        deltaT = currTimestamp - prevTimestamp;
         }
-        while (turnPositionRad > 2.0 * Math.PI) {
-            turnPositionRad -= 2.0 * Math.PI;
-        }
-        // distance traveled + Rad/Time * Time * diameter
-        data.drivePositionM = data.drivePositionM
-                + (driveSim.getAngularVelocityRadPerSec() * 0.02 * ModuleConstants.wheelDiameterMeters) / 2;
-        data.driveVelocityMPerSec = driveSim.getAngularVelocityRadPerSec() * ModuleConstants.wheelDiameterMeters / 2;
-        data.driveAppliedVolts = driveAppliedVolts;
+        prevTimestamp = currTimestamp;
+
+        driveSim.update(deltaT);
+        turnSim.update(deltaT);
+
+        Rotation2d angleDiff = Rotation2d.fromRadians(turnSim.getAngularVelocityRadPerSec() * deltaT);
+
+        double driveVelMps = getDriveVelocityMetersPerSec();
+        double driveAccelMps2 = (driveVelMps - prevDriveVelMps) / deltaT;
+        prevDriveVelMps = driveVelMps;
+
+        data.drivePositionM += driveVelMps * deltaT;
+        data.driveVelocityMPerSec = driveVelMps;
+        data.driveAccelerationMPerSecSquared = driveAccelMps2;
         data.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
-        data.driveTempCelcius = 0;
+        data.driveTempCelcius = 0.0;
 
-        data.turnAbsolutePositionRad = turnPositionRad;
+        data.turnPosition = data.turnPosition.plus(angleDiff);
+        data.absoluteEncoderPosition = data.turnPosition;
         data.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
-        data.turnAppliedVolts = turnAppliedVolts;
         data.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
-        data.turnTempCelcius = 0;
-
+        data.turnTempCelcius = 0.0;
     }
 
     @Override
     public void setDriveVoltage(double volts) {
-        driveAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
-                DriveConstants.maxMotorVolts);
-
-        // driveAppliedVolts = Math.copySign(12,driveAppliedVolts);
-        driveSim.setInputVoltage(driveAppliedVolts);
+        double apply = MathUtil.clamp(volts, -12, 12);
+        data.driveDesiredVolts = apply;
+        data.driveAppliedVolts = apply;
+        driveSim.setInputVoltage(apply);
     }
 
     @Override
     public void setTurnVoltage(double volts) {
-        turnAppliedVolts = MathUtil.clamp(volts, -DriveConstants.maxMotorVolts,
-                DriveConstants.maxMotorVolts);
-        turnSim.setInputVoltage(turnAppliedVolts);
+        double apply = MathUtil.clamp(volts, -12, 12);
+        data.turnDesiredVolts = apply;
+        data.turnAppliedVolts = apply;
+        turnSim.setInputVoltage(apply);
+    }
+
+    @Override
+    public void setDriveBrakeMode(boolean enable) {
+
+    }
+
+    @Override
+    public void setTurningBrakeMode(boolean enable) {
+
+    }
+
+    @Override
+    public void requestDriveVelocity(double setpoint) {
+        // double error = setpoint - getDriveVelocityMetersPerSec();
+        // double voltage = MathUtil.clamp(error * 10.0, -12, 12);
+        // setDriveVoltage(voltage);
+    }
+
+    @Override
+    public void requestTurnPosition(Rotation2d setpoint) {
+        // double error = setpoint.getRadians() - turnPositionRad;
+        // error = MathUtil.angleModulus(error);
+        // double voltage = MathUtil.clamp(error * 10.0, -12, 12);
+        // setTurnVoltage(voltage);
+    }
+
+    @Override
+    public void syncEncoderPosition() {
+
+    }
+
+    private double getDriveVelocityMetersPerSec() {
+        return (driveSim.getAngularVelocityRadPerSec() * (Drivetrain.wheelDiameterMeters / 2.0));
     }
 }

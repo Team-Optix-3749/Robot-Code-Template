@@ -1,214 +1,162 @@
 package frc.robot.subsystems.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.subsystems.swerve.SwerveModuleIO.ModuleData;
-import frc.robot.utils.ShuffleData;
+import frc.robot.subsystems.swerve.SwerveConfig.Control;
+import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
+import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
+import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
 
 /**
  * General class for swerve modules that interacts with the
- * interface. Handles all logic relating to individual modules
- * 
- * @author Noah Simon
- * @author Rohin Sood
- * @author Raadwan Masum
+ * interface. Handles all logic relating to individual modules.
  */
 public class SwerveModule {
-
-    private double index;
-    private String name;
+    private final String name;
     private SwerveModuleState desiredState = new SwerveModuleState();
-    private final PIDController turningPidController;
-    private final PIDController drivingPidController;
-    private final SimpleMotorFeedforward drivingFeedFordward;
 
-    private ModuleData moduleData = new ModuleData();
-    private SwerveModuleIO moduleIO;
+    private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0, 0, 0);;
+    private final PIDController drivePID = new PIDController(Control.moduleDrivePID[0], Control.moduleDrivePID[1],
+            Control.moduleDrivePID[2]);
+    private final PIDController turnPID = new PIDController(Control.moduleTurnPID[0], Control.moduleTurnPID[1],
+            Control.moduleTurnPID[2]);
 
-    private double previousSetpointVelocity = 0;
+    private final SwerveModuleIO moduleIO;
+    private ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();
 
-    // private double previousSetpointVelocity = 0;
+    /**
+     * Constructs a new SwerveModule.
+     * 
+     * @param index        The module index (0-3)
+     * @param SwerveModule The hardware IO implementation
+     */
+    public SwerveModule(int index, SwerveModuleType type) {
+        name = Drivetrain.moduleNames.get(index);
 
-    private ShuffleData<Double> driveSpeed;
-    private ShuffleData<Double> drivePosition;
-    private ShuffleData<Double> driveTemp;
-    private ShuffleData<Double> driveVolts;
-    private ShuffleData<Double> driveCurrent;
-
-    private ShuffleData<Double> turningSpeed;
-    private ShuffleData<Double> turningPosition;
-    private ShuffleData<Double> turningTemp;
-    private ShuffleData<Double> turningVolts;
-    private ShuffleData<Double> turningCurrent;
-
-    public SwerveModule(int index, SwerveModuleIO SwerveModule) {
-
-        moduleIO = SwerveModule;
-
-        drivingPidController = new PIDController(ModuleConstants.kPDriving, 0, 0);
-        drivingFeedFordward = new SimpleMotorFeedforward(ModuleConstants.kSDriving,
-                ModuleConstants.kVDriving, ModuleConstants.kADriving);
-        turningPidController = new PIDController(ModuleConstants.kPturning, 0, ModuleConstants.kDTurning);
-        turningPidController.enableContinuousInput(0, 2 * Math.PI);
-
-        this.index = index;
-
-        if (index == 0) {
-            name = "FL module";
-        } else if (index == 1) {
-            name = "FR module";
-        } else if (index == 2) {
-            name = "BL module";
-        } else if (index == 3) {
-            name = "BR module";
+        switch (type) {
+            case SIM:
+                moduleIO = new SwerveModuleSim(index, moduleData);
+                System.out.println("Initialized " + name + " swerve module in SIM mode");
+                break;
+            // case FLEX:
+            // moduleIO = new SwerveModuleFlex(index, moduleData);
+            // System.out.println("Initialized " + name + " swerve module in FLEX mode");
+            // break;
+            case SPARK:
+            default:
+                moduleIO = new SwerveModuleSpark(index, moduleData);
+                System.out.println("Initialized " + name + " swerve module in SPARK mode");
+                break;
         }
-        // Tab, name, data
-        driveSpeed = new ShuffleData<>("Swerve/" + name, "drive speed",
-                moduleData.driveVelocityMPerSec);
-        drivePosition = new ShuffleData<>("Swerve/" + name, " drive position",
-                moduleData.driveVelocityMPerSec);
-        driveTemp = new ShuffleData<>("Swerve/" + name, "drive temp",
-                moduleData.driveVelocityMPerSec);
-        driveVolts = new ShuffleData<>("Swerve/" + name, "drive volts",
-                moduleData.driveVelocityMPerSec);
-        driveCurrent = new ShuffleData<>("Swerve/" + name, "drive current",
-                moduleData.driveVelocityMPerSec);
 
-        turningSpeed = new ShuffleData<>("Swerve/" + name, "turning speed",
-                moduleData.driveVelocityMPerSec);
-        turningPosition = new ShuffleData<>("Swerve/" + name, "turning position",
-                moduleData.driveVelocityMPerSec);
-        turningTemp = new ShuffleData<>("Swerve/" + name, "turning temp",
-                moduleData.driveVelocityMPerSec);
-        turningVolts = new ShuffleData<>("Swerve/" + name, "turning volts",
-                moduleData.driveVelocityMPerSec);
-        turningCurrent = new ShuffleData<>("Swerve/" + name, "turning current",
-                moduleData.turnCurrentAmps);
+        turnPID.enableContinuousInput(-Math.PI, Math.PI);
     }
 
+    /**
+     * @return The module name (e.g. "Front Left")
+     */
     public String getName() {
         return name;
     }
 
-    /**
-     * State has a velocity (m/s) and an angle(0-2pi) component
-     * 
-     * @return The state of the module as a SwerveModuleState object
-     */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(
-                moduleData.driveVelocityMPerSec,
-                new Rotation2d(moduleData.turnAbsolutePositionRad));
+        return new SwerveModuleState(moduleData.driveVelocityMPerSec, moduleData.turnPosition);
     }
 
-    /**
-     * State has a distance (m) and an angle (0-2pi) component
-     * 
-     * @return The position of the module as a SwerveModuleState object
-     */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(moduleData.drivePositionM, new Rotation2d(moduleData.turnAbsolutePositionRad));
+        return new SwerveModulePosition(moduleData.drivePositionM, moduleData.turnPosition);
     }
 
-    /**
-     * 
-     * @return SwerveModuleState - Angle and velocity point
-     */
     public SwerveModuleState getDesiredState() {
         return desiredState;
     }
 
-    /**
-     * sets the module to a given setpoint state
-     * 
-     * @param state the SwerveModule state, velocity (m/s) and angle(0-2pi) that
-     *              will become the module's setpoint
-     */
+    public ModuleDataAutoLogged getModuleData() {
+        return moduleData;
+    }
+
     public void setDesiredState(SwerveModuleState state) {
-
-        state = SwerveModuleState.optimize(state, getState().angle);
-
-        // prevent micromovements on the motor
-        if (Math.abs(state.speedMetersPerSecond) < 0.001) {
-            state.speedMetersPerSecond = 0;
-        }
-
-        this.desiredState = state;
-
-        setDriveSpeed(state.speedMetersPerSecond);
-        setTurnPosition(state.angle.getRadians());
-
+        desiredState = state;
+        desiredState.optimize(moduleData.turnPosition);
     }
 
     /**
+     * Sets the drive motor speed with feedforward and PID control.
      * 
-     * @param speedMetersPerSecond - the drive speed setpoint for the module
+     * @param speedMetersPerSecond The target velocity in m/s
      */
     public void setDriveSpeed(double speedMetersPerSecond) {
-        
-        double drive_volts = 0;
-        double setpointAcceleration = (speedMetersPerSecond-previousSetpointVelocity)/0.02;
-
-        drive_volts = drivingFeedFordward.calculate(speedMetersPerSecond, setpointAcceleration)
-                + drivingPidController.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
-        setDriveVoltage(drive_volts);
-        previousSetpointVelocity = speedMetersPerSecond;
-
+        double feedforward = driveFF.calculateWithVelocities(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
+        double PID = drivePID.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
+        moduleIO.setDriveVoltage(PID + feedforward);
     }
 
     /**
+     * Sets the turn motor position with PID control.
      * 
-     * @param positionRad - the angle setpoint (0-2pi) for the module
+     * @param positionRad The target angle setpoint
      */
-    public void setTurnPosition(double positionRad) {
-        double turning_volts = turningPidController.calculate(moduleData.turnAbsolutePositionRad,
-                positionRad);
-        // Make a drive PID Controller
-        setTurnVoltage(turning_volts);
+    public void setTurnPosition(Rotation2d positionRad) {
+        double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), positionRad.getRadians());
+        moduleIO.setTurnVoltage(PID);
     }
 
+    /**
+     * Sets the drive motor voltage directly.
+     * 
+     * @param volts The voltage to apply
+     */
     public void setDriveVoltage(double volts) {
         moduleIO.setDriveVoltage(volts);
-
     }
 
+    /**
+     * Sets the turn motor voltage directly.
+     * 
+     * @param volts The voltage to apply
+     */
     public void setTurnVoltage(double volts) {
         moduleIO.setTurnVoltage(volts);
     }
 
-    public void setBreakMode(boolean enabled) {
+    /**
+     * Enables or disables brake mode on both motors.
+     * 
+     * @param enabled True to enable brake mode, false for coast
+     */
+    public void setBrakeMode(boolean enabled) {
         moduleIO.setDriveBrakeMode(enabled);
         moduleIO.setTurningBrakeMode(enabled);
-
     }
 
+    /**
+     * Syncs the relative encoder with the absolute encoder.
+     */
+    public void syncEncoderPosition() {
+        moduleIO.syncEncoderPosition();
+    }
+
+    /**
+     * Stops both drive and turn motors.
+     */
     public void stop() {
         setDriveVoltage(0);
         setTurnVoltage(0);
     }
 
-    public ModuleData getModuleData() {
-        return moduleData;
-    }
-
-    // called within the swerve subsystem's periodic
+    /**
+     * Updates module data from hardware.
+     * Called periodically by the swerve subsystem.
+     */
     public void periodic() {
-        moduleIO.updateData(moduleData);
-        // Logging
-        driveSpeed.set(moduleData.driveVelocityMPerSec);
-        drivePosition.set(moduleData.drivePositionM);
-        driveTemp.set(moduleData.driveTempCelcius);
-        driveVolts.set(moduleData.driveAppliedVolts);
-        driveCurrent.set(moduleData.driveCurrentAmps);
+        setDriveSpeed(desiredState.speedMetersPerSecond);
+        setTurnPosition(desiredState.angle);
 
-        turningSpeed.set(moduleData.turnVelocityRadPerSec);
-        turningPosition.set(moduleData.turnAbsolutePositionRad);
-        turningTemp.set(moduleData.turnTempCelcius);
-        turningVolts.set(moduleData.turnAppliedVolts);
-        turningCurrent.set(moduleData.turnCurrentAmps);
-
+        moduleIO.updateData();
+        Logger.processInputs("Swerve/Module " + moduleData.index, moduleData);
     }
 }

@@ -3,10 +3,10 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot;
-import frc.robot.commands.example.ExampleSubsystemCommand;
-import frc.robot.commands.swerve.DriveStraight;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 /**
@@ -17,10 +17,8 @@ import frc.robot.commands.swerve.SwerveDefaultCommand;
  */
 public class JoystickIO {
 
-    private static final CommandXboxController pilot = new CommandXboxController(0);
+    private static final CommandPS5Controller pilot = new CommandPS5Controller(0);
     private static final CommandXboxController operator = new CommandXboxController(1);
-    private static final Command sample = new ExampleSubsystemCommand();
-    private static final Command DriveStraight = new DriveStraight();
 
     public JoystickIO() {
     }
@@ -29,21 +27,6 @@ public class JoystickIO {
      * Calls binding methods according to the joysticks connected
      */
     public static void getButtonBindings() {
-
-        if (DriverStation.isJoystickConnected(1)) {
-            // if both xbox controllers are connected
-            pilotAndOperatorBindings();
-        } else if (DriverStation.isJoystickConnected(0)) {
-            // if only one xbox controller is connected
-            pilotBindings();
-        } else if (Robot.isSimulation()) {
-            // will show not connected if on
-            pilotAndOperatorBindings();
-            // simBindings();
-        } else {
-
-        }
-
         setDefaultCommands();
     }
 
@@ -51,21 +34,11 @@ public class JoystickIO {
      * If both controllers are plugged in (pi and op)
      */
     public static void pilotAndOperatorBindings() {
-        // gyro reset
-        pilot.start().onTrue(Commands.runOnce(() -> Robot.swerve.resetGyro()));
-        pilot.a().whileTrue(DriveStraight);
-
-        // Example binding
-        operator.a().whileTrue(new ExampleSubsystemCommand());
 
     }
 
     public static void pilotBindings() {
-        // gyro reset
-        pilot.start().onTrue(Commands.runOnce(() -> Robot.swerve.resetGyro()));
 
-        // Example binding
-        pilot.a().whileTrue(new ExampleSubsystemCommand());
     }
 
     public static void simBindings() {
@@ -97,12 +70,7 @@ public class JoystickIO {
                         new SwerveDefaultCommand(
                                 () -> pilot.getLeftX(),
                                 () -> pilot.getLeftY(),
-                                () -> {
-                                    if (pilot.y().getAsBoolean()) {
-                                        return 1.0;
-                                    }
-                                    return 0.0;
-                                }));
+                                () -> pilot.getRightX()));
     }
 
 }

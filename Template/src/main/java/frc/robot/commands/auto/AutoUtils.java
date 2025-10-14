@@ -6,7 +6,6 @@ import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoTrajectory;
-import choreo.auto.AutoFactory.AutoBindings;
 import choreo.auto.AutoRoutine;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -53,27 +52,13 @@ public class AutoUtils {
      * setup the choreo factor object with bindings, controller, etc.
      */
     private static void setupFactory() {
-        // what commands run on what markers
-        AutoBindings bindings = new AutoFactory.AutoBindings();
-        bindings.bind("Marker", Commands.print("Marker Passed"));
-
-        /**
-         * Swerve Pose Supplier
-         * Reset Odometry Method
-         * Swerve Controller (PID and set chassis speeds)
-         * Alliance Supplier for swapping
-         * Swerve Subsystem for scheduling
-         * Bindings, created above
-         */
-
-        // will now take a reset odometry
-
-        factory = new AutoFactory(() -> Robot.swerve.getPose(),
-                (Pose2d startingPose) -> Robot.swerve.setOdometry(startingPose),
-                (SwerveSample sample) -> Robot.swerve.followSample(sample),
-                true,
-                Robot.swerve,
-                bindings);
+        factory = new AutoFactory(
+                Robot.swerve::getPose, // A function that returns the current robot pose
+                Robot.swerve::setOdometry, // A function that resets the current robot pose to the provided Pose2d
+                Robot.swerve::driveToSample, // The drive subsystem trajectory follower
+                true, // If alliance flipping should be enabled
+                Robot.swerve// The drive subsystem
+        );
 
     }
 
@@ -82,17 +67,6 @@ public class AutoUtils {
      * networktables
      */
     private static void setupChooser() {
-        // interface for choreo
-
-        // Made sendable, use SmartDashbaord now
-        chooser = new AutoChooser();
-        SmartDashboard.putData("Auto: Auto Chooser", chooser);
-        chooser.addCmd("My Routine", () -> Autos.getMyRoutine());
-        chooser.addCmd("Print", () -> Autos.getPrint());
-        chooser.addCmd("Split", () -> Autos.getSplitRoutine());
-        chooser.addCmd("Straight", () -> Autos.getStraight());
-        // Default
-        chooser.select("Straight");
 
     }
 
@@ -105,10 +79,9 @@ public class AutoUtils {
         routine.active().onTrue(
                 factory.resetOdometry(trajectoryName).andThen(
                         trajectoy1Command));
-        
+
         System.out.println(trajectory1.getInitialPose().get());
         return Commands.print(trajectoryName).andThen(routine.cmd());
 
     }
-
 }
