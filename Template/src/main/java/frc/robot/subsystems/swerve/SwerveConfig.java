@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -17,9 +18,14 @@ import edu.wpi.first.math.util.Units;
  * @author Raadwan Masum
  * 
  */
-public class SwerveConfig {
+public final class SwerveConfig {
+
+        private SwerveConfig() {
+        }
 
         public static final class Control {
+                private Control() {
+                }
                 public static final double[] moduleDrivePID = new double[] {
                                 12, 0, 0 };
                 public static final double[] moduleTurnPID = new double[] {
@@ -30,16 +36,9 @@ public class SwerveConfig {
                 public static final double[] drivetrainTurnPID = new double[] {
                                 3, 0, 0 };
 
-                // // our FF values
-                // public static LoggedTunableNumber kSDriving = new
-                // LoggedTunableNumber("swerve/kSDriving",
-                // 0.26);
-                // public static LoggedTunableNumber kVDriving = new
-                // LoggedTunableNumber("swerve/kVDriving",
-                // 2.765);
-                // public static LoggedTunableNumber kADriving = new
-                // LoggedTunableNumber("swerve/kADriving",
-                // 0.0);
+                public static final double moduleDriveKs = 0.0;
+                public static final double moduleDriveKv = 0.0;
+                public static final double moduleDriveKa = 0.0;
 
                 // public static LoggedTunableNumber maxVelocity = new
                 // LoggedTunableNumber("swerve/maxVelocity",
@@ -61,6 +60,8 @@ public class SwerveConfig {
         }
 
         public static final class Motor {
+                private Motor() {
+                }
                 public static final double driveMotorGearRatio = 6.75;
                 public static final double turnMotorGearRatio = 12.8;
 
@@ -81,6 +82,8 @@ public class SwerveConfig {
         }
 
         public static final class Drivetrain {
+                private Drivetrain() {
+                }
                 public static final double wheelDiameterMeters = Units.inchesToMeters(4);
                 // Distance between right and left wheels
                 public static final double trackWidth = Units.inchesToMeters(26);
@@ -100,6 +103,18 @@ public class SwerveConfig {
                 // Moment of inertia for simulation (kg*m^2)
                 public static final double driveMomentOfInertia = 0.025;
                 public static final double turnMomentOfInertia = 0.004;
+        }
+
+        public static final class PoseEstimator {
+                private PoseEstimator() {
+                }
+
+                public static final Pose2d INITIAL_POSE = new Pose2d(
+                                new Translation2d(5.773, 3.963),
+                                Rotation2d.fromDegrees(180));
+
+                public static final double[] STATE_STD_DEVS = { 0.045, 0.045, 0.004 };
+                public static final double[] VISION_STD_DEVS = { 1e-6, 1e-6, 1e-6 };
         }
 
 }

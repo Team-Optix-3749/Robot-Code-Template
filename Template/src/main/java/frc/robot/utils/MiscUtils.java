@@ -2,23 +2,20 @@ package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Robot;
+import frc.robot.config.RobotConfig.RobotType;
 
 /**
  * Methods that are helpful throughout the code base
  * 
  * @author Noah Simon
  */
-public class UtilityFunctions {
+public class MiscUtils {
 
     public static boolean isRedAlliance() {
-        boolean isRed = false;
-
-        if (DriverStation.getAlliance().isEmpty()) {
-            return isRed;
-        } else {
-            isRed = DriverStation.getAlliance().get() == Alliance.Red;
-        }
-        return isRed;
+        return DriverStation.getAlliance()
+                .map(alliance -> alliance == Alliance.Red)
+                .orElse(false);
     }
 
     /***
@@ -35,10 +32,7 @@ public class UtilityFunctions {
         double aDouble = a.doubleValue();
         double bDouble = b.doubleValue();
 
-        if (aDouble + marginDouble >= bDouble && aDouble - marginDouble <= bDouble) {
-            return true;
-        }
-        return false;
+        return aDouble + marginDouble >= bDouble && aDouble - marginDouble <= bDouble;
     }
 
     /**
@@ -78,8 +72,17 @@ public class UtilityFunctions {
 
         if (Math.abs(measurementDouble) < deadbandDouble) {
             return 0.0;
+        }
+        return measurementDouble;
+    }
+
+    public static RobotType getRobotType() {
+        if (Robot.isReal()) {
+            return RobotType.REAL;
+        } else if (Robot.isSimulation()) {
+            return RobotType.SIM;
         } else {
-            return measurementDouble;
+            return RobotType.REPLAY;
         }
     }
 }

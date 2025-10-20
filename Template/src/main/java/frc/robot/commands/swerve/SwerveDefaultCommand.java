@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConfig;
-import frc.robot.utils.UtilityFunctions;
-import frc.robot.utils.MiscConfig.*;
+import frc.robot.utils.MiscUtils;
+import frc.robot.config.RobotConfig.Controller;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -48,22 +48,18 @@ public class SwerveDefaultCommand extends Command {
 
   @Override
   public void execute() {
-    // controllers are weird in what's positive, so we flip these
+    // controllers are weird in what's positive, so we flip these so it matches "our" xy plane
     double controllerX = xSupplier.get();
     double controllerY = -ySupplier.get();
     double controllerTurn = -turnSupplier.get();
 
-    // deadband
-    controllerX = UtilityFunctions.signedDeadband(controllerX, Controller.deadbandLX);
-    controllerY = UtilityFunctions.signedDeadband(controllerY, Controller.deadbandLY);
-    controllerTurn = UtilityFunctions.signedDeadband(controllerTurn, Controller.deadbandRX);
-
-    controllerX = Math.copySign(controllerX, Math.pow(controllerX, Controller.expoFactorTranslate));
-    controllerY = Math.copySign(controllerY, Math.pow(controllerY, Controller.expoFactorTranslate));
+  controllerX = Math.copySign(controllerX, Math.pow(controllerX, Controller.TRANSLATE_EXPO));
+  controllerY = Math.copySign(controllerY, Math.pow(controllerY, Controller.TRANSLATE_EXPO));
     controllerTurn = Math.copySign(controllerTurn,
-        Math.pow(controllerTurn, Controller.expoFactorRotate));
+    Math.pow(controllerTurn, Controller.ROTATE_EXPO));
 
     // field relative
+    // yes i know im negating y again
     double x = controllerX;
     double y = -controllerY;
     double omega = controllerTurn;
@@ -81,7 +77,7 @@ public class SwerveDefaultCommand extends Command {
     double turningVelocity = omega * Robot.swerve.getMaxAngularSpeed();
 
     // flip for red alliance
-    if (UtilityFunctions.isRedAlliance()) {
+    if (MiscUtils.isRedAlliance()) {
       xVelocity *= -1;
       yVelocity *= -1;
     }

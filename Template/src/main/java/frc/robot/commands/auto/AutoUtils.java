@@ -8,12 +8,13 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoTrajectory;
 import choreo.auto.AutoRoutine;
 import choreo.trajectory.SwerveSample;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
-import frc.robot.utils.UtilityFunctions;
+import frc.robot.utils.MiscUtils;
 
 /**
  * All setup and helper methods for auto routines, including the
@@ -80,7 +81,7 @@ public class AutoUtils {
                 factory.resetOdometry(trajectoryName).andThen(
                         trajectoy1Command));
 
-        System.out.println(trajectory1.getInitialPose().get());
+        Logger.recordOutput("Auto/" + trajectoryName + "/InitialPose", trajectory1.getInitialPose().get());
         return Commands.print(trajectoryName).andThen(routine.cmd());
 
     }

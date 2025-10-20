@@ -4,22 +4,22 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.utils.JoystickIO;
-import frc.robot.utils.MiscConfig;
+import frc.robot.utils.ButtonBindings;
+import frc.robot.utils.MiscUtils;
 
 public class Robot extends LoggedRobot {
   public static Swerve swerve = new Swerve();
@@ -33,62 +33,55 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     switch (BuildConstants.DIRTY) {
-      case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
-        break;
-      case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        break;
-      default:
-        Logger.recordMetadata("GitDirty", "Unknown");
-        break;
+      case 0 -> Logger.recordMetadata("GitDirty", "All changes committed");
+      case 1 -> Logger.recordMetadata("GitDirty", "Uncomitted changes");
+      default -> Logger.recordMetadata("GitDirty", "Unknown");
     }
 
-    Logger.recordOutput("Robot Type", MiscConfig.ROBOT_TYPE);
+    var robotType = MiscUtils.getRobotType();
+    Logger.recordOutput("Robot Type", robotType);
 
     // Set up data receivers & replay source
-    switch (MiscConfig.ROBOT_TYPE) {
-      case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
+    switch (robotType) {
+      case REAL, SIM -> {
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM:
-        // Running a physics simulator, log to NT
-        Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case REPLAY:
+      }
+      case REPLAY -> {
         // Replaying a log, set up replay source
         // setUseTiming(false); // Run as fast as possible
         // String logPath = LogFileUtil.findReplayLog();
         // Logger.setReplaySource(new WPILOGReader(logPath));
         // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-        // "_sim")));
-        break;
+        //     "_sim")));
+      }
     }
 
-    LoggedPowerDistribution.getInstance(MiscConfig.CAN.PDH_ID, ModuleType.kRev);
+    LoggedPowerDistribution.getInstance(RobotConfig.Can.PDH_ID, ModuleType.kRev);
 
     Logger.start();
   }
 
+  double startTime = 0.0;
+
   @Override
   public void robotInit() {
-    JoystickIO.getButtonBindings();
+    ButtonBindings.apply();
     // AutoUtils.initAuto();
+
+    startTime = Timer.getTimestamp();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    Logger.recordOutput("graph", Math.sin(Timer.getTimestamp() - startTime));
   }
 
   @Override
   public void disabledInit() {
-    
+
   }
 
   @Override
@@ -120,6 +113,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    ButtonBindings.apply();
+
     if (autoCommand != null) {
       autoCommand.cancel();
     }

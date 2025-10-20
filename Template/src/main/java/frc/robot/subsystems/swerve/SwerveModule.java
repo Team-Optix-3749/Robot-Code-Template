@@ -19,14 +19,17 @@ public class SwerveModule {
     private final String name;
     private SwerveModuleState desiredState = new SwerveModuleState();
 
-    private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0, 0, 0);;
+    private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(
+        Control.moduleDriveKs,
+        Control.moduleDriveKv,
+        Control.moduleDriveKa);
     private final PIDController drivePID = new PIDController(Control.moduleDrivePID[0], Control.moduleDrivePID[1],
             Control.moduleDrivePID[2]);
     private final PIDController turnPID = new PIDController(Control.moduleTurnPID[0], Control.moduleTurnPID[1],
             Control.moduleTurnPID[2]);
 
     private final SwerveModuleIO moduleIO;
-    private ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();
+    private final ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();
 
     /**
      * Constructs a new SwerveModule.
@@ -40,18 +43,17 @@ public class SwerveModule {
         switch (type) {
             case SIM:
                 moduleIO = new SwerveModuleSim(index, moduleData);
-                System.out.println("Initialized " + name + " swerve module in SIM mode");
                 break;
             // case FLEX:
             // moduleIO = new SwerveModuleFlex(index, moduleData);
-            // System.out.println("Initialized " + name + " swerve module in FLEX mode");
             // break;
             case SPARK:
             default:
                 moduleIO = new SwerveModuleSpark(index, moduleData);
-                System.out.println("Initialized " + name + " swerve module in SPARK mode");
                 break;
         }
+
+        Logger.recordMetadata("SwerveModule/" + name + "/Implementation", type.name());
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
     }

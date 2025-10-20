@@ -1,6 +1,6 @@
 package frc.robot.subsystems.swerve.real;
 
-import frc.robot.utils.MiscConfig;
+import frc.robot.config.RobotConfig;
 import frc.robot.utils.OptixSpark;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -15,17 +15,17 @@ import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.SwerveConfig.Motor;
 
 public class SwerveModuleSpark implements SwerveModuleIO {
-    private OptixSpark drive;
-    private OptixSpark turn;
+    private final OptixSpark drive;
+    private final OptixSpark turn;
 
-    private CANcoder absoluteEncoder;
+    private final CANcoder absoluteEncoder;
 
-    private ModuleDataAutoLogged data;
+    private final ModuleDataAutoLogged data;
 
     public SwerveModuleSpark(int index, ModuleDataAutoLogged moduleData) {
-        data = moduleData;
+    data = moduleData;
 
-        data.index = index;
+    data.index = index;
 
         drive = OptixSpark.ofSparkMax(Motor.driveMotorIds[index]);
         turn = OptixSpark.ofSparkMax(Motor.turnMotorIds[index]);
@@ -56,8 +56,9 @@ public class SwerveModuleSpark implements SwerveModuleIO {
                 absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI
                         - absoluteEncoderOffsetRad.getRadians());
 
-        absoluteEncoder.optimizeBusUtilization();
-        absoluteEncoder.getAbsolutePosition().setUpdateFrequency(MiscConfig.Optimizations.nonEssentialCanRefreshRateHz);
+    absoluteEncoder.optimizeBusUtilization();
+    absoluteEncoder.getAbsolutePosition()
+        .setUpdateFrequency(RobotConfig.Optimisations.NON_ESSENTIAL_CAN_REFRESH_RATE_HZ);
     }
 
     @Override

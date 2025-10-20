@@ -2,10 +2,9 @@ package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
+
 import choreo.trajectory.SwerveSample;
-import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,10 +21,11 @@ import frc.robot.subsystems.swerve.gyro.GyroIO;
 import frc.robot.subsystems.swerve.gyro.GyroSim;
 import frc.robot.subsystems.swerve.gyro.PigeonGyro;
 import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
-import frc.robot.utils.MiscConfig;
-import frc.robot.utils.UtilityFunctions;
+import frc.robot.config.RobotConfig.RobotType;
+import frc.robot.utils.MiscUtils;
 import frc.robot.subsystems.swerve.SwerveConfig.Control;
 import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
+import frc.robot.subsystems.swerve.SwerveConfig.PoseEstimator;
 import frc.robot.subsystems.swerve.real.*;
 
 /**
@@ -54,37 +54,29 @@ public class Swerve extends SubsystemBase {
       SwerveConfig.Control.drivetrainTurnPID[2], Control.turnControllerConstants);
 
   public Swerve() {
-    System.out.println(MiscConfig.ROBOT_TYPE);
-    switch (MiscConfig.ROBOT_TYPE) {
-      case SIM:
-        gyro = new GyroSim(gyroData);
-        for (int i = 0; i < 4; i++) {
-          modules[i] = new SwerveModule(i, SwerveModuleType.SIM);
-          System.out.println("Initialized swerve in SIM mode");
-        }
-        break;
+    var robotType = MiscUtils.getRobotType();
+    Logger.recordOutput("Swerve/RobotType", robotType.name());
+    gyro = robotType == RobotType.SIM ? new GyroSim(gyroData) : new PigeonGyro(gyroData);
 
-      default:
-        gyro = new PigeonGyro(gyroData);
-        for (int i = 0; i < 4; i++) {
-          modules[i] = new SwerveModule(i, SwerveModuleType.SPARK);
-        }
-        break;
+    SwerveModuleType moduleType = robotType == RobotType.SIM ? SwerveModuleType.SIM : SwerveModuleType.SPARK;
+    for (int i = 0; i < modules.length; i++) {
+      modules[i] = new SwerveModule(i, moduleType);
     }
 
     // Initialize pose estimator
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
         Drivetrain.driveKinematics,
-        new Rotation2d(0),
-        new SwerveModulePosition[] {
-            modules[0].getPosition(),
-            modules[1].getPosition(),
-            modules[2].getPosition(),
-            modules[3].getPosition()
-        },
-        new Pose2d(new Translation2d(5.773, 3.963), Rotation2d.fromDegrees(180)),
-        VecBuilder.fill(0.045, 0.045, 0.004), // 6328's 2024 numbers with factors of 1.5x, 1.5x, 2x
-        VecBuilder.fill(1e-6, 1e-6, 1e-6));
+        new Rotation2d(),
+        collectModulePositions(),
+        PoseEstimator.INITIAL_POSE,
+        VecBuilder.fill(
+            PoseEstimator.STATE_STD_DEVS[0],
+            PoseEstimator.STATE_STD_DEVS[1],
+            PoseEstimator.STATE_STD_DEVS[2]),
+        VecBuilder.fill(
+            PoseEstimator.VISION_STD_DEVS[0],
+            PoseEstimator.VISION_STD_DEVS[1],
+            PoseEstimator.VISION_STD_DEVS[2]));
 
     // Configure auto PID controllers
     // autoZController.enableContinuousInput(-Math.PI, Math.PI);
@@ -96,7 +88,6 @@ public class Swerve extends SubsystemBase {
     // autoYController.setIZone(AutoConstants.driveIZone);
 
     autoTurnController.enableContinuousInput(-Math.PI, Math.PI);
-
     resetGyro();
   }
 
@@ -105,16 +96,15 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
-   * @return Field-relative chassis speeds
+   * @return robot-relative chassis speeds
    */
   public ChassisSpeeds getChassisSpeeds() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
       states[i] = modules[i].getState();
     }
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        Drivetrain.driveKinematics.toChassisSpeeds(states),
-        getRotation());
+
+    return Drivetrain.driveKinematics.toChassisSpeeds(states);
   }
 
   /**
@@ -177,12 +167,7 @@ public class Swerve extends SubsystemBase {
     Rotation2d gyroHeading = Rotation2d.fromRadians(gyroData.orientation.getZ());
     swerveDrivePoseEstimator.resetPosition(
         gyroHeading,
-        new SwerveModulePosition[] {
-            modules[0].getPosition(),
-            modules[1].getPosition(),
-            modules[2].getPosition(),
-            modules[3].getPosition()
-        },
+        collectModulePositions(),
         pose);
   }
 
@@ -195,7 +180,7 @@ public class Swerve extends SubsystemBase {
         swerveDrivePoseEstimator.getEstimatedPosition().getX(), sample.x);
     double vy = sample.vy + autoTranslateController.calculate(
         swerveDrivePoseEstimator.getEstimatedPosition().getY(), sample.y);
-    double targetAngle = UtilityFunctions.isRedAlliance()
+    double targetAngle = MiscUtils.isRedAlliance()
         ? sample.heading + Math.PI
         : sample.heading;
     double currentAngle = swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians();
@@ -230,36 +215,33 @@ public class Swerve extends SubsystemBase {
   public void updateOdometry() {
     swerveDrivePoseEstimator.update(
         Rotation2d.fromRadians(gyroData.orientation.getZ()),
-        new SwerveModulePosition[] {
-            modules[0].getPosition(),
-            modules[1].getPosition(),
-            modules[2].getPosition(),
-            modules[3].getPosition()
-        });
+        collectModulePositions());
   }
 
   public void resetGyro() {
-    System.out.println("Resetting gyro");
-
     gyro.reset();
 
     for (SwerveModule module : modules) {
       module.syncEncoderPosition();
     }
 
-    Rotation2d targetRotation = UtilityFunctions.isRedAlliance()
+    Rotation2d targetRotation = MiscUtils.isRedAlliance()
         ? Rotation2d.fromDegrees(180)
         : new Rotation2d();
 
     swerveDrivePoseEstimator.resetPosition(
         new Rotation2d(),
-        new SwerveModulePosition[] {
-            modules[0].getPosition(),
-            modules[1].getPosition(),
-            modules[2].getPosition(),
-            modules[3].getPosition()
-        },
+        collectModulePositions(),
         new Pose2d(swerveDrivePoseEstimator.getEstimatedPosition().getTranslation(), targetRotation));
+  }
+
+  private SwerveModulePosition[] collectModulePositions() {
+    return new SwerveModulePosition[] {
+        modules[0].getPosition(),
+        modules[1].getPosition(),
+        modules[2].getPosition(),
+        modules[3].getPosition()
+    };
   }
 
   /**

@@ -4,9 +4,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Robot;
+import frc.robot.config.RobotConfig;
 
 /**
- * Simualtion implementatation for a gyroscope
+ * Simulation implementation for a gyroscope.
  * 
  * @author Noah Simon
  * 
@@ -16,7 +17,7 @@ public class GyroSim implements GyroIO {
 
   private double prevTimestamp = -1.0;
 
-  public GyroData data;
+  private final GyroData data;
 
   public GyroSim(GyroData moduleData) {
     data = moduleData;
@@ -24,7 +25,7 @@ public class GyroSim implements GyroIO {
 
   @Override
   public void updateData() {
-    double deltaT = 0.02;
+  double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
     double currTimestamp = Timer.getTimestamp();
 
     if (prevTimestamp > 0.0) {

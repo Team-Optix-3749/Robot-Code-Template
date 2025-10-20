@@ -8,11 +8,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
 import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.SwerveConfig.Motor;
-import frc.robot.utils.MiscConfig.Sim;
 
 /**
  * Simulation implementation for swerve modules.
@@ -32,19 +32,19 @@ public class SwerveModuleSim implements SwerveModuleIO {
             Motor.turnMotorGearRatio);
     FlywheelSim turnSim = new FlywheelSim(turnPlant, DCMotor.getNEO(1), 0.0);
 
-    public ModuleDataAutoLogged data = new ModuleDataAutoLogged();
+    private final ModuleDataAutoLogged data;
 
     private double prevDriveVelMps = 0.0;
     private double prevTimestamp = -1.0;
 
     public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
-        data = moduleData;
-        data.index = index;
+    data = moduleData;
+    data.index = index;
     }
 
     @Override
     public void updateData() {
-        double deltaT = 0.02;
+    double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
         double currTimestamp = Timer.getTimestamp();
 
         if (prevTimestamp > 0.0) {
