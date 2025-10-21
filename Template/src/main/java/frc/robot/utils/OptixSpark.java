@@ -21,9 +21,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 /**
- * Lightweight wrapper around SparkBase/SparkMax/SparkFlex providing
- * fluent configuration, telemetry, and simple open/closed-loop helpers
- * with optional position wrapping and deadband behavior.
+ * Lightweight wrapper around SparkBase/SparkMax/SparkFlex
  */
 public final class OptixSpark {
     private final SparkBase motor;

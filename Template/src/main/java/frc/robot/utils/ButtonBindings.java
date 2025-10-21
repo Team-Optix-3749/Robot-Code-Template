@@ -13,6 +13,10 @@ import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 
 public final class ButtonBindings {
@@ -25,22 +29,22 @@ public final class ButtonBindings {
     /**
      * If both controllers are plugged in (pi and op)
      */
-    public static void pilotAndOperatorBindings(CommandXboxController piCtl, CommandXboxController opCtl) {
+    public static void twoControllerBindings(CommandXboxController piCtl, CommandXboxController opCtl) {
         // Add any dual-controller bindings here.
         // Example:
-        bindOnTrue(pilot.povUp(), Commands.print("Pilot: povUp pressed"));
-        bindOnTrue(operator.a(), Commands.print("Operator: A pressed"));
+        bindOnTrue(piCtl.povUp(), Commands.print("Pilot: povUp pressed"));
+        bindOnTrue(opCtl.a(), Commands.print("Operator: A pressed"));
 
-        bindOnTrue(pilot.start(), Robot.swerve::resetGyro);
-        bindOnTrue(pilot.back(), Robot.swerve::syncEncoderPositions);
+        bindOnTrue(piCtl.start(), Robot.swerve::resetGyro);
+        bindOnTrue(piCtl.back(), Robot.swerve::syncEncoderPositions);
     }
 
-    public static void pilotBindings(CommandXboxController ctl) {
+    public static void oneControllerBindings(CommandXboxController ctl) {
         // Add any pilot-only bindings here.
     }
 
     public static void simBindings() {
-        pilotBindings(pilot);
+        twoControllerBindings(pilot, operator);
     }
 
     private static void bindOnTrue(Trigger trigger, Runnable command, Runnable... onFalse) {
@@ -100,7 +104,6 @@ public final class ButtonBindings {
         switch (mode) {
             case OPERATOR_ONLY:
                 return operator;
-            case BOTH, PILOT_ONLY, SIM:
             default:
                 return pilot;
         }
@@ -115,22 +118,24 @@ public final class ButtonBindings {
         ControlMode mode = getControlMode();
 
         switch (mode) {
-            case BOTH -> pilotAndOperatorBindings(pilot, operator);
-            case PILOT_ONLY -> pilotBindings(pilot);
-            case OPERATOR_ONLY -> pilotBindings(operator);
+            case BOTH -> twoControllerBindings(pilot, operator);
+            case PILOT_ONLY -> oneControllerBindings(pilot);
+            case OPERATOR_ONLY -> oneControllerBindings(operator);
             case SIM -> simBindings();
             case NONE -> {
             }
         }
 
         controllerAlert.set(mode == ControlMode.NONE);
+
+        Logger.recordOutput("ControlMode", mode);
     }
 
     private static void setDefaultCommands() {
         ControlMode mode = getControlMode();
 
         switch (mode) {
-            case BOTH, PILOT_ONLY -> {
+            case BOTH, PILOT_ONLY, SIM -> {
                 Robot.swerve.setDefaultCommand(
                         new SwerveDefaultCommand(
                                 () -> getAxis(pilot, Axis.kLeftX),

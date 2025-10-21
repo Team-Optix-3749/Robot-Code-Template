@@ -37,9 +37,11 @@ public class SwerveDefaultCommand extends Command {
 
   @Override
   public void execute() {
-    double xInput = applyExpo(xSupplier.getAsDouble(), Controller.TRANSLATE_EXPO);
-    double yInput = applyExpo(ySupplier.getAsDouble(), Controller.TRANSLATE_EXPO);
-    double turnInput = applyExpo(turnSupplier.getAsDouble(), Controller.ROTATE_EXPO);
+    // controller x and y is "field relative" we have to make it "driver relative" (basically x is y and y is x)
+    // turn is also flipped
+    double xInput = applyExpo(ySupplier.getAsDouble(), Controller.TRANSLATE_EXPO);
+    double yInput = applyExpo(xSupplier.getAsDouble(), Controller.TRANSLATE_EXPO);
+    double omegaInput = applyExpo(-turnSupplier.getAsDouble(), Controller.ROTATE_EXPO);
 
     double magnitude = Math.hypot(xInput, yInput);
     if (magnitude > 1.0) {
@@ -51,7 +53,7 @@ public class SwerveDefaultCommand extends Command {
 
     double vx = xInput * Robot.swerve.getMaxDriveSpeed() * speedScale;
     double vy = yInput * Robot.swerve.getMaxDriveSpeed() * speedScale;
-    double omega = turnInput * Robot.swerve.getMaxAngularSpeed() * speedScale;
+    double omega = omegaInput * Robot.swerve.getMaxAngularSpeed() * speedScale;
 
     double fieldVx = MiscUtils.isRedAlliance() ? -vx : vx;
     double fieldVy = MiscUtils.isRedAlliance() ? -vy : vy;
