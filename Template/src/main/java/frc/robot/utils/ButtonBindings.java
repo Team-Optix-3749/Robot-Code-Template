@@ -15,22 +15,12 @@ import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 import edu.wpi.first.math.MathUtil;
 
-/**
- * Util class for button bindings
- * 
- * @author Rohin Sood
- * @author Noah Simon
- */
 public final class ButtonBindings {
 
     private static final CommandXboxController pilot = new CommandXboxController(Controller.PILOT_PORT);
     private static final CommandXboxController operator = new CommandXboxController(Controller.OPERATOR_PORT);
 
     public static final Alert controllerAlert = new Alert("No controllers connected!", Alert.AlertType.kError);
-
-    private ButtonBindings() {
-        // Utility class
-    }
 
     /**
      * If both controllers are plugged in (pi and op)
@@ -40,6 +30,9 @@ public final class ButtonBindings {
         // Example:
         bindOnTrue(pilot.povUp(), Commands.print("Pilot: povUp pressed"));
         bindOnTrue(operator.a(), Commands.print("Operator: A pressed"));
+
+        bindOnTrue(pilot.start(), Robot.swerve::resetGyro);
+        bindOnTrue(pilot.back(), Robot.swerve::syncEncoderPositions);
     }
 
     public static void pilotBindings(CommandXboxController ctl) {
@@ -48,6 +41,21 @@ public final class ButtonBindings {
 
     public static void simBindings() {
         pilotBindings(pilot);
+    }
+
+    private static void bindOnTrue(Trigger trigger, Runnable command, Runnable... onFalse) {
+        Command onTrueCmd = Commands.runOnce(command);
+        trigger.onTrue(onTrueCmd);
+
+        if (onFalse.length > 0) {
+            Command onFalseCmd = Commands.runOnce(onFalse[0]);
+            trigger.onFalse(onFalseCmd);
+        }
+
+        if (onFalse.length > 1) {
+            DriverStation.reportWarning(
+                    "bindOnTrue called with multiple onFalse commands; only the first will be used.", false);
+        }
     }
 
     private static void bindOnTrue(Trigger trigger, Command command, Command... onFalse) {
@@ -118,19 +126,21 @@ public final class ButtonBindings {
         controllerAlert.set(mode == ControlMode.NONE);
     }
 
-    /**
-     * Backward-compatible entrypoint; resolves mode internally.
-     */
-    public static void setDefaultCommands() {
-        setDefaultCommands(getActiveController());
-    }
+    private static void setDefaultCommands() {
+        ControlMode mode = getControlMode();
 
-    private static void setDefaultCommands(CommandXboxController ctl) {
-        Robot.swerve.setDefaultCommand(
-                new SwerveDefaultCommand(
-                        () -> getAxis(ctl, Axis.kLeftX),
-                        () -> getAxis(ctl, Axis.kLeftY),
-                        () -> getAxis(ctl, Axis.kRightX)));
+        switch (mode) {
+            case BOTH, PILOT_ONLY -> {
+                Robot.swerve.setDefaultCommand(
+                        new SwerveDefaultCommand(
+                                () -> getAxis(pilot, Axis.kLeftX),
+                                () -> getAxis(pilot, Axis.kLeftY),
+                                () -> getAxis(pilot, Axis.kRightX)));
+            }
+            default -> {
+
+            }
+        }
     }
 
     private static double getAxis(CommandXboxController ctl, Axis axis) {

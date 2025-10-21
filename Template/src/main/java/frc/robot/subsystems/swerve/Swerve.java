@@ -2,31 +2,28 @@ package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.Logger;
 
-
 import choreo.trajectory.SwerveSample;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.gyro.GyroDataAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroIO;
 import frc.robot.subsystems.swerve.gyro.GyroSim;
 import frc.robot.subsystems.swerve.gyro.PigeonGyro;
-import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
 import frc.robot.config.RobotConfig.RobotType;
+import frc.robot.config.SwerveConfig;
 import frc.robot.utils.MiscUtils;
-import frc.robot.subsystems.swerve.SwerveConfig.Control;
-import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
-import frc.robot.subsystems.swerve.SwerveConfig.PoseEstimator;
-import frc.robot.subsystems.swerve.real.*;
+import frc.robot.config.SwerveConfig.Control;
+import frc.robot.config.SwerveConfig.Drivetrain;
+import frc.robot.config.SwerveConfig.PoseEstimator;
 
 /**
  * Subsystem class for swerve drive, used to manage four swerve
@@ -38,6 +35,7 @@ import frc.robot.subsystems.swerve.real.*;
  */
 public class Swerve extends SubsystemBase {
   private final SwerveModule[] modules = new SwerveModule[4];
+  private final SwerveModulePosition[] modulePositionsBuffer = new SwerveModulePosition[4];
 
   private final GyroIO gyro;
   private final GyroDataAutoLogged gyroData = new GyroDataAutoLogged();
@@ -46,53 +44,68 @@ public class Swerve extends SubsystemBase {
 
   private ChassisSpeeds desiredChassisSpeeds = new ChassisSpeeds();
 
-  private final ProfiledPIDController autoTranslateController = new ProfiledPIDController(
-      SwerveConfig.Control.drivetrainTranslatePID[0], SwerveConfig.Control.drivetrainTranslatePID[1],
-      SwerveConfig.Control.drivetrainTranslatePID[2], Control.translateControllerConstants);
+  private double lastEncoderSyncTime = -1.0;
+
+  private final ProfiledPIDController autoXController = new ProfiledPIDController(
+      SwerveConfig.Control.TRANSLATE_PID[0], SwerveConfig.Control.TRANSLATE_PID[1],
+      SwerveConfig.Control.TRANSLATE_PID[2], Control.TRANSLATE_CONSTRAINTS);
+  private final ProfiledPIDController autoYController = new ProfiledPIDController(
+      SwerveConfig.Control.TRANSLATE_PID[0], SwerveConfig.Control.TRANSLATE_PID[1],
+      SwerveConfig.Control.TRANSLATE_PID[2], Control.TRANSLATE_CONSTRAINTS);
   private final ProfiledPIDController autoTurnController = new ProfiledPIDController(
-      SwerveConfig.Control.drivetrainTurnPID[0], SwerveConfig.Control.drivetrainTurnPID[1],
-      SwerveConfig.Control.drivetrainTurnPID[2], Control.turnControllerConstants);
+      SwerveConfig.Control.ROTATE_PID[0], SwerveConfig.Control.ROTATE_PID[1],
+      SwerveConfig.Control.ROTATE_PID[2], Control.ROTATE_CONSTRAINTS);
 
   public Swerve() {
-    var robotType = MiscUtils.getRobotType();
+    RobotType robotType = MiscUtils.getRobotType();
     Logger.recordOutput("Swerve/RobotType", robotType.name());
-    gyro = robotType == RobotType.SIM ? new GyroSim(gyroData) : new PigeonGyro(gyroData);
 
-    SwerveModuleType moduleType = robotType == RobotType.SIM ? SwerveModuleType.SIM : SwerveModuleType.SPARK;
+    SwerveModuleType moduleType;
+
+    switch (robotType) {
+      case SIM:
+        moduleType = SwerveModuleType.SIM;
+        gyro = new GyroSim(gyroData);
+        break;
+      case REAL:
+      default:
+        moduleType = SwerveModuleType.SPARK;
+        gyro = new PigeonGyro(gyroData);
+        break;
+    }
+
     for (int i = 0; i < modules.length; i++) {
       modules[i] = new SwerveModule(i, moduleType);
     }
 
     // Initialize pose estimator
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
-        Drivetrain.driveKinematics,
+        Drivetrain.DRIVE_KINEMATICS,
         new Rotation2d(),
-        collectModulePositions(),
+        getModulePositions(),
         PoseEstimator.INITIAL_POSE,
-        VecBuilder.fill(
-            PoseEstimator.STATE_STD_DEVS[0],
-            PoseEstimator.STATE_STD_DEVS[1],
-            PoseEstimator.STATE_STD_DEVS[2]),
-        VecBuilder.fill(
-            PoseEstimator.VISION_STD_DEVS[0],
-            PoseEstimator.VISION_STD_DEVS[1],
-            PoseEstimator.VISION_STD_DEVS[2]));
+        PoseEstimator.STATE_STD_DEVS,
+        PoseEstimator.VISION_STD_DEVS);
+
+    resetGyro();
 
     // Configure auto PID controllers
-    // autoZController.enableContinuousInput(-Math.PI, Math.PI);
-    // autoZController.setIZone(AutoConstants.turnIZone);
-    // autoZController.setTolerance(AutoConstants.turnToleranceRad / 2);
-    // autoXController.setTolerance(AutoConstants.driveToleranceMeters / 3);
-    // autoYController.setTolerance(AutoConstants.driveToleranceMeters / 3);
-    // autoXController.setIZone(AutoConstants.driveIZone);
-    // autoYController.setIZone(AutoConstants.driveIZone);
-
+    autoXController.reset(PoseEstimator.INITIAL_POSE.getX());
+    autoYController.reset(PoseEstimator.INITIAL_POSE.getY());
     autoTurnController.enableContinuousInput(-Math.PI, Math.PI);
-    resetGyro();
+    autoTurnController.reset(PoseEstimator.INITIAL_POSE.getRotation().getRadians());
+
   }
 
   public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
     return swerveDrivePoseEstimator;
+  }
+
+  private SwerveModulePosition[] getModulePositions() {
+    for (int i = 0; i < modules.length; i++) {
+      modulePositionsBuffer[i] = modules[i].getPosition();
+    }
+    return modulePositionsBuffer;
   }
 
   /**
@@ -104,7 +117,7 @@ public class Swerve extends SubsystemBase {
       states[i] = modules[i].getState();
     }
 
-    return Drivetrain.driveKinematics.toChassisSpeeds(states);
+    return Drivetrain.DRIVE_KINEMATICS.toChassisSpeeds(states);
   }
 
   /**
@@ -125,15 +138,14 @@ public class Swerve extends SubsystemBase {
    * @return Max speed in meters per second
    */
   public double getMaxDriveSpeed() {
-    return DriverStation.isTeleopEnabled() ? Control.maxSpeedMPS
-        : Control.maxSpeedMPS;
+    return Control.MAX_SPEED_MPS;
   }
 
   /**
    * @return Max angular speed in radians per second
    */
   public double getMaxAngularSpeed() {
-    return Control.maxAngularSpeedRadsPS;
+    return Control.MAX_ANGULAR_SPEED_RADSS;
   }
 
   public SwerveDrivePoseEstimator getPoseEstimator() {
@@ -147,7 +159,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, getMaxDriveSpeed());
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
     }
   }
@@ -167,24 +179,32 @@ public class Swerve extends SubsystemBase {
     Rotation2d gyroHeading = Rotation2d.fromRadians(gyroData.orientation.getZ());
     swerveDrivePoseEstimator.resetPosition(
         gyroHeading,
-        collectModulePositions(),
+        getModulePositions(),
         pose);
+    resetAutoControllers(pose);
   }
 
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
-    desiredChassisSpeeds = chassisSpeeds;
+    desiredChassisSpeeds = new ChassisSpeeds(
+        chassisSpeeds.vxMetersPerSecond,
+        chassisSpeeds.vyMetersPerSecond,
+        chassisSpeeds.omegaRadiansPerSecond);
   }
 
   public void driveToSample(SwerveSample sample) {
-    double vx = sample.vx + autoTranslateController.calculate(
-        swerveDrivePoseEstimator.getEstimatedPosition().getX(), sample.x);
-    double vy = sample.vy + autoTranslateController.calculate(
-        swerveDrivePoseEstimator.getEstimatedPosition().getY(), sample.y);
+    Pose2d pose = swerveDrivePoseEstimator.getEstimatedPosition();
+
+    autoXController.setGoal(sample.x);
+    autoYController.setGoal(sample.y);
+
+    double vx = sample.vx + autoXController.calculate(pose.getX());
+    double vy = sample.vy + autoYController.calculate(pose.getY());
+
     double targetAngle = MiscUtils.isRedAlliance()
         ? sample.heading + Math.PI
         : sample.heading;
-    double currentAngle = swerveDrivePoseEstimator.getEstimatedPosition().getRotation().getRadians();
-    double omega = sample.omega + autoTurnController.calculate(currentAngle, targetAngle);
+    autoTurnController.setGoal(targetAngle);
+    double omega = sample.omega + autoTurnController.calculate(pose.getRotation().getRadians());
 
     ChassisSpeeds speeds = new ChassisSpeeds(vx, vy, omega);
 
@@ -215,33 +235,35 @@ public class Swerve extends SubsystemBase {
   public void updateOdometry() {
     swerveDrivePoseEstimator.update(
         Rotation2d.fromRadians(gyroData.orientation.getZ()),
-        collectModulePositions());
+        getModulePositions());
+  }
+
+  public void syncEncoderPositions() {
+    for (SwerveModule module : modules) {
+      module.syncEncoderPosition();
+    }
   }
 
   public void resetGyro() {
     gyro.reset();
 
-    for (SwerveModule module : modules) {
-      module.syncEncoderPosition();
-    }
+    syncEncoderPositions();
 
     Rotation2d targetRotation = MiscUtils.isRedAlliance()
-        ? Rotation2d.fromDegrees(180)
+        ? Rotation2d.k180deg
         : new Rotation2d();
 
     swerveDrivePoseEstimator.resetPosition(
         new Rotation2d(),
-        collectModulePositions(),
+        getModulePositions(),
         new Pose2d(swerveDrivePoseEstimator.getEstimatedPosition().getTranslation(), targetRotation));
+    resetAutoControllers(swerveDrivePoseEstimator.getEstimatedPosition());
   }
 
-  private SwerveModulePosition[] collectModulePositions() {
-    return new SwerveModulePosition[] {
-        modules[0].getPosition(),
-        modules[1].getPosition(),
-        modules[2].getPosition(),
-        modules[3].getPosition()
-    };
+  private void resetAutoControllers(Pose2d pose) {
+    autoXController.reset(pose.getX());
+    autoYController.reset(pose.getY());
+    autoTurnController.reset(pose.getRotation().getRadians());
   }
 
   /**
@@ -274,11 +296,20 @@ public class Swerve extends SubsystemBase {
     gyro.updateData();
     Logger.processInputs("Swerve/GyroData", gyroData);
 
-    SwerveModuleState[] desiredStates = Drivetrain.driveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
     setModuleStates(desiredStates);
 
     for (SwerveModule module : modules) {
       module.periodic();
+    }
+
+    double netMovement = Math.abs(desiredChassisSpeeds.vxMetersPerSecond)
+        + Math.abs(desiredChassisSpeeds.vyMetersPerSecond)
+        + Math.abs(desiredChassisSpeeds.omegaRadiansPerSecond);
+
+    if (netMovement < 0.1 && (Timer.getTimestamp() - lastEncoderSyncTime) > 20.0) {
+      syncEncoderPositions();
+      lastEncoderSyncTime = Timer.getTimestamp();
     }
 
     updateOdometry();

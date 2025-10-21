@@ -6,8 +6,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
-import frc.robot.subsystems.swerve.SwerveConfig.Control;
-import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
+import frc.robot.config.SwerveConfig.Control;
+import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
 import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
 
@@ -20,13 +20,13 @@ public class SwerveModule {
     private SwerveModuleState desiredState = new SwerveModuleState();
 
     private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(
-        Control.moduleDriveKs,
-        Control.moduleDriveKv,
-        Control.moduleDriveKa);
-    private final PIDController drivePID = new PIDController(Control.moduleDrivePID[0], Control.moduleDrivePID[1],
-            Control.moduleDrivePID[2]);
-    private final PIDController turnPID = new PIDController(Control.moduleTurnPID[0], Control.moduleTurnPID[1],
-            Control.moduleTurnPID[2]);
+        Control.MODULE_DRIVE_KS,
+        Control.MODULE_DRIVE_KV,
+        Control.MODULE_DRIVE_KA);
+    private final PIDController drivePID = new PIDController(Control.MODULE_DRIVE_PID[0], Control.MODULE_DRIVE_PID[1],
+            Control.MODULE_DRIVE_PID[2]);
+    private final PIDController turnPID = new PIDController(Control.MODULE_TURN_PID[0], Control.MODULE_TURN_PID[1],
+            Control.MODULE_TURN_PID[2]);
 
     private final SwerveModuleIO moduleIO;
     private final ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();
@@ -38,7 +38,7 @@ public class SwerveModule {
      * @param SwerveModule The hardware IO implementation
      */
     public SwerveModule(int index, SwerveModuleType type) {
-        name = Drivetrain.moduleNames.get(index);
+        name = Drivetrain.MODULE_NAMES.get(index);
 
         switch (type) {
             case SIM:
@@ -92,6 +92,11 @@ public class SwerveModule {
      * @param speedMetersPerSecond The target velocity in m/s
      */
     public void setDriveSpeed(double speedMetersPerSecond) {
+        if (Math.abs(speedMetersPerSecond) <= Control.SPEED_DEADBAND_MPS) {
+            moduleIO.setDriveVoltage(0.0);
+            return;
+        }
+
         double feedforward = driveFF.calculateWithVelocities(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
         double PID = drivePID.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
         moduleIO.setDriveVoltage(PID + feedforward);

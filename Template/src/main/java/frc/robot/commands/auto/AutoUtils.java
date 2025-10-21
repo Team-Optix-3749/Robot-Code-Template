@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import choreo.Choreo;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.auto.AutoRoutine;
 import choreo.trajectory.SwerveSample;
@@ -34,13 +35,9 @@ public class AutoUtils {
     public static void initAuto() {
         setupFactory();
         setupChooser();
-
     }
 
-    /**
-     * 
-     * @return the auto selector object
-     */
+
     public static AutoChooser getChooser() {
         return chooser;
     }
@@ -49,9 +46,6 @@ public class AutoUtils {
         return factory;
     }
 
-    /**
-     * setup the choreo factor object with bindings, controller, etc.
-     */
     private static void setupFactory() {
         factory = new AutoFactory(
                 Robot.swerve::getPose, // A function that returns the current robot pose
@@ -63,10 +57,6 @@ public class AutoUtils {
 
     }
 
-    /**
-     * setup the choreo auto chooser and assign it to the Shuffleboard/Auto tab of
-     * networktables
-     */
     private static void setupChooser() {
 
     }

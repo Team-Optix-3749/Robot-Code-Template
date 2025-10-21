@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve.real;
 
 import frc.robot.config.RobotConfig;
+import frc.robot.config.RobotConfig.Can;
 import frc.robot.utils.OptixSpark;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -9,10 +10,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
-import frc.robot.subsystems.swerve.SwerveConfig;
+import frc.robot.config.SwerveConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
-import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
-import frc.robot.subsystems.swerve.SwerveConfig.Motor;
+import frc.robot.config.SwerveConfig.Drivetrain;
+import frc.robot.config.SwerveConfig.Motor;
 
 public class SwerveModuleSpark implements SwerveModuleIO {
     private final OptixSpark drive;
@@ -23,24 +24,24 @@ public class SwerveModuleSpark implements SwerveModuleIO {
     private final ModuleDataAutoLogged data;
 
     public SwerveModuleSpark(int index, ModuleDataAutoLogged moduleData) {
-    data = moduleData;
+        data = moduleData;
 
-    data.index = index;
+        data.index = index;
 
-        drive = OptixSpark.ofSparkMax(Motor.driveMotorIds[index]);
-        turn = OptixSpark.ofSparkMax(Motor.turnMotorIds[index]);
+        drive = OptixSpark.ofSparkMax(Can.DRIVE_MOTORS[index]);
+        turn = OptixSpark.ofSparkMax(Can.TURN_MOTORS[index]);
 
         drive.setPositionConversionFactor(
-                (Math.PI * Drivetrain.wheelDiameterMeters / Motor.driveMotorGearRatio));
+                (Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING));
         drive.setVelocityConversionFactor(
-                (Math.PI * Drivetrain.wheelDiameterMeters / (60 * Motor.driveMotorGearRatio)));
-        turn.setPositionConversionFactor((2.0 * Math.PI) / Motor.turnMotorGearRatio);
-        turn.setVelocityConversionFactor(2.0 * Math.PI / (Motor.turnMotorGearRatio * 60));
+                (Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)));
+        turn.setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING);
+        turn.setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60));
 
-        drive.setSmartCurrentLimit(SwerveConfig.Motor.stallCurrentLimit,
-                SwerveConfig.Motor.freeCurrentLimit);
-        turn.setSmartCurrentLimit(SwerveConfig.Motor.stallCurrentLimit,
-                SwerveConfig.Motor.freeCurrentLimit);
+        drive.setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT,
+                SwerveConfig.Motor.FREE_CURRENT);
+        turn.setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT,
+                SwerveConfig.Motor.FREE_CURRENT);
 
         drive.setIdleMode(IdleMode.kBrake);
         turn.setIdleMode(IdleMode.kBrake);
@@ -50,29 +51,29 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         drive.apply();
         turn.apply();
 
-        absoluteEncoder = new CANcoder(Motor.absoluteEncoderIds[index]);
-        Rotation2d absoluteEncoderOffsetRad = Motor.absoluteEncoderOffsetRad[index];
+        absoluteEncoder = new CANcoder(Can.CANCODERS[index]);
+        Rotation2d absoluteEncoderOffsetRad = Motor.CANCODER_OFFSET[index];
         turn.requestPosition(
                 absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI
                         - absoluteEncoderOffsetRad.getRadians());
 
-    absoluteEncoder.optimizeBusUtilization();
-    absoluteEncoder.getAbsolutePosition()
-        .setUpdateFrequency(RobotConfig.Optimisations.NON_ESSENTIAL_CAN_REFRESH_RATE_HZ);
+        absoluteEncoder.optimizeBusUtilization();
+        absoluteEncoder.getAbsolutePosition()
+                .setUpdateFrequency(RobotConfig.Optimizations.NON_ESSENTIAL_CAN_REFRESH_HZ);
     }
 
     @Override
     public void setDriveVoltage(double volts) {
-        volts = MathUtil.clamp(volts, -12, 12);
-
-        data.driveDesiredVolts = 0.0;
-        drive.setVoltage(volts);
+        double clamped = MathUtil.clamp(volts, -12, 12);
+        data.driveDesiredVolts = clamped;
+        drive.setVoltage(clamped);
     }
 
     @Override
     public void setTurnVoltage(double volts) {
-        volts = MathUtil.clamp(volts, -12, 12);
-        turn.setVoltage(volts);
+        double clamped = MathUtil.clamp(volts, -12, 12);
+        data.turnDesiredVolts = clamped;
+        turn.setVoltage(clamped);
     }
 
     @Override
@@ -98,7 +99,7 @@ public class SwerveModuleSpark implements SwerveModuleIO {
     @Override
     public void syncEncoderPosition() {
         Rotation2d absolutePosition = data.absoluteEncoderPosition
-                .minus(SwerveConfig.Motor.absoluteEncoderOffsetRad[data.index]);
+                .minus(SwerveConfig.Motor.CANCODER_OFFSET[data.index]);
 
         turn.setPosition(absolutePosition.getRadians());
         data.turnPosition = absolutePosition;

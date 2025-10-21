@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
-import frc.robot.subsystems.swerve.SwerveConfig.Drivetrain;
-import frc.robot.subsystems.swerve.SwerveConfig.Motor;
+import frc.robot.config.SwerveConfig.Drivetrain;
+import frc.robot.config.SwerveConfig.Motor;
 
 /**
  * Simulation implementation for swerve modules.
@@ -22,14 +22,14 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     LinearSystem<N1, N1, N1> drivePlant = LinearSystemId.createFlywheelSystem(
             DCMotor.getNEO(1),
-            Drivetrain.driveMomentOfInertia,
-            Motor.driveMotorGearRatio);
+            Drivetrain.TRANSLATE_MOI,
+            Motor.DRIVE_GEARING);
     FlywheelSim driveSim = new FlywheelSim(drivePlant, DCMotor.getNEO(1), 0.0);
 
     LinearSystem<N1, N1, N1> turnPlant = LinearSystemId.createFlywheelSystem(
             DCMotor.getNEO(1),
-            Drivetrain.turnMomentOfInertia,
-            Motor.turnMotorGearRatio);
+            Drivetrain.ROTATE_MOI,
+            Motor.TURN_GEARING);
     FlywheelSim turnSim = new FlywheelSim(turnPlant, DCMotor.getNEO(1), 0.0);
 
     private final ModuleDataAutoLogged data;
@@ -38,17 +38,17 @@ public class SwerveModuleSim implements SwerveModuleIO {
     private double prevTimestamp = -1.0;
 
     public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
-    data = moduleData;
-    data.index = index;
+        data = moduleData;
+        data.index = index;
     }
 
     @Override
     public void updateData() {
-    double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
+        double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
         double currTimestamp = Timer.getTimestamp();
 
         if (prevTimestamp > 0.0) {
-        deltaT = currTimestamp - prevTimestamp;
+            deltaT = currTimestamp - prevTimestamp;
         }
         prevTimestamp = currTimestamp;
 
@@ -121,6 +121,6 @@ public class SwerveModuleSim implements SwerveModuleIO {
     }
 
     private double getDriveVelocityMetersPerSec() {
-        return (driveSim.getAngularVelocityRadPerSec() * (Drivetrain.wheelDiameterMeters / 2.0));
+        return (driveSim.getAngularVelocityRadPerSec() * (Drivetrain.WHEEL_DIA_METERS / 2.0));
     }
 }

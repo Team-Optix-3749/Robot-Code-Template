@@ -6,71 +6,51 @@ package frc.robot.config;
  * across the codebase while keeping the values in one authoritative location.
  */
 public final class RobotConfig {
-    private RobotConfig() {
-        // Utility class
-    }
+  public enum RobotType {
+    REAL,
+    SIM,
+    REPLAY
+  }
 
-    /**
-     * Distinguishes between deployment targets for behaviour that needs to adapt
-     * between real hardware, simulation and log replay.
-     */
-    public enum RobotType {
-        REAL,
-        SIM,
-        REPLAY
-    }
+  public enum ControlMode {
+    BOTH,
+    PILOT_ONLY,
+    OPERATOR_ONLY,
+    SIM,
+    NONE
+  }
 
-    /**
-     * Identifies which physical controllers are connected so the correct control
-     * scheme can be selected.
-     */
-    public enum ControlMode {
-        BOTH,
-        PILOT_ONLY,
-        OPERATOR_ONLY,
-        SIM,
-        NONE
-    }
+  public static final class Can {
+    public static final int TIMEOUT_MS = 250;
+    public static final int LONG_TIMEOUT_MS = 1000;
+    public static final int CONFIG_TIMEOUT_MS = 5000;
+    public static final int PDH_ID = 40;
 
-    /** CAN device IDs and timeouts shared across subsystems. */
-    public static final class Can {
-        private Can() {
-        }
+    // Module Settings: order is FL, FR, BL, BR
+    public static final int[] DRIVE_MOTORS = { 3, 5, 7, 9 };
+    public static final int[] TURN_MOTORS = { 4, 6, 8, 10 };
+    public static final int[] CANCODERS = { 11, 12, 13, 14 };
+  }
 
-        public static final int TIMEOUT_MS = 250;
-        public static final int LONG_TIMEOUT_MS = 1000;
-        public static final int CONFIG_TIMEOUT_MS = 5000;
-        public static final int PDH_ID = 40;
-    }
+  /** Simulator specific settings. */
+  public static final class Simulation {
+    public static final double LOOP_PERIOD_SEC = 0.02;
+  }
 
-    /** Simulator specific settings. */
-    public static final class Simulation {
-        private Simulation() {
-        }
+  /** Configuration for driver/operator controllers. */
+  public static final class Controller {
+    public static final int PILOT_PORT = 0;
+    public static final int OPERATOR_PORT = 1;
 
-        public static final double LOOP_PERIOD_SEC = 0.02;
-    }
+    public static final double DEADBAND = 0.05;
 
-    /** Configuration for driver/operator controllers. */
-    public static final class Controller {
-        private Controller() {
-        }
+    public static final double TRANSLATE_EXPO = 1.5;
+    public static final double ROTATE_EXPO = 1.5;
+  }
 
-        public static final int PILOT_PORT = 0;
-        public static final int OPERATOR_PORT = 1;
-
-        public static final double DEADBAND = 0.05;
-
-        public static final double TRANSLATE_EXPO = 1.5;
-        public static final double ROTATE_EXPO = 1.5;
-    }
-
-    /** Feature toggles and refresh rates that optimise CAN traffic. */
-    public static final class Optimisations {
-        private Optimisations() {
-        }
-
-        public static final boolean USE_VISION = true;
-        public static final int NON_ESSENTIAL_CAN_REFRESH_RATE_HZ = 50;
-    }
+  /** Feature toggles and refresh rates that affect robot performance */
+  public static final class Optimizations {
+    public static final boolean USE_VISION = true;
+    public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 50;
+  }
 }

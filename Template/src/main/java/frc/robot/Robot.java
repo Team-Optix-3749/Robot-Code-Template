@@ -11,12 +11,13 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.auto.AutoUtils;
 import frc.robot.config.RobotConfig;
+import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.utils.ButtonBindings;
 import frc.robot.utils.MiscUtils;
@@ -32,13 +33,14 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
     switch (BuildConstants.DIRTY) {
       case 0 -> Logger.recordMetadata("GitDirty", "All changes committed");
       case 1 -> Logger.recordMetadata("GitDirty", "Uncomitted changes");
       default -> Logger.recordMetadata("GitDirty", "Unknown");
     }
 
-    var robotType = MiscUtils.getRobotType();
+    RobotType robotType = MiscUtils.getRobotType();
     Logger.recordOutput("Robot Type", robotType);
 
     // Set up data receivers & replay source
@@ -53,7 +55,7 @@ public class Robot extends LoggedRobot {
         // String logPath = LogFileUtil.findReplayLog();
         // Logger.setReplaySource(new WPILOGReader(logPath));
         // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-        //     "_sim")));
+        // "_sim")));
       }
     }
 
@@ -62,21 +64,15 @@ public class Robot extends LoggedRobot {
     Logger.start();
   }
 
-  double startTime = 0.0;
-
   @Override
   public void robotInit() {
     ButtonBindings.apply();
-    // AutoUtils.initAuto();
-
-    startTime = Timer.getTimestamp();
+    AutoUtils.initAuto();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-    Logger.recordOutput("graph", Math.sin(Timer.getTimestamp() - startTime));
   }
 
   @Override
@@ -96,11 +92,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    // autoCommand = Autos.getChairGame();
-
-    if (autoCommand != null) {
-      autoCommand.schedule();
-    }
+    autoCommand = AutoUtils.getChooser().selectedCommand();
+    autoCommand.schedule();
   }
 
   @Override
@@ -109,15 +102,15 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
+    if (autoCommand != null) {
+      autoCommand.cancel();
+      autoCommand = null;
+    }
   }
 
   @Override
   public void teleopInit() {
     ButtonBindings.apply();
-
-    if (autoCommand != null) {
-      autoCommand.cancel();
-    }
   }
 
   @Override
