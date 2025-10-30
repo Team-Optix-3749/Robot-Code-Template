@@ -1,21 +1,17 @@
 package frc.robot.commands.auto;
 
-import java.util.function.Consumer;
-
-import choreo.Choreo;
+import java.util.Map;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import choreo.auto.AutoRoutine;
-import choreo.trajectory.SwerveSample;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.Robot;
-import frc.robot.utils.MiscUtils;
+import frc.robot.config.RobotConfig.Accuracy;
 
 /**
  * All setup and helper methods for auto routines, including the
@@ -29,21 +25,15 @@ public class AutoUtils {
     private static AutoFactory factory;
     private static AutoChooser chooser;
 
+    private static Map<String, Command> eventMarkerCommands = Map.of(
+            "score", new PrintCommand("Scored"));
+
     /**
      * run all necessary auto setup methods
      */
-    public static void initAuto() {
+    public static void initAutoUtils() {
         setupFactory();
         setupChooser();
-    }
-
-
-    public static AutoChooser getChooser() {
-        return chooser;
-    }
-
-    public static AutoFactory getAutoFactory() {
-        return factory;
     }
 
     private static void setupFactory() {
@@ -61,18 +51,35 @@ public class AutoUtils {
 
     }
 
-    public static Command getSingleTrajectory(String trajectoryName) {
+    private static void applyEventMarkers(AutoTrajectory traj, String... markers) {
+        for (String marker : markers) {
+            if (!eventMarkerCommands.containsKey(marker)) {
+                System.out.println("[AutoUtils]: No command found for event marker: " + marker);
+                continue;
+            }
+
+            traj.atPose(marker, Accuracy.TRANSLATE_TOLERANCE_M, Accuracy.ROTATION_TOLERANCE.getRadians())
+                    .onTrue(eventMarkerCommands.get(marker));
+        }
+    }
+
+    public static AutoChooser getChooser() {
+        return chooser;
+    }
+
+    public static AutoFactory getAutoFactory() {
+        return factory;
+    }
+
+    public static Command getSingleTrajectoryCommand(String trajectoryName) {
         AutoRoutine routine = factory.newRoutine(trajectoryName);
-        AutoTrajectory trajectory1 = routine.trajectory(trajectoryName);
+        AutoTrajectory traj = routine.trajectory(trajectoryName);
 
-        Command trajectoy1Command = trajectory1.cmd();
+        routine.active().onTrue(Commands.sequence(
+                traj.resetOdometry(),
+                traj.cmd()));
 
-        routine.active().onTrue(
-                factory.resetOdometry(trajectoryName).andThen(
-                        trajectoy1Command));
-
-        Logger.recordOutput("Auto/" + trajectoryName + "/InitialPose", trajectory1.getInitialPose().get());
-        return Commands.print(trajectoryName).andThen(routine.cmd());
-
+        Logger.recordOutput("AutoUtils/" + trajectoryName + "/InitialPose", traj.getInitialPose().orElse(Pose2d.kZero));
+        return Commands.print("[AutoUtils]: Running - " + trajectoryName).andThen(routine.cmd());
     }
 }

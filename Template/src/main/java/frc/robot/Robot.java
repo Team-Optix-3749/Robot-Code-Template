@@ -67,7 +67,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     ButtonBindings.apply();
-    AutoUtils.initAuto();
+    AutoUtils.initAutoUtils();
   }
 
   @Override

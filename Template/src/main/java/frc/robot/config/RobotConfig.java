@@ -1,5 +1,7 @@
 package frc.robot.config;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 /**
  * Centralized configuration for robot-wide settings that are not tied to a
  * specific subsystem. Grouping these constants makes it easier to reuse them
@@ -52,5 +54,10 @@ public final class RobotConfig {
   public static final class Optimizations {
     public static final boolean USE_VISION = true;
     public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 50;
+  }
+
+  public static final class Accuracy {
+    public static final double TRANSLATE_TOLERANCE_M = 0.02;
+    public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(3);
   }
 }
