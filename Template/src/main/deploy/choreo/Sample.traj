@@ -4,8 +4,8 @@
  "snapshot":{
   "waypoints":[
     {"x":7.537466526031494, "y":1.7178046703338623, "heading":3.14159265358479, "intervals":31, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":5.291098117828369, "y":2.9749464988708496, "heading":2.057695339738052, "intervals":38, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":1.3754088878631592, "y":0.8522313237190247, "heading":0.9561333615139276, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":5.291098117828369, "y":2.9749464988708496, "heading":2.057695339738052, "intervals":38, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":1.3754088878631592, "y":0.8522313237190247, "heading":0.9561333615139276, "intervals":40, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -100,8 +100,8 @@
     {"t":1.9856, "x":1.38889, "y":0.86313, "heading":0.99021, "vx":-0.41946, "vy":-0.33907, "omega":-0.70264, "ax":6.53425, "ay":5.27679, "alpha":10.75768, "fx":[77.81822,151.71132,133.75505,81.2982], "fy":[131.92538,21.96565,75.08603,130.04986]},
     {"t":2.01777, "x":1.37877, "y":0.85495, "heading":0.9676, "vx":-0.20925, "vy":-0.16931, "omega":-0.35656, "ax":6.50438, "ay":5.26283, "alpha":11.08344, "fx":[74.68167,151.93158,134.42412,81.51305], "fy":[133.75616,20.48691,73.90325,129.93068]},
     {"t":2.04994, "x":1.37541, "y":0.85223, "heading":0.95613, "vx":0.0, "vy":0.0, "omega":0.0, "ax":0.0, "ay":0.0, "alpha":0.0, "fx":[0.0,0.0,0.0,0.0], "fy":[0.0,0.0,0.0,0.0]}],
-  "splits":[0,31]
+  "splits":[0]
  },
  "events":[
-   {"name":"Score", "from":{"target":1, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"\"score\""}}}]
+   {"name":"Score", "from":{"target":1, "targetTimestamp":0.82746, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"\"score\""}}}]
 }
