@@ -54,13 +54,6 @@ public interface SwerveModuleIO {
   }
 
   /**
-   * Updates sensor data from hardware.
-   */
-  public default void updateData() {
-
-  }
-
-  /**
    * Runs the drive motor at the specified voltage.
    * 
    * @param volts Voltage to apply (-12 to 12)
@@ -113,4 +106,12 @@ public interface SwerveModuleIO {
    */
   public default void syncEncoderPosition() {
   }
+
+  /**
+   * Updates sensor data from hardware.
+   */
+  public default void updateData() {
+
+  }
+
 }

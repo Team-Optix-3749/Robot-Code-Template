@@ -10,6 +10,7 @@ import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.GENERAL;
 import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO;
+import frc.robot.utils.MiscUtils;
 import frc.robot.utils.OptixSpark;
 
 /**
@@ -52,7 +53,7 @@ public class ElevatorReal implements ElevatorIO {
 
     @Override
     public void setVoltage(double volts) {
-        double clampedVolts = MathUtil.clamp(volts, -GENERAL.NOMINAL_BUS_VOLTAGE, GENERAL.NOMINAL_BUS_VOLTAGE);
+        double clampedVolts = MiscUtils.voltageClamp(volts);
 
         leftMotor.setVoltage(clampedVolts);
     }

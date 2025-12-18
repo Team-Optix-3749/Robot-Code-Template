@@ -9,6 +9,7 @@ import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.GENERAL;
 import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO;
+import frc.robot.utils.MiscUtils;
 
 /**
  * The reason this class is named weirdly is because "ElevatorSim" is already
@@ -52,7 +53,7 @@ public class ElevatorSiml implements ElevatorIO {
          * 
          * When using the {@link OptixSpark} class, this can be omitted
          */
-        double clampedVolts = MathUtil.clamp(volts, -GENERAL.NOMINAL_BUS_VOLTAGE, GENERAL.NOMINAL_BUS_VOLTAGE);
+        double clampedVolts = MiscUtils.voltageClamp(volts);
 
         /*
          * One of the perks of using the reference is that we can update the data object

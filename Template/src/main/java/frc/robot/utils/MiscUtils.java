@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
@@ -11,6 +12,25 @@ import frc.robot.config.RobotConfig.RobotType;
  * @author Neel Adem
  */
 public class MiscUtils {
+
+    /***
+     * Clamps the input voltage to the nominal bus voltage defined in RobotConfig.
+     * 
+     * @param <T>   any numeric type (e.g., Double, Integer). Will automatically be
+     *              inferred.
+     * @param input the voltage to clamp
+     * @return the clamped voltage
+     */
+    public static <T extends Number> double voltageClamp(T input) {
+        double value = input.doubleValue();
+
+        if (Math.abs(value) > RobotConfig.GENERAL.NOMINAL_BUS_VOLTAGE) {
+            return Math.copySign(RobotConfig.GENERAL.NOMINAL_BUS_VOLTAGE, value);
+        }
+
+        return value;
+    }
+
     /***
      * @param <T>    any numeric type (e.g., Double, Integer). Will automatically be
      *               inferred.

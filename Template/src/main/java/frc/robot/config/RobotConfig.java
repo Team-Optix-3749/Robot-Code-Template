@@ -24,7 +24,7 @@ public final class RobotConfig {
 
   public static final class GENERAL {
     public static final double NOMINAL_LOOP_TIME_S = 0.02;
-    public static final int NOMINAL_BUS_VOLTAGE = 12;
+    public static final double NOMINAL_BUS_VOLTAGE = 12.0;
 
     public static final int HIGH_CURRENT_LIMIT_AMPS = 60;
     public static final int MED_CURRENT_LIMIT_AMPS = 40;

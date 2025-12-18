@@ -23,13 +23,6 @@ public interface ElevatorIO {
     }
 
     /**
-     * will be periodically polled from our {@link Elevator} class to update the
-     * {@link ElevatorData} class with the latest data
-     */
-    public default void updateData() {
-    };
-
-    /**
      * Set the voltage applied to the elevator motors
      * 
      * @param volts
@@ -44,4 +37,11 @@ public interface ElevatorIO {
      */
     public default void setMotorIdleMode(IdleMode idleMode) {
     }
+
+    /**
+     * will be periodically polled from our {@link Elevator} class to update the
+     * {@link ElevatorData} class with the latest data
+     */
+    public default void updateData() {
+    };
 }
