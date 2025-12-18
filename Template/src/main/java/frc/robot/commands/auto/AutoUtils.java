@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Robot;
-import frc.robot.config.RobotConfig.Accuracy;
+import frc.robot.config.RobotConfig.ACCURACY;
 
 /**
  * All setup and helper methods for auto routines, including the
@@ -90,7 +90,7 @@ public class AutoUtils {
                 continue;
             }
 
-            traj.atPose(marker, Accuracy.TRANSLATE_TOLERANCE_M, Accuracy.ROTATION_TOLERANCE.getRadians())
+            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE.getRadians())
                     .onTrue(eventMarkerCommands.get(marker));
         }
     }

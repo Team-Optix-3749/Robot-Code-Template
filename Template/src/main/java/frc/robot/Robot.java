@@ -61,7 +61,7 @@ public class Robot extends LoggedRobot {
       }
     }
 
-    LoggedPowerDistribution.getInstance(RobotConfig.Can.PDH_ID, ModuleType.kRev);
+    LoggedPowerDistribution.getInstance(RobotConfig.CAN.PDH_ID, ModuleType.kRev);
 
     Logger.start();
   }

@@ -3,21 +3,14 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.RobotType;
 
 /**
- * Methods that are helpful throughout the code base
- * 
- * @author Noah Simon
+ * @author FRC 3749
+ * @author Neel Adem
  */
 public class MiscUtils {
-
-    public static boolean isRedAlliance() {
-        return DriverStation.getAlliance()
-                .map(alliance -> alliance == Alliance.Red)
-                .orElse(false);
-    }
-
     /***
      * @param <T>    any numeric type (e.g., Double, Integer). Will automatically be
      *               inferred.
@@ -43,7 +36,7 @@ public class MiscUtils {
      *         stopped
      */
     public static <T extends Number> boolean isStopped(T velocity) {
-        return withinMargin(0.01, velocity.doubleValue(), 0.0);
+        return withinMargin(RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE_MPS, velocity.doubleValue(), 0.0);
     }
 
     /**
@@ -84,5 +77,29 @@ public class MiscUtils {
         } else {
             return RobotType.REPLAY;
         }
+    }
+
+    public static Alliance getAlliance() {
+        return DriverStation.getAlliance().orElse(Alliance.Red);
+    }
+
+    public static boolean isSimulation() {
+        return getRobotType() == RobotType.SIM;
+    }
+
+    public static boolean isReal() {
+        return getRobotType() == RobotType.REAL;
+    }
+
+    public static boolean isReplay() {
+        return getRobotType() == RobotType.REPLAY;
+    }
+
+    public static boolean isBlueAlliance() {
+        return getAlliance() == Alliance.Blue;
+    }
+
+    public static boolean isRedAlliance() {
+        return getAlliance() == Alliance.Red;
     }
 }

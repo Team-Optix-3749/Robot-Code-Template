@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve.real;
 
 import frc.robot.config.RobotConfig;
-import frc.robot.config.RobotConfig.Can;
+import frc.robot.config.RobotConfig.CAN;
 import frc.robot.utils.OptixSpark;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -28,8 +28,8 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         data.index = index;
 
-        drive = OptixSpark.ofSparkMax(Can.DRIVE_MOTORS[index]);
-        turn = OptixSpark.ofSparkMax(Can.TURN_MOTORS[index]);
+        drive = OptixSpark.ofSparkMax(CAN.DRIVE_MOTORS[index]);
+        turn = OptixSpark.ofSparkMax(CAN.TURN_MOTORS[index]);
 
         drive.setPositionConversionFactor(
                 (Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING));
@@ -51,7 +51,7 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         drive.apply();
         turn.apply();
 
-        absoluteEncoder = new CANcoder(Can.CANCODERS[index]);
+        absoluteEncoder = new CANcoder(CAN.CANCODERS[index]);
         Rotation2d absoluteEncoderOffsetRad = Motor.CANCODER_OFFSET[index];
         turn.requestPosition(
                 absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI

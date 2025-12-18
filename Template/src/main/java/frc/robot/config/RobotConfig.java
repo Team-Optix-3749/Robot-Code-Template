@@ -22,25 +22,32 @@ public final class RobotConfig {
     NONE
   }
 
-  public static final class Can {
+  public static final class GENERAL {
+    public static final double NOMINAL_LOOP_TIME_S = 0.02;
+    public static final int NOMINAL_BUS_VOLTAGE = 12;
+
+    public static final int HIGH_CURRENT_LIMIT_AMPS = 60;
+    public static final int MED_CURRENT_LIMIT_AMPS = 40;
+    public static final int LOW_CURRENT_LIMIT_AMPS = 20;
+  }
+
+  public static final class CAN {
     public static final int TIMEOUT_MS = 250;
     public static final int LONG_TIMEOUT_MS = 1000;
     public static final int CONFIG_TIMEOUT_MS = 5000;
     public static final int PDH_ID = 40;
 
-    // Module Settings: order is FL, FR, BL, BR
+    /** Module Settings: order is FL, FR, BL, BR */
     public static final int[] DRIVE_MOTORS = { 3, 5, 7, 9 };
     public static final int[] TURN_MOTORS = { 4, 6, 8, 10 };
     public static final int[] CANCODERS = { 11, 12, 13, 14 };
-  }
 
-  /** Simulator specific settings. */
-  public static final class Simulation {
-    public static final double LOOP_PERIOD_SEC = 0.02;
+    /** Order: Left, Right */
+    public static final int[] ELEVATOR_MOTORS = { 20, 21 };
   }
 
   /** Configuration for driver/operator controllers. */
-  public static final class Controller {
+  public static final class INPUT {
     public static final int PILOT_PORT = 0;
     public static final int OPERATOR_PORT = 1;
 
@@ -56,8 +63,15 @@ public final class RobotConfig {
     public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 50;
   }
 
-  public static final class Accuracy {
-    public static final double TRANSLATE_TOLERANCE_M = 0.02;
-    public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(3);
+  /** Acceptable tolerances for various robot actions */
+  public static final class ACCURACY {
+    // default 3 mm/s tolerance for any subsystem movement
+    public static final double DEFAULT_MOVEMENT_TOLERANCE_MPS = 0.003;
+
+    public static final double DRIVE_TRANSLATE_TOLERANCE_M = 0.02;
+    public static final Rotation2d DRIVE_ROTATION_TOLERANCE = Rotation2d.fromDegrees(3);
+
+    // 3 cm tolerance for elevator positioning
+    public static final double ELEVATOR_TOLERANCE_M = 0.025;
   }
 }

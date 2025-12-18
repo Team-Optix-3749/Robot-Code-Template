@@ -15,8 +15,6 @@ import frc.robot.config.RobotConfig;
 public class GyroSim implements GyroIO {
   private Rotation2d yaw = new Rotation2d(0);
 
-  private double prevTimestamp = -1.0;
-
   private final GyroData data;
 
   public GyroSim(GyroData moduleData) {
@@ -25,13 +23,7 @@ public class GyroSim implements GyroIO {
 
   @Override
   public void updateData() {
-  double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
-    double currTimestamp = Timer.getTimestamp();
-
-    if (prevTimestamp > 0.0) {
-      deltaT = currTimestamp - prevTimestamp;
-    }
-    prevTimestamp = currTimestamp;
+    double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
 
     double angleDiffRad = Robot.swerve.getChassisSpeeds().omegaRadiansPerSecond * deltaT;
     yaw = yaw.plus(Rotation2d.fromRadians(angleDiffRad));

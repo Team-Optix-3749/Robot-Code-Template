@@ -35,7 +35,6 @@ public class SwerveModuleSim implements SwerveModuleIO {
     private final ModuleDataAutoLogged data;
 
     private double prevDriveVelMps = 0.0;
-    private double prevTimestamp = -1.0;
 
     public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
         data = moduleData;
@@ -44,13 +43,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     @Override
     public void updateData() {
-        double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
-        double currTimestamp = Timer.getTimestamp();
-
-        if (prevTimestamp > 0.0) {
-            deltaT = currTimestamp - prevTimestamp;
-        }
-        prevTimestamp = currTimestamp;
+        double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
 
         driveSim.update(deltaT);
         turnSim.update(deltaT);
