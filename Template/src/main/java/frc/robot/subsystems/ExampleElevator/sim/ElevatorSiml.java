@@ -1,6 +1,9 @@
 package frc.robot.subsystems.ExampleElevator.sim;
 
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -66,10 +69,17 @@ public class ElevatorSiml implements ElevatorIO {
     }
 
     @Override
+    public void setMotorIdleMode(IdleMode idleMode) {
+        System.out.println("[ElevatorSim] setMotorIdleMode called with " + idleMode
+                + ". Note: Idle mode has no effect in simulation.");
+    }
+
+    @Override
     public void updateData() {
         elevatorSimSystem.update(RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S);
 
-        data.positionM = elevatorSimSystem.getPositionMeters();
+        data.position = new Translation2d(0, elevatorSimSystem.getPositionMeters() +
+                ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getY());
         data.velocityMPS = elevatorSimSystem.getVelocityMetersPerSecond();
 
         // The following data is not useful in simulation:

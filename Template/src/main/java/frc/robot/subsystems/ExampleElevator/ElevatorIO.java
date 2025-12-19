@@ -4,6 +4,9 @@ import org.littletonrobotics.junction.AutoLog;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.config.ExampleElevatorConfig;
+
 public interface ElevatorIO {
     /**
      * Contains all the data for our elevator
@@ -12,8 +15,8 @@ public interface ElevatorIO {
      *          Akit.
      */
     @AutoLog
-    public static class ElevatorData {
-        public double positionM = 0;
+    public class ElevatorData {
+        public Translation2d position = ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET;
         public double velocityMPS = 0;
         public double accelMPSS = 0;
         public double leftCurrentAmps = 0;
@@ -27,21 +30,19 @@ public interface ElevatorIO {
      * 
      * @param volts
      */
-    public default void setVoltage(double volts) {
-    };
+    public void setVoltage(double volts);
 
     /**
      * Sets the {@link IdleMode} for the elevator motors
      * 
      * @param idleMode
      */
-    public default void setMotorIdleMode(IdleMode idleMode) {
-    }
+    public void setMotorIdleMode(IdleMode idleMode);
 
     /**
-     * will be periodically polled from our {@link Elevator} class to update the
+     * will be periodically polled from our {@link ExampleElevator} class to update
+     * the
      * {@link ElevatorData} class with the latest data
      */
-    public default void updateData() {
-    };
+    public void updateData();
 }

@@ -3,8 +3,10 @@ package frc.robot.subsystems.ExampleElevator.real;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import frc.robot.config.ExampleElevatorConfig;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.GENERAL;
@@ -38,17 +40,21 @@ public class ElevatorReal implements ElevatorIO {
          */
         data = elevData;
 
+        // all motors MUST have a current limit. No exceptions. Otherwise, when
+        // stalling, they will draw as much current as possible and likely damage
+        // themselves.
         leftMotor
                 .setPositionConversionFactor(2 * Math.PI * 2 * ElevatorSpecs.DRUM_RADIUS_M / ElevatorSpecs.GEARING)
                 .setSmartCurrentLimit(GENERAL.MED_CURRENT_LIMIT_AMPS)
                 .setIdleMode(IdleMode.kBrake)
                 .setInverted(ElevatorSpecs.IS_INVERTED);
 
-        // Left and right motors must be synchronized anyway, so why not just simplify it and control one
+        // Left and right motors must be synchronized anyway, so why not just simplify
+        // it and control one
+        rightMotor.follow(leftMotor, true);
+
         leftMotor.apply();
         rightMotor.apply(leftMotor.getConfig());
-
-        rightMotor.follow(leftMotor, true);
     }
 
     @Override
@@ -56,6 +62,12 @@ public class ElevatorReal implements ElevatorIO {
         double clampedVolts = MiscUtils.voltageClamp(volts);
 
         leftMotor.setVoltage(clampedVolts);
+    }
+
+    @Override
+    public void setMotorIdleMode(IdleMode idleMode) {
+        leftMotor.setIdleMode(idleMode);
+        rightMotor.setIdleMode(idleMode);
     }
 
     @Override
@@ -67,7 +79,9 @@ public class ElevatorReal implements ElevatorIO {
         double deltaTimeS = prevUpdateS == 0 ? 0.02 : currentTimeS - prevUpdateS;
 
         // average to try getting a more accurate reading (shouldn't matter much)
-        data.positionM = (leftMotor.getPosition() + rightMotor.getPosition()) / 2.0;
+        double elevatorRawPosition = (leftMotor.getPosition() + rightMotor.getPosition()) / 2.0;
+        data.position = new Translation2d(0, elevatorRawPosition +
+                ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getY());
         data.velocityMPS = (leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0;
 
         data.leftAppliedVolts = leftMotor.getAppliedVolts();

@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.config.ExampleElevatorConfig.ElevatorControl;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.ExampleElevatorConfig.ElevatorStates;
@@ -14,11 +15,12 @@ import frc.robot.config.ExampleElevatorConfig.ElevatorControl.ControlConfig;
 import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO.ElevatorData;
+import frc.robot.subsystems.ExampleElevator.real.ElevatorReal;
 import frc.robot.subsystems.ExampleElevator.sim.ElevatorSiml;
 import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.utils.MiscUtils;
 
-public class Elevator {
+public class ExampleElevator {
     /* subsystem controllers and data go at the top */
     ElevatorIO io;
     ElevatorDataAutoLogged data = new ElevatorDataAutoLogged();
@@ -46,9 +48,9 @@ public class Elevator {
     }
 
     /* under all variables is the actual code */
-    public Elevator() {
+    public ExampleElevator() {
         if (MiscUtils.getRobotType() == RobotType.REAL) {
-            // io = new ElevatorReal();
+            io = new ElevatorReal(data);
         } else {
             io = new ElevatorSiml(data);
         }
@@ -60,14 +62,21 @@ public class Elevator {
         return currentState;
     }
 
+    // ElevatorDataAutoLogged extends ElevatorData, so this works
+    // We don't want to return the entire AutoLog object because those methods are
+    // not meant to be accessed by the user
     public ElevatorData getData() {
         return data;
     }
 
-    public double getHeight() {
-        return data.positionM;
+    public double getHeightM() {
+        return data.position.getY();
     }
 
+    public Translation2d getPosition() {
+        return data.position;
+    }
+    
     /* SETTERS GO AFTER GETTERS */
 
     public void setState(ElevatorStates state) {
@@ -88,7 +97,7 @@ public class Elevator {
     public boolean isStableState() {
         // check if within the tolerance of the setpoint and is not moving
 
-        double error = Math.abs(pid.getSetpoint() - data.positionM);
+        double error = Math.abs(pid.getSetpoint() - data.position.getY());
         return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE_M &&
                 isStopped();
     }
@@ -103,9 +112,9 @@ public class Elevator {
             return;
         }
 
-        pid.setSetpoint(currentState.heightM);
+        pid.setSetpoint(currentState.position.getY());
 
-        double pidOutput = pid.calculate(data.positionM);
+        double pidOutput = pid.calculate(data.position.getY());
         double feedforwardOutput = feedforward.calculate(data.velocityMPS);
 
         double voltageOutput = pidOutput + feedforwardOutput;
@@ -113,7 +122,7 @@ public class Elevator {
     }
 
     public void updateMechanism() {
-        ligament.setLength(data.positionM);
+        ligament.setLength(data.position.getY());
 
         Logger.recordOutput("Elevator/mechanism", mech2d);
     }

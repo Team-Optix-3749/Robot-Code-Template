@@ -20,12 +20,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.AutoUtils;
 import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.RobotType;
+import frc.robot.subsystems.ExampleElevator.ExampleElevator;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.utils.ButtonBindings;
 import frc.robot.utils.MiscUtils;
 
 public class Robot extends LoggedRobot {
   public static Swerve swerve = new Swerve();
+  public static ExampleElevator exampleElevator = new ExampleElevator();
 
   Command autoCommand = null;
 
