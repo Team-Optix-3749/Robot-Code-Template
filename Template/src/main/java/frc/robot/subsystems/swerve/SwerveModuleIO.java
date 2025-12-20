@@ -58,60 +58,51 @@ public interface SwerveModuleIO {
    * 
    * @param volts Voltage to apply (-12 to 12)
    */
-  public default void setDriveVoltage(double volts) {
-  }
+  public void setDriveVoltage(double volts);
 
   /**
    * Runs the turn motor at the specified voltage.
    * 
    * @param volts Voltage to apply (-12 to 12)
    */
-  public default void setTurnVoltage(double volts) {
-  }
+  public void setTurnVoltage(double volts);
 
   /**
    * Enables or disables brake mode on the drive motor.
    * 
    * @param enable True for brake mode, false for coast mode
    */
-  public default void setDriveBrakeMode(boolean enable) {
-  }
+  public void setDriveBrakeMode(boolean enable);
 
   /**
    * Enables or disables brake mode on the turn motor.
    * 
    * @param enable True for brake mode, false for coast mode
    */
-  public default void setTurningBrakeMode(boolean enable) {
-  }
+  public void setTurningBrakeMode(boolean enable);
 
   /**
    * Sets turn motor position using closed-loop control.
    * 
    * @param position Target angle (0-2π radians)
    */
-  public default void requestTurnPosition(Rotation2d position) {
-  }
+  public void requestTurnPosition(Rotation2d position);
 
   /**
    * Sets drive motor velocity using closed-loop control.
    * 
    * @param setpoint Target velocity in meters per second
    */
-  public default void requestDriveVelocity(double setpoint) {
-  }
+  public void requestDriveVelocity(double setpoint);
 
   /**
    * Syncs the relative encoder position with the absolute encoder.
    */
-  public default void syncEncoderPosition() {
-  }
+  public void syncEncoderPosition();
 
   /**
    * Updates sensor data from hardware.
    */
-  public default void updateData() {
-
-  }
+  public void updateData();
 
 }

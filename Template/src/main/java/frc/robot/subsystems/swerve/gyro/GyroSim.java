@@ -29,6 +29,7 @@ public class GyroSim implements GyroIO {
     yaw = yaw.plus(Rotation2d.fromRadians(angleDiffRad));
 
     data.orientation = new Rotation3d(0, 0, yaw.getRadians());
+    data.lastUpdateS = Timer.getTimestamp();
   }
 
   @Override

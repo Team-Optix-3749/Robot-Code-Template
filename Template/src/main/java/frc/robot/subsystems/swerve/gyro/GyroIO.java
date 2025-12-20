@@ -11,6 +11,7 @@ public interface GyroIO {
   @AutoLog
   public class GyroData {
     public Rotation3d orientation = new Rotation3d(0, 0, 0);
+    public double lastUpdateS = 0.0;
   }
 
   public default void updateData() {

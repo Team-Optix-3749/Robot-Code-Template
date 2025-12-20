@@ -23,8 +23,6 @@ public class ExampleArmConfig {
         public static boolean IS_INVERTED = false;
     }
 
-    public static final double stateMarginOfError = 0.1;
-
     public static class ArmControl {
         // cleaner utility class to help make switching between real and sim configs
         // easier
@@ -72,7 +70,6 @@ public class ExampleArmConfig {
     }
 
     public enum ArmStates {
-        // states for the different possible positions the elevator would need to go to
         STOW(Rotation2d.fromDegrees(0)),
         POSITION_1(Rotation2d.fromDegrees(60)),
         POSITION_2(Rotation2d.fromDegrees(250)),
@@ -82,7 +79,6 @@ public class ExampleArmConfig {
         public Rotation2d angle;
 
         private ArmStates(Rotation2d s_angle) {
-            // Position is relative to the ground, we need relative to mount point
             this.angle = s_angle;
         }
     }

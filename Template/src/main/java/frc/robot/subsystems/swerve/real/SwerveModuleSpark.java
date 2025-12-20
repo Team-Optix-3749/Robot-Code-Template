@@ -55,7 +55,7 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         absoluteEncoder.optimizeBusUtilization();
         absoluteEncoder.getAbsolutePosition()
-                .setUpdateFrequency(RobotConfig.Optimizations.NON_ESSENTIAL_CAN_REFRESH_HZ);
+                .setUpdateFrequency(RobotConfig.OPTIMIZATIONS.NON_ESSENTIAL_CAN_REFRESH_HZ);
     }
 
     @Override

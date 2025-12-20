@@ -58,9 +58,10 @@ public final class RobotConfig {
   }
 
   /** Feature toggles and refresh rates that affect robot performance */
-  public static final class Optimizations {
+  public static final class OPTIMIZATIONS {
     public static final boolean USE_VISION = true;
-    public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 50;
+    public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 20;
+    public static final int ESSENTIAL_CAN_REFRESH_HZ = 80;
   }
 
   /** Acceptable tolerances for various robot actions */

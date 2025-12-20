@@ -23,8 +23,6 @@ public class ExampleElevatorConfig {
 
     }
 
-    public static final double stateMarginOfError = 0.1;
-
     public static class ElevatorControl {
         // cleaner utility class to help make switching between real and sim configs
         // easier
