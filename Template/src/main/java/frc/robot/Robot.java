@@ -22,7 +22,7 @@ import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.subsystems.ExampleElevator.ExampleElevator;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.utils.ButtonBindings;
+import frc.robot.config.ButtonBindings;
 import frc.robot.utils.MiscUtils;
 
 public class Robot extends LoggedRobot {

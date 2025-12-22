@@ -112,7 +112,7 @@ public class ExampleElevator {
             return;
         }
 
-        pid.setSetpoint(currentState.position.getY());
+        pid.setSetpoint(getHeightM());
 
         double pidOutput = pid.calculate(data.position.getY());
         double feedforwardOutput = feedforward.calculate(data.velocityMPS);

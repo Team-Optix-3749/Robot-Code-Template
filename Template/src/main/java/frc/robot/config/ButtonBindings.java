@@ -1,4 +1,4 @@
-package frc.robot.utils;
+package frc.robot.config;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.config.RobotConfig.ControlMode;
 import frc.robot.config.RobotConfig.INPUT;
 import frc.robot.config.RobotConfig.RobotType;
+import frc.robot.utils.MiscUtils;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 

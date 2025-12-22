@@ -1,5 +1,6 @@
 package frc.robot.config;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
@@ -18,6 +19,7 @@ public class ExampleElevatorConfig {
         public static boolean IS_INVERTED = false;
 
         public static final boolean SIMULATE_GRAVITY = true;
+        public static final Translation2d MOUNT_OFFSET = null;
 
         
     }
