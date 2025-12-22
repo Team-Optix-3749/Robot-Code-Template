@@ -1,6 +1,5 @@
 package frc.robot.config;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
@@ -12,7 +11,6 @@ public class ExampleElevatorConfig {
         // 22 TOOTH, 1/4 in pitch, divide by 2pi to go from circumfrence to radius
         public static final double DRUM_RADIUS_M = (Units.inchesToMeters(22.0 / 4.0) / (2 * Math.PI));
 
-        public static Translation2d MOUNT_OFFSET = new Translation2d(0, Units.inchesToMeters(3));
         public static final double MIN_HEIGHT_M = 0;
         public static final double MAX_HEIGHT_M = Units.feetToMeters(6);
         public static final double STARTING_HEIGHT_M = 0;
@@ -21,7 +19,10 @@ public class ExampleElevatorConfig {
 
         public static final boolean SIMULATE_GRAVITY = true;
 
+        
     }
+
+    public static final double stateMarginOfError = 0.1;
 
     public static class ElevatorControl {
         // cleaner utility class to help make switching between real and sim configs
@@ -77,11 +78,10 @@ public class ExampleElevatorConfig {
         MAX(Units.feetToMeters(6)),
         STOPPED(-1);
 
-        public Translation2d position;
+        public double heightM;
 
         private ElevatorStates(double heightM) {
-            // Position is relative to the ground, we need relative to mount point
-            this.position = new Translation2d(0, heightM - ElevatorSpecs.MOUNT_OFFSET.getY());
+            this.heightM = heightM;
         }
     }
 }
