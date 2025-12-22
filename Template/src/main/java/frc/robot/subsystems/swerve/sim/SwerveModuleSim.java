@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
+import frc.robot.utils.MiscUtils;
 import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
 import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.config.SwerveConfig.Motor;
@@ -35,7 +36,6 @@ public class SwerveModuleSim implements SwerveModuleIO {
     private final ModuleDataAutoLogged data;
 
     private double prevDriveVelMps = 0.0;
-    private double prevTimestamp = -1.0;
 
     public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
         data = moduleData;
@@ -44,13 +44,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     @Override
     public void updateData() {
-        double deltaT = RobotConfig.Simulation.LOOP_PERIOD_SEC;
-        double currTimestamp = Timer.getTimestamp();
-
-        if (prevTimestamp > 0.0) {
-            deltaT = currTimestamp - prevTimestamp;
-        }
-        prevTimestamp = currTimestamp;
+        double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
 
         driveSim.update(deltaT);
         turnSim.update(deltaT);
@@ -76,7 +70,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     @Override
     public void setDriveVoltage(double volts) {
-        double apply = MathUtil.clamp(volts, -12, 12);
+        double apply = MiscUtils.voltageClamp(volts);
         data.driveDesiredVolts = apply;
         data.driveAppliedVolts = apply;
         driveSim.setInputVoltage(apply);
@@ -84,7 +78,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     @Override
     public void setTurnVoltage(double volts) {
-        double apply = MathUtil.clamp(volts, -12, 12);
+        double apply = MiscUtils.voltageClamp(volts);
         data.turnDesiredVolts = apply;
         data.turnAppliedVolts = apply;
         turnSim.setInputVoltage(apply);

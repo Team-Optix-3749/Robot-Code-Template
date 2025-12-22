@@ -295,6 +295,17 @@ public final class OptixSpark {
         return this;
     }
 
+    /**
+     * Configures smart current limits.
+     * 
+     * @param limit stall current limit (A)
+     * @return this for chaining
+     */
+    public OptixSpark setSmartCurrentLimit(int limit) {
+        cfg.smartCurrentLimit(limit);
+        return this;
+    }
+
     // PID per slot
 
     /**
@@ -408,11 +419,31 @@ public final class OptixSpark {
     }
 
     /**
+     * Configures this controller to follow another.
+     * 
+     * @param leader leader OptixSpark
+     * @param invert true to invert output
+     * @return this for chaining
+     */
+    public OptixSpark follow(OptixSpark leader, boolean invert) {
+        cfg.follow(leader.getSpark(), invert);
+        return this;
+    }
+
+    /**
      * Applies the accumulated configuration to hardware, safely resetting
      * parameters and persisting them to flash.
      */
     public void apply() {
         motor.configure(cfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    /**
+     * Applies the accumulated configuration to hardware, safely resetting
+     * parameters and persisting them to flash.
+     */
+    public void apply(SparkBaseConfig config) {
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     // ---- Internal helpers ----

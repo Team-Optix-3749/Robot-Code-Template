@@ -1,7 +1,8 @@
 package frc.robot.subsystems.swerve.real;
 
 import frc.robot.config.RobotConfig;
-import frc.robot.config.RobotConfig.Can;
+import frc.robot.config.RobotConfig.CAN;
+import frc.robot.utils.MiscUtils;
 import frc.robot.utils.OptixSpark;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -28,30 +29,25 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         data.index = index;
 
-        drive = OptixSpark.ofSparkMax(Can.DRIVE_MOTORS[index]);
-        turn = OptixSpark.ofSparkMax(Can.TURN_MOTORS[index]);
+        drive = OptixSpark.ofSparkMax(CAN.DRIVE_MOTORS[index]);
+        turn = OptixSpark.ofSparkMax(CAN.TURN_MOTORS[index]);
 
-        drive.setPositionConversionFactor(
-                (Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING));
-        drive.setVelocityConversionFactor(
-                (Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)));
-        turn.setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING);
-        turn.setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60));
+        drive
+                .setPositionConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING))
+                .setVelocityConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)))
+                .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
+                .setIdleMode(IdleMode.kBrake);
 
-        drive.setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT,
-                SwerveConfig.Motor.FREE_CURRENT);
-        turn.setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT,
-                SwerveConfig.Motor.FREE_CURRENT);
-
-        drive.setIdleMode(IdleMode.kBrake);
-        turn.setIdleMode(IdleMode.kBrake);
-
-        turn.setPositionWrapping(-Math.PI, Math.PI);
+        turn
+                .setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING)
+                .setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60))
+                .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
+                .setPositionWrapping(-Math.PI, Math.PI).setIdleMode(IdleMode.kBrake);
 
         drive.apply();
         turn.apply();
 
-        absoluteEncoder = new CANcoder(Can.CANCODERS[index]);
+        absoluteEncoder = new CANcoder(CAN.CANCODERS[index]);
         Rotation2d absoluteEncoderOffsetRad = Motor.CANCODER_OFFSET[index];
         turn.requestPosition(
                 absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI
@@ -59,19 +55,19 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         absoluteEncoder.optimizeBusUtilization();
         absoluteEncoder.getAbsolutePosition()
-                .setUpdateFrequency(RobotConfig.Optimizations.NON_ESSENTIAL_CAN_REFRESH_HZ);
+                .setUpdateFrequency(RobotConfig.OPTIMIZATIONS.NON_ESSENTIAL_CAN_REFRESH_HZ);
     }
 
     @Override
     public void setDriveVoltage(double volts) {
-        double clamped = MathUtil.clamp(volts, -12, 12);
+        double clamped = MiscUtils.voltageClamp(volts);
         data.driveDesiredVolts = clamped;
         drive.setVoltage(clamped);
     }
 
     @Override
     public void setTurnVoltage(double volts) {
-        double clamped = MathUtil.clamp(volts, -12, 12);
+        double clamped = MiscUtils.voltageClamp(volts);
         data.turnDesiredVolts = clamped;
         turn.setVoltage(clamped);
     }

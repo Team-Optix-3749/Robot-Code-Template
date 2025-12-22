@@ -8,21 +8,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.config.RobotConfig.ControlMode;
-import frc.robot.config.RobotConfig.Controller;
+import frc.robot.config.RobotConfig.INPUT;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 
 public final class ButtonBindings {
+    private static final Trigger hasDualControllers = new Trigger(() -> DriverStation.getJoystickType(1) > 1);
 
-    private static final CommandXboxController pilot = new CommandXboxController(Controller.PILOT_PORT);
-    private static final CommandXboxController operator = new CommandXboxController(Controller.OPERATOR_PORT);
+    private static final CommandXboxController pilot = new CommandXboxController(INPUT.PILOT_PORT);
+    private static final CommandXboxController operator = new CommandXboxController(INPUT.OPERATOR_PORT);
 
     public static final Alert controllerAlert = new Alert("No controllers connected!", Alert.AlertType.kError);
 
@@ -32,11 +31,11 @@ public final class ButtonBindings {
     public static void twoControllerBindings(CommandXboxController piCtl, CommandXboxController opCtl) {
         // Add any dual-controller bindings here.
         // Example:
-        bindOnTrue(piCtl.povUp(), Commands.print("Pilot: povUp pressed"));
-        bindOnTrue(opCtl.a(), Commands.print("Operator: A pressed"));
+        Bind.button(piCtl.povUp()).onTrue(Commands.print("Pilot: povUp pressed"));
+        Bind.button(opCtl.a()).onTrue(Commands.print("Operator: A pressed"));
 
-        bindOnTrue(piCtl.start(), Robot.swerve::resetGyro);
-        bindOnTrue(piCtl.back(), Robot.swerve::syncEncoderPositions);
+        Bind.button(piCtl.start()).onTrue(Robot.swerve::resetGyro);
+        Bind.button(piCtl.back()).onTrue(Robot.swerve::syncEncoderPositions);
     }
 
     public static void oneControllerBindings(CommandXboxController ctl) {
@@ -47,40 +46,12 @@ public final class ButtonBindings {
         twoControllerBindings(pilot, operator);
     }
 
-    private static void bindOnTrue(Trigger trigger, Runnable command, Runnable... onFalse) {
-        Command onTrueCmd = Commands.runOnce(command);
-        trigger.onTrue(onTrueCmd);
-
-        if (onFalse.length > 0) {
-            Command onFalseCmd = Commands.runOnce(onFalse[0]);
-            trigger.onFalse(onFalseCmd);
-        }
-
-        if (onFalse.length > 1) {
-            DriverStation.reportWarning(
-                    "bindOnTrue called with multiple onFalse commands; only the first will be used.", false);
-        }
-    }
-
-    private static void bindOnTrue(Trigger trigger, Command command, Command... onFalse) {
-        trigger.onTrue(command);
-
-        if (onFalse.length > 0) {
-            trigger.onFalse(onFalse[0]);
-        }
-
-        if (onFalse.length > 1) {
-            DriverStation.reportWarning(
-                    "bindOnTrue called with multiple onFalse commands; only the first will be used.", false);
-        }
-    }
-
     private static boolean isPilotConnected() {
-        return DriverStation.isJoystickConnected(Controller.PILOT_PORT);
+        return DriverStation.isJoystickConnected(INPUT.PILOT_PORT);
     }
 
     private static boolean isOperatorConnected() {
-        return DriverStation.isJoystickConnected(Controller.OPERATOR_PORT);
+        return DriverStation.isJoystickConnected(INPUT.OPERATOR_PORT);
     }
 
     private static ControlMode getControlMode() {
@@ -113,9 +84,10 @@ public final class ButtonBindings {
      * Call the appropriate bindings methods and set default commands.
      */
     public static void apply() {
-        setDefaultCommands();
+        hasDualControllers.onChange(Commands.runOnce(ButtonBindings::apply));
 
         ControlMode mode = getControlMode();
+        setDefaultCommands();
 
         switch (mode) {
             case BOTH -> twoControllerBindings(pilot, operator);
@@ -127,7 +99,6 @@ public final class ButtonBindings {
         }
 
         controllerAlert.set(mode == ControlMode.NONE);
-
         Logger.recordOutput("ControlMode", mode);
     }
 
@@ -153,7 +124,62 @@ public final class ButtonBindings {
     }
 
     private static double applyDeadbandInternal(double v) {
-        return MathUtil.applyDeadband(v, Controller.DEADBAND);
+        return MathUtil.applyDeadband(v, INPUT.DEADBAND);
     }
 
+    public static class Bind {
+        private final Trigger trigger;
+
+        boolean switchState = false;
+
+        private Bind(Trigger trigger) {
+            this.trigger = trigger;
+        }
+
+        public static Bind button(Trigger trigger) {
+            return new Bind(trigger);
+        }
+
+        public Bind onTrue(Command command) {
+            trigger.onTrue(command);
+            return this;
+        }
+
+        public Bind onTrue(Runnable runnable) {
+            return onTrue(Commands.runOnce(runnable));
+        }
+
+        public Bind onFalse(Command command) {
+            trigger.onFalse(command);
+            return this;
+        }
+
+        public Bind onFalse(Runnable runnable) {
+            return onFalse(Commands.runOnce(runnable));
+        }
+
+        public Bind whileHeld(Command command) {
+            trigger.whileTrue(command);
+            return this;
+        }
+
+        public Bind whileHeld(Runnable runnable) {
+            return whileHeld(Commands.run(runnable));
+        }
+
+        public Bind toggleOnTrue(Command command) {
+            trigger.toggleOnTrue(command);
+            return this;
+        }
+
+        public Bind switchCommands(Command commandA, Command commandB) {
+            trigger.onTrue(Commands.either(commandA, commandB, () -> {
+                switchState = !switchState;
+                return switchState;
+            }));
+            return this;
+        }
+
+        // Add more binding types here as needed (e.g., toggleOnRelease, etc.)
+    }
 }
