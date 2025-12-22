@@ -96,11 +96,15 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autoCommand = AutoUtils.getChooser().selectedCommand();
-    autoCommand.schedule();
+
+    if (autoCommand != null) {
+      autoCommand.schedule();
+    }
   }
 
   @Override
   public void autonomousPeriodic() {
+
   }
 
   @Override

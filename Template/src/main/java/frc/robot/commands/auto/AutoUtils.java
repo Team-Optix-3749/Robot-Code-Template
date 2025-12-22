@@ -32,8 +32,6 @@ public class AutoUtils {
 
     private static AutoFactory factory;
     private static AutoChooser chooser;
-    // private static LoggedDashboardChooser<Command> loggedChooser = new
-    // LoggedDashboardChooser<>("AutoChooser");
 
     private static Map<String, Command> eventMarkerCommands = Map.of(
             "score", new PrintCommand("Scored"));
@@ -66,7 +64,7 @@ public class AutoUtils {
         chooser.addCmd("No Auto", () -> Commands.print("[AutoUtils]: No Auto Selected"));
         chooser.addCmd("Sample", () -> getSingleTrajectoryCommand("Sample"));
 
-        chooser.select("No Auto");
+        chooser.select("Sample");
     }
 
     public static void setupAutoTrigger() {
@@ -87,7 +85,6 @@ public class AutoUtils {
         for (String marker : markers) {
             if (!eventMarkerCommands.containsKey(marker)) {
                 System.out.println("[AutoUtils]: No command found for event marker: " + marker);
-                continue;
             }
 
             traj.atPose(marker, Accuracy.TRANSLATE_TOLERANCE_M, Accuracy.ROTATION_TOLERANCE.getRadians())
@@ -99,19 +96,22 @@ public class AutoUtils {
         return chooser;
     }
 
-    public static AutoFactory getAutoFactory() {
-        return factory;
-    }
+    // public static AutoFactory getAutoFactory() {
+    //     return factory;
+    // }
 
     public static Command getSingleTrajectoryCommand(String trajectoryName) {
         AutoRoutine routine = factory.newRoutine(trajectoryName);
         AutoTrajectory traj = routine.trajectory(trajectoryName);
+        applyEventMarkers(traj, "score");
+        // traj.atTime("Score").onTrue(eventMarkerCommands.get("score"));
 
         routine.active().onTrue(Commands.sequence(
                 traj.resetOdometry(),
                 traj.cmd()));
-
+    
         Logger.recordOutput("AutoUtils/" + trajectoryName + "/InitialPose", traj.getInitialPose().orElse(Pose2d.kZero));
+        
         return Commands.sequence(
                 Commands.print("[AutoUtils]: Running - " + trajectoryName),
                 routine.cmd(),

@@ -57,7 +57,7 @@ public final class RobotConfig {
   }
 
   public static final class Accuracy {
-    public static final double TRANSLATE_TOLERANCE_M = 0.02;
-    public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(3);
+    public static final double TRANSLATE_TOLERANCE_M = 10000;
+    public static final Rotation2d ROTATION_TOLERANCE = Rotation2d.fromDegrees(10000);
   }
 }
