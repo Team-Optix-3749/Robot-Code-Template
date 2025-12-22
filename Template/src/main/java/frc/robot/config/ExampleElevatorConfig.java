@@ -12,6 +12,7 @@ public class ExampleElevatorConfig {
         // 22 TOOTH, 1/4 in pitch, divide by 2pi to go from circumfrence to radius
         public static final double DRUM_RADIUS_M = (Units.inchesToMeters(22.0 / 4.0) / (2 * Math.PI));
 
+        public static final Translation2d MOUNT_OFFSET = new Translation2d(0, Units.inchesToMeters(3));
         public static final double MIN_HEIGHT_M = 0;
         public static final double MAX_HEIGHT_M = Units.feetToMeters(6);
         public static final double STARTING_HEIGHT_M = 0;
@@ -19,9 +20,6 @@ public class ExampleElevatorConfig {
         public static boolean IS_INVERTED = false;
 
         public static final boolean SIMULATE_GRAVITY = true;
-        public static final Translation2d MOUNT_OFFSET = null;
-
-        
     }
 
     public static final double stateMarginOfError = 0.1;
@@ -80,10 +78,10 @@ public class ExampleElevatorConfig {
         MAX(Units.feetToMeters(6)),
         STOPPED(-1);
 
-        public double heightM;
+        public Translation2d position;
 
         private ElevatorStates(double heightM) {
-            this.heightM = heightM;
+            this.position = (new Translation2d(0, heightM)).minus(ElevatorSpecs.MOUNT_OFFSET);
         }
     }
 }

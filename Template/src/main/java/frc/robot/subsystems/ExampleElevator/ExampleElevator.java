@@ -17,7 +17,6 @@ import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO.ElevatorData;
 import frc.robot.subsystems.ExampleElevator.real.ElevatorReal;
 import frc.robot.subsystems.ExampleElevator.sim.ElevatorSiml;
-import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.utils.MiscUtils;
 
 public class ExampleElevator {
