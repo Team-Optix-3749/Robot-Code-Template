@@ -7,8 +7,11 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.config.ExampleArmConfig.ArmControl.ControlConfig;
 import frc.robot.config.ExampleArmConfig.ArmStates;
 import frc.robot.config.ExampleArmConfig;
@@ -29,7 +32,8 @@ public class ExampleArm {
     ControlConfig config = ExampleArmConfig.ArmControl.CONTROL_CONFIG;
 
     ArmFeedforward feedforward = new ArmFeedforward(config.kS, config.kG, config.kV, config.kA);
-    PIDController pid = new PIDController(config.kP, config.kI, config.kD);
+    ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
+            new Constraints(config.MAX_VELOCITY_RadPS, config.MAX_ACCEL_RadPSS));
 
     /* last is state and any other variables needed */
     ArmStates currentState = ArmStates.STOPPED;
@@ -51,7 +55,7 @@ public class ExampleArm {
             io = new ArmSim(data);
         }
 
-        pid.enableContinuousInput(-Math.PI, Math.PI);
+        profile.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /* GETTERS GO AT THE TOP */
@@ -93,7 +97,7 @@ public class ExampleArm {
     public boolean isStableState() {
         // check if within the tolerance of the setpoint and is not moving
 
-        double error = Math.abs(pid.getSetpoint() - data.angle.getRadians());
+        double error = Math.abs(profile.getSetpoint().position - data.angle.getRadians());
         return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE_M &&
                 isStopped();
     }
@@ -108,10 +112,12 @@ public class ExampleArm {
             return;
         }
 
-        pid.setSetpoint(currentState.angle.getRadians());
+        State firstState = profile.getSetpoint();
+        double pidOutput = profile.calculate(getAngle().getRadians());
 
-        double pidOutput = pid.calculate(data.angle.getRadians());
-        double feedforwardOutput = feedforward.calculate(data.angle.getRadians(), data.angularVelocityRadPS);
+        State nextState = profile.getSetpoint();
+        double feedforwardOutput = feedforward.calculateWithVelocities(getAngle().getRadians(), firstState.velocity,
+                nextState.velocity);
 
         double voltageOutput = pidOutput + feedforwardOutput;
         io.setVoltage(voltageOutput);

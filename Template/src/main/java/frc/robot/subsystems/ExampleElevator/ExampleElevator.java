@@ -7,7 +7,10 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.config.ExampleElevatorConfig.ElevatorControl;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.ExampleElevatorConfig.ElevatorStates;
@@ -32,7 +35,8 @@ public class ExampleElevator {
      * don'tconfig.config.config.
      */
     ElevatorFeedforward feedforward = new ElevatorFeedforward(config.kS, config.kG, config.kV, config.kA);
-    PIDController pid = new PIDController(config.kP, config.kI, config.kD);
+    ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
+            new Constraints(config.MAX_VELOCITY_MPS, config.MAX_ACCEL_MPSS));
 
     /* last is state and any other variables needed */
     ElevatorStates currentState = ElevatorStates.STOPPED;
@@ -96,7 +100,7 @@ public class ExampleElevator {
     public boolean isStableState() {
         // check if within the tolerance of the setpoint and is not moving
 
-        double error = Math.abs(pid.getSetpoint() - data.position.getY());
+        double error = Math.abs(profile.getSetpoint().position - data.position.getY());
         return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE_M &&
                 isStopped();
     }
@@ -111,10 +115,12 @@ public class ExampleElevator {
             return;
         }
 
-        pid.setSetpoint(getHeightM());
+        State firstState = profile.getSetpoint();
+        double pidOutput = profile.calculate(getHeightM());
 
-        double pidOutput = pid.calculate(data.position.getY());
-        double feedforwardOutput = feedforward.calculate(data.velocityMPS);
+        State nextState = profile.getSetpoint();
+        double feedforwardOutput = feedforward.calculateWithVelocities(firstState.velocity,
+                nextState.velocity);
 
         double voltageOutput = pidOutput + feedforwardOutput;
         io.setVoltage(voltageOutput);
