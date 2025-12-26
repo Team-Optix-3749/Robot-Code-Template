@@ -130,6 +130,9 @@ public class ExampleElevator {
         // always get latest data first
         io.updateData();
 
+        // send logged data to ascope
+        Logger.processInputs("Elevator", data);
+
         // then do control
         moveToGoal();
 

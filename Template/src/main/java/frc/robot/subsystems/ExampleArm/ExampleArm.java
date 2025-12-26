@@ -127,6 +127,9 @@ public class ExampleArm {
         // always get latest data first
         io.updateData();
 
+        // send logged data to ascope
+        Logger.processInputs("Arm", data);
+
         // then do control
         moveToGoal();
 
