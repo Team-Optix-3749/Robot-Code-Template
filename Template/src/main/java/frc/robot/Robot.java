@@ -29,8 +29,6 @@ public class Robot extends LoggedRobot {
   public static Swerve swerve = new Swerve();
   public static ExampleElevator exampleElevator = new ExampleElevator();
 
-  Command autoCommand = null;
-
   public Robot() {
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -97,11 +95,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    autoCommand = AutoUtils.getChooser().selectedCommand();
+    AutoUtils.runSelectedCommand();
+    // Dont use ^ anymore. See AutoUtils.setupAutoTrigger()
 
-    if (autoCommand != null) {
-      autoCommand.schedule();
-    }
+    // In here should be just any special setup needed before auto starts
+    // For example, if we do piece detection, maybe we would want to select a different preset
   }
 
   @Override
@@ -111,10 +109,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
-    if (autoCommand != null) {
-      autoCommand.cancel();
-      autoCommand = null;
-    }
+
   }
 
   @Override
