@@ -70,7 +70,7 @@ public final class RobotConfig {
     public static final double DEFAULT_MOVEMENT_TOLERANCE_MPS = 0.003;
 
     public static final double DRIVE_TRANSLATE_TOLERANCE_M = 0.02;
-    public static final Rotation2d DRIVE_ROTATION_TOLERANCE = Rotation2d.fromDegrees(3);
+    public static final double DRIVE_ROTATION_TOLERANCE_RAD = Rotation2d.fromDegrees(3).getRadians();
 
     // 3 cm tolerance for elevator positioning
     public static final double ELEVATOR_TOLERANCE_M = 0.025;

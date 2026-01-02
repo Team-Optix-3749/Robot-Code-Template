@@ -185,14 +185,11 @@ public class Swerve extends SubsystemBase {
   }
 
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
-    desiredChassisSpeeds = new ChassisSpeeds(
-        chassisSpeeds.vxMetersPerSecond,
-        chassisSpeeds.vyMetersPerSecond,
-        chassisSpeeds.omegaRadiansPerSecond);
+    desiredChassisSpeeds = chassisSpeeds;
   }
 
   public void driveToSample(SwerveSample sample) {
-    Pose2d pose = swerveDrivePoseEstimator.getEstimatedPosition();
+    Pose2d pose = getPose();
 
     autoXController.setGoal(sample.x);
     autoYController.setGoal(sample.y);
@@ -206,7 +203,7 @@ public class Swerve extends SubsystemBase {
     autoTurnController.setGoal(targetAngle);
     double omega = sample.omega + autoTurnController.calculate(pose.getRotation().getRadians());
 
-    ChassisSpeeds speeds = new ChassisSpeeds(vx, vy, omega);
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, pose.getRotation());
 
     driveFieldRelative(speeds);
   }
@@ -250,7 +247,7 @@ public class Swerve extends SubsystemBase {
     syncEncoderPositions();
 
     Rotation2d targetRotation = MiscUtils.isRedAlliance()
-        ? Rotation2d.k180deg
+        ? Rotation2d.fromDegrees(180)
         : new Rotation2d();
 
     swerveDrivePoseEstimator.resetPosition(
@@ -289,12 +286,14 @@ public class Swerve extends SubsystemBase {
     // Current command
     String currentCommand = this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName();
     Logger.recordOutput("Swerve/CurrentCommand", currentCommand);
+
+    Logger.processInputs("Swerve/GyroData", gyroData);
   }
 
   @Override
   public void periodic() {
     gyro.updateData();
-    Logger.processInputs("Swerve/GyroData", gyroData);
+    updateOdometry();
 
     SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
     setModuleStates(desiredStates);
@@ -312,7 +311,6 @@ public class Swerve extends SubsystemBase {
       lastEncoderSyncTime = Timer.getTimestamp();
     }
 
-    updateOdometry();
     logData();
   }
 }

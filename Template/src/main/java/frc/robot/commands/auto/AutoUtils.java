@@ -42,7 +42,7 @@ public class AutoUtils {
     public static void initAutoUtils() {
         setupFactory();
         setupChooser();
-        setupAutoTrigger();
+        // setupAutoTrigger();
     }
 
     public static void setupFactory() {
@@ -63,12 +63,22 @@ public class AutoUtils {
 
         chooser.addCmd("No Auto", () -> Commands.print("[AutoUtils]: No Auto Selected"));
         chooser.addCmd("Sample", () -> getSingleTrajectoryCommand("Sample"));
+        chooser.addCmd("Random", () -> getSingleTrajectoryCommand("Random"));
 
         chooser.select("Sample");
     }
 
     public static void setupAutoTrigger() {
-        RobotModeTriggers.autonomous().whileTrue(chooser.selectedCommand());
+        RobotModeTriggers.autonomous().whileTrue(chooser.selectedCommandScheduler());
+    }
+
+    public static void runSelectedCommand() {
+        Command autoCmd = chooser.selectedCommand();
+        if (autoCmd != null) {
+            autoCmd.schedule();
+        } else {
+            System.out.println("[AutoUtils]: No Auto Command Selected");
+        }
     }
 
     /* Adds routine to the auto chooser */
@@ -87,7 +97,7 @@ public class AutoUtils {
                 System.out.println("[AutoUtils]: No command found for event marker: " + marker);
             }
 
-            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE.getRadians())
+            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE_RAD)
                     .onTrue(eventMarkerCommands.get(marker));
         }
     }
@@ -97,21 +107,21 @@ public class AutoUtils {
     }
 
     // public static AutoFactory getAutoFactory() {
-    //     return factory;
+    // return factory;
     // }
 
     public static Command getSingleTrajectoryCommand(String trajectoryName) {
         AutoRoutine routine = factory.newRoutine(trajectoryName);
         AutoTrajectory traj = routine.trajectory(trajectoryName);
-        applyEventMarkers(traj, "score");
+        // applyEventMarkers(traj, "score");
         // traj.atTime("Score").onTrue(eventMarkerCommands.get("score"));
 
         routine.active().onTrue(Commands.sequence(
                 traj.resetOdometry(),
                 traj.cmd()));
-    
+
         Logger.recordOutput("AutoUtils/" + trajectoryName + "/InitialPose", traj.getInitialPose().orElse(Pose2d.kZero));
-        
+
         return Commands.sequence(
                 Commands.print("[AutoUtils]: Running - " + trajectoryName),
                 routine.cmd(),
