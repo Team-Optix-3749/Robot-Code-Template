@@ -116,11 +116,15 @@ public class AutoUtils {
         // applyEventMarkers(traj, "score");
         // traj.atTime("Score").onTrue(eventMarkerCommands.get("score"));
 
+        Pose2d finalPose = traj.getFinalPose().orElse(Pose2d.kZero);
+
         routine.active().onTrue(Commands.sequence(
                 traj.resetOdometry(),
-                traj.cmd()));
+                traj.cmd(),
+                Commands.run(() -> Robot.swerve.driveToPose(finalPose), Robot.swerve)));
 
         Logger.recordOutput("AutoUtils/" + trajectoryName + "/InitialPose", traj.getInitialPose().orElse(Pose2d.kZero));
+        Logger.recordOutput("AutoUtils/" + trajectoryName + "/FinalPose", finalPose);
 
         return Commands.sequence(
                 Commands.print("[AutoUtils]: Running - " + trajectoryName),
