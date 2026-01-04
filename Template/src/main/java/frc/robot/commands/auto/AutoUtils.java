@@ -7,6 +7,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.util.ChoreoAllianceFlipUtil;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,6 +34,7 @@ public class AutoUtils {
 
     private static AutoFactory factory;
     private static AutoChooser chooser;
+    public static ChoreoAllianceFlipUtil.Flipper flipper = ChoreoAllianceFlipUtil.getFlipper();
 
     private static Map<String, Command> eventMarkerCommands = Map.of(
             "score", new PrintCommand("Scored"));

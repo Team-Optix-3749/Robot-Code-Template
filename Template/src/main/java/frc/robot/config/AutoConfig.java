@@ -8,10 +8,12 @@ public final class AutoConfig {
     public static final class Drive {
         public static final double KP = 3.0;
         public static final double KD = 0.5;
+        public static final double KI = 0.5;
     }
 
     public static final class Turn {
         public static final double KP = 4.75;
         public static final double KD = 0.0;
+        public static final double KI = 0.0;
     }
 }

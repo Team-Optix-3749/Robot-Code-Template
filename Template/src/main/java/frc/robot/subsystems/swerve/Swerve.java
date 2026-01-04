@@ -3,22 +3,28 @@ package frc.robot.subsystems.swerve;
 import org.littletonrobotics.junction.Logger;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.gyro.GyroDataAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroIO;
 import frc.robot.subsystems.swerve.gyro.GyroSim;
 import frc.robot.subsystems.swerve.gyro.PigeonGyro;
+import frc.robot.commands.auto.AutoUtils;
 import frc.robot.config.RobotConfig.RobotType;
+import frc.robot.config.AutoConfig;
 import frc.robot.config.SwerveConfig;
 import frc.robot.utils.MiscUtils;
 import frc.robot.config.SwerveConfig.Control;
@@ -40,7 +46,16 @@ public class Swerve extends SubsystemBase {
   private final GyroIO gyro;
   private final GyroDataAutoLogged gyroData = new GyroDataAutoLogged();
 
+  private PIDController xController = new PIDController(AutoConfig.Drive.KP, AutoConfig.Drive.KI, AutoConfig.Drive.KD);
+  private PIDController yController = new PIDController(AutoConfig.Drive.KP, AutoConfig.Drive.KI, AutoConfig.Drive.KD);
+  private PIDController turnController = new PIDController(AutoConfig.Turn.KP, AutoConfig.Turn.KI, AutoConfig.Turn.KD);
+
+  private Pose2d positionSetpoint = new Pose2d();
+  private Pose2d velocitySetpoint = new Pose2d();
+
   private final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+
+  private boolean isOTF = false;
 
   private ChassisSpeeds desiredChassisSpeeds = new ChassisSpeeds();
 
@@ -184,6 +199,14 @@ public class Swerve extends SubsystemBase {
     resetAutoControllers(pose);
   }
 
+  public void setIsOTF(boolean otf) {
+    isOTF = otf;
+  }
+
+  public boolean getIsOTF() {
+    return isOTF;
+  }
+
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
     desiredChassisSpeeds = chassisSpeeds;
   }
@@ -213,6 +236,108 @@ public class Swerve extends SubsystemBase {
         0, new double[4], new double[4]);
 
     driveToSample(sample);
+  }
+
+  public void followSample(Pose2d positions, Pose2d velocities) {
+    positionSetpoint = positions;
+    velocitySetpoint = velocities;
+
+    double xPID = xController.calculate(getPose().getX(), positions.getX());
+    xPID = MathUtil.clamp(xPID, -1, 1);
+    if (xController.atSetpoint()) {
+      SmartDashboard.putBoolean("xAtSetpoint", true);
+      xPID = 0;
+    }
+
+    double yPID = yController.calculate(getPose().getY(), positions.getY());
+    yPID = MathUtil.clamp(yPID, -1, 1);
+
+    if (yController.atSetpoint()) {
+      SmartDashboard.putBoolean("yAtSetpoint", true);
+      yPID = 0;
+    }
+
+    double turnPID = turnController.calculate(getPose().getRotation().getRadians(),
+        positions.getRotation().getRadians());
+    // turnPID = MathUtil.clamp(turnPID, -Math.PI/2, Math.PI/2);
+
+    if (turnController.atSetpoint()) {
+      turnPID = 0;
+    }
+    Logger.recordOutput("Swerve/auto/turn PID", turnPID);
+    Logger.recordOutput("Swerve/auto/x PID", xPID);
+    Logger.recordOutput("Swerve/auto/y PID", yPID);
+
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        new ChassisSpeeds(
+            xPID + velocities.getX(),
+            yPID + velocities.getY(),
+            turnPID
+                + velocities.getRotation().getRadians()),
+        getPose().getRotation());
+    logSetpoints(positions, velocities);
+    Logger.recordOutput("Swerve/auto/velocity hypt", Math.sqrt(
+        speeds.vxMetersPerSecond * speeds.vxMetersPerSecond + speeds.vyMetersPerSecond * speeds.vyMetersPerSecond));
+    driveFieldRelative(speeds);
+  }
+
+  public void logSetpoints(Pose2d position, Pose2d velocity) {
+    logSetpoints(position.getX(), velocity.getX(), 0, position.getY(), velocity.getY(), 0,
+        position.getRotation().getRadians(), velocity.getRotation().getRadians(), 0);
+
+  }
+
+  public void logSetpoints(double posX, double velX, double accX, double posY, double velY, double accY, double heading,
+      double omega, double alpha) {
+    // setpoint logging for automated driving
+    double[] positions = new double[] { posX, posY, heading };
+    Logger.recordOutput("Swerve/auto/position setpoint", positions);
+    Transform2d poseDiff = new Pose2d(posX, posY, new Rotation2d(heading)).minus(getPose());
+    Logger.recordOutput("Swerve/auto/position error", poseDiff);
+
+    Double[] velocities = new Double[] { velX, velY, omega };
+    double velocity = 0;
+    velocity += Math.pow(velocities[0], 2);
+    velocity += Math.pow(velocities[1], 2);
+
+    velocity = Math.sqrt(velocity);
+    Logger.recordOutput("Swerve/auto/setpoint velocity", velocity);
+    Logger.recordOutput("Swerve/auto/setpoint rotational velocity", velocities[2]);
+    velocity = velocities[2];
+    Logger.recordOutput("Swerve/auto/velocity hypt", Math.sqrt(
+        velX * velX + velY * velY));
+
+    Double[] accelerations = new Double[] { accX, accY, alpha };
+    double acceleration = 0;
+    acceleration += Math.pow(accelerations[0], 2);
+    acceleration += Math.pow(accelerations[1], 2);
+
+    acceleration = Math.sqrt(acceleration);
+    Logger.recordOutput("Swerve/auto/setpoint acceleration", acceleration);
+    Logger.recordOutput("Swerve/auto/setpoint rotational acceleration", accelerations[2]);
+  }
+
+  public void followSample(SwerveSample sample, boolean isFlipped) {
+
+    // ternaries are for x-axis flipping
+
+    double xPos = sample.x;
+    double xVel = sample.vx;
+    double xAcc = sample.ax;
+
+    double yPos = isFlipped ? AutoUtils.flipper.flipY(sample.y) : sample.y;
+    double yVel = isFlipped ? -sample.vy : sample.vy;
+    double yAcc = isFlipped ? -sample.ay : sample.ay;
+
+    double heading = isFlipped ? new Rotation2d(Math.PI - sample.heading).rotateBy(new Rotation2d(Math.PI)).getRadians()
+        : sample.heading;
+    double omega = isFlipped ? -sample.omega : sample.omega;
+    double alpha = isFlipped ? -sample.alpha : sample.alpha;
+
+    positionSetpoint = new Pose2d(xPos, yPos, new Rotation2d(heading));
+    velocitySetpoint = new Pose2d(xVel, yVel, new Rotation2d(omega));
+
+    followSample(positionSetpoint, velocitySetpoint);
   }
 
   public void lockModules() {

@@ -12,11 +12,14 @@ import frc.robot.config.RobotConfig.INPUT;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
 import frc.robot.Robot;
+import frc.robot.commands.swerve.OnTheFly;
 import frc.robot.commands.swerve.SwerveDefaultCommand;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public final class ButtonBindings {
     private static final Trigger hasDualControllers = new Trigger(() -> DriverStation.getJoystickType(1) > 1);
@@ -33,6 +36,9 @@ public final class ButtonBindings {
         // Add any dual-controller bindings here.
         // Example:
         Bind.button(piCtl.povUp()).onTrue(Commands.print("Pilot: povUp pressed"));
+        Bind.button(piCtl.a()).onTrue(new OnTheFly(new Pose2d(8.0,
+                4.0,
+                Rotation2d.fromDegrees(0))));
         Bind.button(opCtl.a()).onTrue(Commands.print("Operator: A pressed"));
 
         Bind.button(piCtl.start()).onTrue(Robot.swerve::resetGyro);
