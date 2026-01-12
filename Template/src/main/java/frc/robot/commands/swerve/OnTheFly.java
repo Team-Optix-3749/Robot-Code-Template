@@ -6,6 +6,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -43,16 +45,17 @@ public class OnTheFly extends Command {
     }
 
     public static final double approachPointDistance = 0.75;
+
     private static Pose2d createApproachPoint(Pose2d pose) {
-            Translation2d position = pose.getTranslation();
-            Rotation2d heading = pose.getRotation();
+        Translation2d position = pose.getTranslation();
+        Rotation2d heading = pose.getRotation();
 
-            // Calculate an offset distance backward in the direction of the heading
-            Translation2d offset = new Translation2d(
-                    -approachPointDistance * Math.cos(heading.getRadians()),
-                    -approachPointDistance * Math.sin(heading.getRadians()));
+        // Calculate an offset distance backward in the direction of the heading
+        Translation2d offset = new Translation2d(
+                -approachPointDistance * Math.cos(heading.getRadians()),
+                -approachPointDistance * Math.sin(heading.getRadians()));
 
-            return new Pose2d(position.plus(offset), heading);
+        return new Pose2d(position.plus(offset), heading);
     }
 
     /**
@@ -141,13 +144,22 @@ public class OnTheFly extends Command {
                                                                                // time
 
         // Command the robot to follow the sampled trajectory state
-        Robot.swerve.followSample(goalState.pose,
-                new Pose2d(
-                        goalState.fieldSpeeds.vxMetersPerSecond, // X velocity
-                        goalState.fieldSpeeds.vyMetersPerSecond, // Y velocity
-                        new Rotation2d(goalState.fieldSpeeds.omegaRadiansPerSecond) // Angular velocity
-                ));
 
+        SwerveSample setpoint = new SwerveSample(
+                0,
+                goalState.pose.getX(),
+                goalState.pose.getY(),
+                goalState.pose.getRotation().getRadians(),
+                goalState.fieldSpeeds.vxMetersPerSecond,
+                goalState.fieldSpeeds.vyMetersPerSecond,
+                goalState.fieldSpeeds.omegaRadiansPerSecond,
+                0,
+                0,
+                0,
+                new double[4],
+                new double[4]);
+
+        Robot.swerve.driveToSample(setpoint);
     }
 
     /**

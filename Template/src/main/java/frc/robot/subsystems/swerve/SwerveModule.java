@@ -10,7 +10,6 @@ import frc.robot.config.SwerveConfig.Control;
 import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
 import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
-
 /**
  * General class for swerve modules that interacts with the
  * interface. Handles all logic relating to individual modules.
@@ -29,7 +28,7 @@ public class SwerveModule {
             Control.MODULE_TURN_PID[2]);
 
     private final SwerveModuleIO moduleIO;
-    private final ModuleDataAutoLogged moduleData = new ModuleDataAutoLogged();
+    private final SwerveModuleDataAutoLogged moduleData = new SwerveModuleDataAutoLogged();
 
     /**
      * Constructs a new SwerveModule.
@@ -77,7 +76,7 @@ public class SwerveModule {
         return desiredState;
     }
 
-    public ModuleDataAutoLogged getModuleData() {
+    public SwerveModuleDataAutoLogged getModuleData() {
         return moduleData;
     }
 

@@ -19,9 +19,9 @@ public class PigeonGyro implements GyroIO {
     private final Pigeon2Configuration config = new Pigeon2Configuration();
     private final MountPoseConfigs mountConfig = new MountPoseConfigs();
 
-    public GyroData data = new GyroData();
+    public GyroDataAutoLogged data = new GyroDataAutoLogged();
 
-    public PigeonGyro(GyroData moduleData) {
+    public PigeonGyro(GyroDataAutoLogged moduleData) {
         data = moduleData;
 
         Rotation3d mountOrientation = GyroConfig.MOUNT_ORIENTATION;

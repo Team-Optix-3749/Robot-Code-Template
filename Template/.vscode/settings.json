@@ -14,28 +14,16 @@
     "**/.factorypath": true,
     "**/*~": true
   },
-  "java.jdt.ls.java.home": "C:\\Users\\Public\\wpilib\\2025\\jdk",
-  "terminal.integrated.env.windows": {
-    "JAVA_HOME": "C:\\Users\\Public\\wpilib\\2025\\jdk",
-    "PATH": "C:\\Users\\Public\\wpilib\\2025\\jdk\\bin;${env:PATH}"
-  },
-  "java.configuration.runtimes": [
-    {
-      "name": "JavaSE-17",
-      "path": "C:\\Users\\Public\\wpilib\\2025\\jdk",
-      "default": true
-    }
-  ],
   "java.test.config": [
     {
       "name": "WPIlibUnitTests",
       "workingDirectory": "${workspaceFolder}/build/jni/release",
-      "vmargs": ["-Djava.library.path=${workspaceFolder}/build/jni/release"],
+      "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
       "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
       }
-    }
+    },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
   "java.import.gradle.annotationProcessing.enabled": false,
@@ -67,7 +55,7 @@
     "javax.smartcardio.*",
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
-    "edu.wpi.first.math.**.struct.*"
+    "edu.wpi.first.math.**.struct.*",
   ],
-  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable"
+  "java.dependency.enableDependencyCheckup": false
 }

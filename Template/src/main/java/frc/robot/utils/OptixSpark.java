@@ -1,18 +1,21 @@
 package frc.robot.utils;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -216,7 +219,7 @@ public final class OptixSpark {
      * @param slot             closed-loop slot to use
      */
     public void requestVelocity(double velocitySetpoint, double feedforward, ClosedLoopSlot slot) {
-        ctrl.setReference(velocitySetpoint, ControlType.kVelocity, slot, feedforward);
+        ctrl.setSetpoint(velocitySetpoint, ControlType.kVelocity, slot, feedforward);
     }
 
     // Position closed-loop with deadband-to-slot3 behavior by default
@@ -239,7 +242,7 @@ public final class OptixSpark {
     public void requestPosition(double positionSetpoint, double feedforward) {
         double sp = wrapEnabled ? wrap(positionSetpoint) : positionSetpoint;
         ClosedLoopSlot slot = inDeadband(getPosition(), sp) ? ClosedLoopSlot.kSlot3 : ClosedLoopSlot.kSlot0;
-        ctrl.setReference(sp, ControlType.kPosition, slot, feedforward);
+        ctrl.setSetpoint(sp, ControlType.kPosition, slot, feedforward);
     }
 
     /**
@@ -252,7 +255,7 @@ public final class OptixSpark {
      */
     public void requestPosition(double positionSetpoint, double feedforward, ClosedLoopSlot slot) {
         double sp = wrapEnabled ? wrap(positionSetpoint) : positionSetpoint;
-        ctrl.setReference(sp, ControlType.kPosition, slot, feedforward);
+        ctrl.setSetpoint(sp, ControlType.kPosition, slot, feedforward);
     }
 
     // Configuration helpers (fluent)
@@ -435,7 +438,7 @@ public final class OptixSpark {
      * parameters and persisting them to flash.
      */
     public void apply() {
-        motor.configure(cfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        apply(cfg);
     }
 
     /**
@@ -443,7 +446,13 @@ public final class OptixSpark {
      * parameters and persisting them to flash.
      */
     public void apply(SparkBaseConfig config) {
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        var ret = motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // If the return code is OK, no error occurred
+        if (ret.compareTo(REVLibError.kOk) == 0)
+            return;
+
+        Logger.recordOutput("Errors/ApplySparkConfig-" + motor.getDeviceId(), ret);
     }
 
     // ---- Internal helpers ----

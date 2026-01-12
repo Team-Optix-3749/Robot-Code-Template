@@ -15,9 +15,9 @@ import frc.robot.config.RobotConfig;
 public class GyroSim implements GyroIO {
   private Rotation2d yaw = new Rotation2d(0);
 
-  private final GyroData data;
+  private final GyroDataAutoLogged data;
 
-  public GyroSim(GyroData moduleData) {
+  public GyroSim(GyroDataAutoLogged moduleData) {
     data = moduleData;
   }
 

@@ -11,7 +11,6 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Robot;
 // import frc.robot.buttons.JoystickIO;
 // import frc.robot.buttons.ToPosTriggers;
 // import frc.robot.buttons.ButtonBoard.ScoringMode;

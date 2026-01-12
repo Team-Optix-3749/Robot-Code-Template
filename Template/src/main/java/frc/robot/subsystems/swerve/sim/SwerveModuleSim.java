@@ -1,17 +1,15 @@
 package frc.robot.subsystems.swerve.sim;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.config.RobotConfig;
+import frc.robot.subsystems.swerve.SwerveModuleDataAutoLogged;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.utils.MiscUtils;
-import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
 import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.config.SwerveConfig.Motor;
 
@@ -33,11 +31,11 @@ public class SwerveModuleSim implements SwerveModuleIO {
             Motor.TURN_GEARING);
     FlywheelSim turnSim = new FlywheelSim(turnPlant, DCMotor.getNEO(1), 0.0);
 
-    private final ModuleDataAutoLogged data;
+    private final SwerveModuleDataAutoLogged data;
 
     private double prevDriveVelMps = 0.0;
 
-    public SwerveModuleSim(int index, ModuleDataAutoLogged moduleData) {
+    public SwerveModuleSim(int index, SwerveModuleDataAutoLogged moduleData) {
         data = moduleData;
         data.index = index;
     }

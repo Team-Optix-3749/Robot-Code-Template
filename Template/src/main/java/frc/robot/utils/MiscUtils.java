@@ -1,6 +1,7 @@
 package frc.robot.utils;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
@@ -12,6 +13,20 @@ import frc.robot.config.RobotConfig.RobotType;
  * @author Neel Adem
  */
 public class MiscUtils {
+    /***
+     * @param <T>   any numeric type (e.g., Double, Integer). Will automatically be
+     *              inferred.
+     * @param input the value to flip
+     * @return the flipped value
+     */
+    public static <T extends Number> double fieldFlipY(T input) {
+        double value = input.doubleValue();
+        double height = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getFieldWidth();
+
+        System.out.println("FIELD FLIP Y IS USING 2025 FIELD DIMENSIONS. UPDATE IF NEEDED.");
+
+        return height - value;
+    }
 
     /***
      * Clamps the input voltage to the nominal bus voltage defined in RobotConfig.

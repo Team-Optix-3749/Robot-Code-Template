@@ -10,7 +10,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.swerve.ModuleDataAutoLogged;
+import frc.robot.subsystems.swerve.SwerveModuleDataAutoLogged;
 import frc.robot.config.SwerveConfig;
 import frc.robot.subsystems.swerve.SwerveModuleIO;
 import frc.robot.config.SwerveConfig.Drivetrain;
@@ -22,9 +22,9 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
     private final CANcoder absoluteEncoder;
 
-    private final ModuleDataAutoLogged data;
+    private final SwerveModuleDataAutoLogged data;
 
-    public SwerveModuleSpark(int index, ModuleDataAutoLogged moduleData) {
+    public SwerveModuleSpark(int index, SwerveModuleDataAutoLogged moduleData) {
         data = moduleData;
 
         data.index = index;

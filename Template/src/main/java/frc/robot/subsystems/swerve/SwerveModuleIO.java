@@ -18,7 +18,7 @@ public interface SwerveModuleIO {
    * Container for all swerve module sensor data and state information.
    */
   @AutoLog
-  public class ModuleData {
+  public class SwerveModuleData {
     /** Module index (0-3) */
     public int index = -1;
 
