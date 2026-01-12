@@ -38,8 +38,8 @@ public final class RobotConfig {
     public static final int PDH_ID = 40;
 
     /** Module Settings: order is FL, FR, BL, BR */
-    public static final int[] DRIVE_MOTORS = { 3, 5, 7, 9 };
-    public static final int[] TURN_MOTORS = { 4, 6, 8, 10 };
+    public static final int[] DRIVE_MOTORS = { 2, 4, 6, 8 };
+    public static final int[] TURN_MOTORS = { 3, 5, 7, 9 };
     public static final int[] CANCODERS = { 11, 12, 13, 14 };
 
     /** Order: Left, Right */

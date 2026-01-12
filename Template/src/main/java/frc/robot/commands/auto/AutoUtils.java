@@ -259,7 +259,7 @@ public class AutoUtils {
          * Builds the command and registers it to the auto chooser.
          */
         public void register() {
-            registerCommand(trajectoryName, this::build);
+            registerCommand(trajectoryName, () -> this.build());
         }
     }
 }
