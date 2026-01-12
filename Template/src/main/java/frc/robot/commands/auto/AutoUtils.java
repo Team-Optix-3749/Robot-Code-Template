@@ -37,7 +37,7 @@ public class AutoUtils {
     public static ChoreoAllianceFlipUtil.Flipper flipper = ChoreoAllianceFlipUtil.getFlipper();
 
     private static Map<String, Command> eventMarkerCommands = Map.of(
-            "score", new PrintCommand("Scored"));
+            "score", Commands.print("scored!!!"));
 
     /**
      * run all necessary auto setup methods
@@ -45,7 +45,7 @@ public class AutoUtils {
     public static void initAutoUtils() {
         setupFactory();
         setupChooser();
-        // setupAutoTrigger();
+        setupAutoTrigger();
     }
 
     public static void setupFactory() {
@@ -56,6 +56,7 @@ public class AutoUtils {
                 true, // If alliance flipping should be enabled
                 Robot.swerve// The drive subsystem
         );
+        eventMarkerCommands.forEach((name, cmd) -> factory.bind(name, cmd));
     }
 
     public static void setupChooser() {
@@ -94,16 +95,16 @@ public class AutoUtils {
         chooser.addCmd(name, commandSupplier);
     }
 
-    public static void applyEventMarkers(AutoTrajectory traj, String... markers) {
-        for (String marker : markers) {
-            if (!eventMarkerCommands.containsKey(marker)) {
-                System.out.println("[AutoUtils]: No command found for event marker: " + marker);
-            }
+    // public static void applyEventMarkers(AutoTrajectory traj, String... markers) {
+    //     for (String marker : markers) {
+    //         if (!eventMarkerCommands.containsKey(marker)) {
+    //             System.out.println("[AutoUtils]: No command found for event marker: " + marker);
+    //         }
 
-            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE_RAD)
-                    .onTrue(eventMarkerCommands.get(marker));
-        }
-    }
+    //         traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE_RAD)
+    //                 .onTrue(eventMarkerCommands.get(marker));
+    //     }
+    // }
 
     public static AutoChooser getChooser() {
         return chooser;

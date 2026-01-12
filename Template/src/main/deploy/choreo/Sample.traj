@@ -103,5 +103,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Score", "from":{"target":1, "targetTimestamp":0.82746, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"score"}}}]
+   {"name":"score", "from":{"target":1, "targetTimestamp":0.82746, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"score"}}}]
 }
