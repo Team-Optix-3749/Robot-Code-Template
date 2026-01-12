@@ -55,8 +55,8 @@ public class SwerveDefaultCommand extends Command {
     double vy = yInput * Robot.swerve.getMaxDriveSpeed() * speedScale;
     double omega = omegaInput * Robot.swerve.getMaxAngularSpeed() * speedScale;
 
-    double fieldVx = MiscUtils.isRedAlliance() ? -vx : vx;
-    double fieldVy = MiscUtils.isRedAlliance() ? -vy : vy;
+    double fieldVx = MiscUtils.isRedAlliance() ? vx : -vx;
+    double fieldVy = MiscUtils.isRedAlliance() ? vy : -vy;
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         fieldVx,
