@@ -9,6 +9,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
+import choreo.util.ChoreoAllianceFlipUtil;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -23,7 +24,10 @@ import frc.robot.config.RobotConfig.ACCURACY;
 public class AutoUtils {
     private static AutoFactory factory;
     private static AutoChooser chooser;
-    private static final Map<String, Supplier<Command>> eventMarkerCommands = new HashMap<>();
+    public static ChoreoAllianceFlipUtil.Flipper flipper = ChoreoAllianceFlipUtil.getFlipper();
+
+    private static Map<String, Supplier<Command>> eventMarkerCommands = Map.of(
+            "score", () -> Commands.print("scored!!!"));
 
     /**
      * Initializes the auto factory and chooser. Call once during robot init.
@@ -98,6 +102,17 @@ public class AutoUtils {
      */
     public static void registerCommand(String name, Supplier<Command> commandSupplier) {
         chooser.addCmd(name, commandSupplier);
+    }
+
+    public static void applyEventMarkers(AutoTrajectory traj, String... markers) {
+        for (String marker : markers) {
+            if (!eventMarkerCommands.containsKey(marker)) {
+                System.out.println("[AutoUtils]: No command found for event marker: " + marker);
+            }
+
+            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE_M, ACCURACY.DRIVE_ROTATION_TOLERANCE_RAD)
+                    .onTrue(eventMarkerCommands.get(marker).get());
+        }
     }
 
     public static AutoChooser getChooser() {
