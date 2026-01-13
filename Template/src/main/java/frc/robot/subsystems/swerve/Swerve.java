@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import org.littletonrobotics.junction.Logger;
 
 import choreo.trajectory.SwerveSample;
@@ -134,20 +137,6 @@ public class Swerve extends SubsystemBase {
     return swerveDrivePoseEstimator.getEstimatedPosition();
   }
 
-  /**
-   * @return Max speed in meters per second
-   */
-  public double getMaxDriveSpeed() {
-    return Control.MAX_SPEED_MPS;
-  }
-
-  /**
-   * @return Max angular speed in radians per second
-   */
-  public double getMaxAngularSpeed() {
-    return Control.MAX_ANGULAR_SPEED_RADSS;
-  }
-
   public SwerveDrivePoseEstimator getPoseEstimator() {
     return swerveDrivePoseEstimator;
   }
@@ -162,7 +151,7 @@ public class Swerve extends SubsystemBase {
    * @param desiredStates Array of desired module states
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, getMaxDriveSpeed());
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Control.MAX_VELOCITY.in(MetersPerSecond));
     for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
     }

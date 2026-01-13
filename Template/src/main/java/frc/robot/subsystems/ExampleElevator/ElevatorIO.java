@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ExampleElevator;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -16,9 +19,9 @@ public interface ElevatorIO {
      */
     @AutoLog
     public class ElevatorData {
-        public Translation2d position = ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET;
-        public double velocityMPS = 0;
-        public double accelMPSS = 0;
+        public Distance height = ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getMeasureY();
+        public LinearVelocity velocity = MetersPerSecond.of(0);
+        public LinearAcceleration accel = MetersPerSecondPerSecond.of(0);
         public double leftCurrentAmps = 0;
         public double rightCurrentAmps = 0;
         public double leftAppliedVolts = 0;

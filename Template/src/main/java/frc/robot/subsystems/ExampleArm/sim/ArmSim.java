@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ExampleArm.sim;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -54,10 +57,10 @@ public class ArmSim implements ArmIO {
         // when creating Rotation2ds, always use fromRadians or fromDegrees to be
         // explicit
         data.angle = Rotation2d.fromRadians(armSystemSim.getAngleRads());
-        data.angularVelocityRadPS = armSystemSim.getVelocityRadPerSec();
+        data.velocity = RadiansPerSecond.of(armSystemSim.getVelocityRadPerSec());
 
         // The following data is not useful in simulation:
         data.currentAmps = armSystemSim.getCurrentDrawAmps();
-        data.angularAccelRadPSS = 0;
+        data.accel = RadiansPerSecondPerSecond.of(0);
     }
 }

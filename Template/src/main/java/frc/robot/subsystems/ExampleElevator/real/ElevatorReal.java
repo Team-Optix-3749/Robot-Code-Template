@@ -1,9 +1,10 @@
 package frc.robot.subsystems.ExampleElevator.real;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.config.ExampleElevatorConfig;
@@ -30,7 +31,7 @@ public class ElevatorReal implements ElevatorIO {
 
     /* anything else after */
 
-    public double previousVelocityMPSS = 0;
+    public LinearVelocity previousVelocity = MetersPerSecond.of(0);
     static double prevUpdateS = 0;
 
     public ElevatorReal(ElevatorDataAutoLogged elevData) {
@@ -44,7 +45,8 @@ public class ElevatorReal implements ElevatorIO {
         // stalling, they will draw as much current as possible and likely damage
         // themselves.
         leftMotor
-                .setPositionConversionFactor(2 * Math.PI * 2 * ElevatorSpecs.DRUM_RADIUS_M / ElevatorSpecs.GEARING)
+                .setPositionConversionFactor(
+                        2 * Math.PI * ElevatorSpecs.DRUM_RADIUS.in(Meters) * ElevatorSpecs.GEARING)
                 .setSmartCurrentLimit(GENERAL.MED_CURRENT_LIMIT_AMPS)
                 .setIdleMode(IdleMode.kBrake)
                 .setInverted(ElevatorSpecs.IS_INVERTED);
@@ -80,16 +82,16 @@ public class ElevatorReal implements ElevatorIO {
 
         // average to try getting a more accurate reading (shouldn't matter much)
         double elevatorRawPosition = (leftMotor.getPosition() + rightMotor.getPosition()) / 2.0;
-        data.position = new Translation2d(0, elevatorRawPosition +
+        data.height = Meters.of(elevatorRawPosition +
                 ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getY());
-        data.velocityMPS = (leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0;
+        data.velocity = MetersPerSecond.of((leftMotor.getVelocity() + rightMotor.getVelocity()) / 2.0);
 
         data.leftAppliedVolts = leftMotor.getAppliedVolts();
         data.rightAppliedVolts = rightMotor.getAppliedVolts();
         data.leftCurrentAmps = leftMotor.getCurrent();
         data.rightCurrentAmps = rightMotor.getCurrent();
 
-        data.accelMPSS = (data.velocityMPS - previousVelocityMPSS) / deltaTimeS;
-        previousVelocityMPSS = data.velocityMPS;
+        data.accel = (data.velocity.minus(previousVelocity)).div(Seconds.of(deltaTimeS));
+        previousVelocity = data.velocity;
     }
 }

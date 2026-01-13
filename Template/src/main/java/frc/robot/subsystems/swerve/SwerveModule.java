@@ -10,6 +10,8 @@ import frc.robot.config.SwerveConfig.Control;
 import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
 import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
+import frc.robot.utils.MiscUtils;
+
 /**
  * General class for swerve modules that interacts with the
  * interface. Handles all logic relating to individual modules.
@@ -19,9 +21,9 @@ public class SwerveModule {
     private SwerveModuleState desiredState = new SwerveModuleState();
 
     private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(
-        Control.MODULE_DRIVE_KS,
-        Control.MODULE_DRIVE_KV,
-        Control.MODULE_DRIVE_KA);
+            Control.MODULE_DRIVE_KS,
+            Control.MODULE_DRIVE_KV,
+            Control.MODULE_DRIVE_KA);
     private final PIDController drivePID = new PIDController(Control.MODULE_DRIVE_PID[0], Control.MODULE_DRIVE_PID[1],
             Control.MODULE_DRIVE_PID[2]);
     private final PIDController turnPID = new PIDController(Control.MODULE_TURN_PID[0], Control.MODULE_TURN_PID[1],
@@ -91,7 +93,7 @@ public class SwerveModule {
      * @param speedMetersPerSecond The target velocity in m/s
      */
     public void setDriveSpeed(double speedMetersPerSecond) {
-        if (Math.abs(speedMetersPerSecond) <= Control.SPEED_DEADBAND_MPS) {
+        if (MiscUtils.isStopped(speedMetersPerSecond)) {
             moduleIO.setDriveVoltage(0.0);
             return;
         }

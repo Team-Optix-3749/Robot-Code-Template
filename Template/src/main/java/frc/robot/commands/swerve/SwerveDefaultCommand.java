@@ -1,13 +1,15 @@
 package frc.robot.commands.swerve;
 
-import java.util.function.BooleanSupplier;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.config.SwerveConfig;
 import frc.robot.config.RobotConfig.INPUT;
 import frc.robot.utils.MiscUtils;
 
@@ -37,7 +39,8 @@ public class SwerveDefaultCommand extends Command {
 
   @Override
   public void execute() {
-    // controller x and y is "field relative" we have to make it "driver relative" (basically x is y and y is x)
+    // controller x and y is "field relative" we have to make it "driver relative"
+    // (basically x is y and y is x)
     // turn is also flipped
     double xInput = applyExpo(ySupplier.getAsDouble(), INPUT.TRANSLATE_EXPO);
     double yInput = applyExpo(xSupplier.getAsDouble(), INPUT.TRANSLATE_EXPO);
@@ -51,9 +54,9 @@ public class SwerveDefaultCommand extends Command {
 
     double speedScale = 1.0;// slowModeSupplier.getAsBoolean() ? Controller.SLOW_MODE_SCALE : 1.0;
 
-    double vx = xInput * Robot.swerve.getMaxDriveSpeed() * speedScale;
-    double vy = yInput * Robot.swerve.getMaxDriveSpeed() * speedScale;
-    double omega = omegaInput * Robot.swerve.getMaxAngularSpeed() * speedScale;
+    double vx = xInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * speedScale;
+    double vy = yInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * speedScale;
+    double omega = omegaInput * SwerveConfig.Control.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond) * speedScale;
 
     double fieldVx = MiscUtils.isRedAlliance() ? vx : -vx;
     double fieldVy = MiscUtils.isRedAlliance() ? vy : -vy;

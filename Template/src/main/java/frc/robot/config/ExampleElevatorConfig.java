@@ -1,5 +1,8 @@
 package frc.robot.config;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.config.RobotConfig.RobotType;
@@ -7,15 +10,15 @@ import frc.robot.utils.MiscUtils;
 
 public class ExampleElevatorConfig {
     public static class ElevatorSpecs {
-        public static final double GEARING = 16 * (24.0 / 22.0);
-        public static final double CARRIAGE_MASS_KG = Units.lbsToKilograms(54);
+        public static final double GEARING = 1.0 / 4.0 / 4.0; // 16:1 stage followed by another 16:1 stage
+        public static final Mass CARRIAGE_MASS = Pounds.of(54);
         // 22 TOOTH, 1/4 in pitch, divide by 2pi to go from circumfrence to radius
-        public static final double DRUM_RADIUS_M = (Units.inchesToMeters(22.0 / 4.0) / (2 * Math.PI));
+        public static final Distance DRUM_RADIUS = Inches.of(4);
 
         public static final Translation2d MOUNT_OFFSET = new Translation2d(0, Units.inchesToMeters(3));
-        public static final double MIN_HEIGHT_M = 0;
-        public static final double MAX_HEIGHT_M = Units.feetToMeters(6);
-        public static final double STARTING_HEIGHT_M = 0;
+        public static final Distance MIN_HEIGHT = Meters.of(0);
+        public static final Distance MAX_HEIGHT = Feet.of(6);
+        public static final Distance STARTING_HEIGHT = Meters.of(0);
 
         public static boolean IS_INVERTED = false;
 
@@ -35,8 +38,8 @@ public class ExampleElevatorConfig {
             public double kS;
             public double kV;
             public double kA;
-            public double MAX_VELOCITY_MPS;
-            public double MAX_ACCEL_MPSS;
+            public LinearVelocity VELOCITY;
+            public LinearAcceleration ACCEL;
         }
 
         public static ControlConfig SIM = new ControlConfig() {
@@ -48,8 +51,8 @@ public class ExampleElevatorConfig {
                 kS = 0.16;
                 kV = 7.77;
                 kA = 0.27; // 1.72
-                MAX_VELOCITY_MPS = 1.415;
-                MAX_ACCEL_MPSS = 4.1;
+                VELOCITY = MetersPerSecond.of(1.415);
+                ACCEL = MetersPerSecondPerSecond.of(4.1);
             }
         };
 
@@ -62,26 +65,29 @@ public class ExampleElevatorConfig {
                 kS = 0.16;
                 kV = 7.77;
                 kA = 0.27; // 1.72
-                MAX_VELOCITY_MPS = 1.415;
-                MAX_ACCEL_MPSS = 4.1;
+                VELOCITY = MetersPerSecond.of(1.415);
+                ACCEL = MetersPerSecondPerSecond.of(4.1);
             }
         };
 
         public static ControlConfig CONTROL_CONFIG = (MiscUtils.getRobotType() == RobotType.SIM) ? SIM : REAL;
     }
 
+    /***
+     * states for the different possible heights the elevator would need to go to
+     */
     public enum ElevatorStates {
-        // states for the different possible positions the elevator would need to go to
         STOW(Units.inchesToMeters(0)),
         POSITION_1(Units.feetToMeters(2.5)),
         POSITION_2(Units.feetToMeters(4)),
         MAX(Units.feetToMeters(6)),
         STOPPED(-1);
 
-        public Translation2d position;
+        /*** the height OFF THE GROUND */
+        public Distance height;
 
         private ElevatorStates(double heightM) {
-            this.position = (new Translation2d(0, heightM)).minus(ElevatorSpecs.MOUNT_OFFSET);
+            this.height = Meters.of(heightM).minus(Meters.of(ElevatorSpecs.MOUNT_OFFSET.getY()));
         }
     }
 }

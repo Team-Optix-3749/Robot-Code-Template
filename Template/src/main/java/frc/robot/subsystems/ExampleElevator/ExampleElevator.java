@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ExampleElevator;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -36,7 +39,7 @@ public class ExampleElevator {
      */
     ElevatorFeedforward feedforward = new ElevatorFeedforward(config.kS, config.kG, config.kV, config.kA);
     ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
-            new Constraints(config.MAX_VELOCITY_MPS, config.MAX_ACCEL_MPSS));
+            new Constraints(config.VELOCITY.in(MetersPerSecond), config.ACCEL.in(MetersPerSecondPerSecond)));
 
     /* last is state and any other variables needed */
     ElevatorStates currentState = ElevatorStates.STOPPED;
@@ -45,7 +48,7 @@ public class ExampleElevator {
     public LoggedMechanism2d mech2d = new LoggedMechanism2d(3, 5);
     public LoggedMechanismRoot2d root = mech2d.getRoot("ElevatorRoot", 1.5, 0);
     public LoggedMechanismLigament2d ligament = new LoggedMechanismLigament2d("Elevator",
-            ElevatorSpecs.STARTING_HEIGHT_M, 90);
+            ElevatorSpecs.STARTING_HEIGHT.in(Meters), 90);
     {
         root.append(ligament);
     }
@@ -72,14 +75,14 @@ public class ExampleElevator {
         return data;
     }
 
-    public double getHeightM() {
-        return data.position.getY();
+    public Distance getHeight() {
+        return data.height;
     }
 
     public Translation2d getPosition() {
-        return data.position;
+        return new Translation2d(ElevatorSpecs.MOUNT_OFFSET.getX(), data.height.in(Meters));
     }
-    
+
     /* SETTERS GO AFTER GETTERS */
 
     public void setState(ElevatorStates state) {
@@ -100,13 +103,14 @@ public class ExampleElevator {
     public boolean isStableState() {
         // check if within the tolerance of the setpoint and is not moving
 
-        double error = Math.abs(profile.getSetpoint().position - data.position.getY());
-        return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE_M &&
+        double error = Math.abs(profile.getSetpoint().position - data.height.in(Meters));
+        return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE.in(Meters) &&
                 isStopped();
     }
 
     public boolean isStopped() {
-        return MiscUtils.isStopped(data.velocityMPS, RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE_MPS);
+        return MiscUtils.isStopped(data.velocity.in(MetersPerSecond),
+                RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
     }
 
     public void moveToGoal() {
@@ -116,7 +120,7 @@ public class ExampleElevator {
         }
 
         State firstState = profile.getSetpoint();
-        double pidOutput = profile.calculate(getHeightM());
+        double pidOutput = profile.calculate(getHeight().in(Meters));
 
         State nextState = profile.getSetpoint();
         double feedforwardOutput = feedforward.calculateWithVelocities(firstState.velocity,
@@ -127,7 +131,7 @@ public class ExampleElevator {
     }
 
     public void updateMechanism() {
-        ligament.setLength(data.position.getY());
+        ligament.setLength(getHeight().in(Meters));
 
         Logger.recordOutput("Elevator/mechanism", mech2d);
     }

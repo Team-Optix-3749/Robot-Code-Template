@@ -1,5 +1,8 @@
 package frc.robot.config;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -67,12 +70,12 @@ public final class RobotConfig {
   /** Acceptable tolerances for various robot actions */
   public static final class ACCURACY {
     // default 3 mm/s tolerance for any subsystem movement
-    public static final double DEFAULT_MOVEMENT_TOLERANCE_MPS = 0.003;
+    public static final LinearVelocity DEFAULT_MOVEMENT_TOLERANCE = InchesPerSecond.of(0.1);
 
-    public static final double DRIVE_TRANSLATE_TOLERANCE_M = 0.02;
-    public static final double DRIVE_ROTATION_TOLERANCE_RAD = Rotation2d.fromDegrees(3).getRadians();
+    public static final Distance DRIVE_TRANSLATE_TOLERANCE = Meters.of(0.02);
+    public static final Angle DRIVE_ROTATION_TOLERANCE = Degrees.of(3);
 
     // 3 cm tolerance for elevator positioning
-    public static final double ELEVATOR_TOLERANCE_M = 0.025;
+    public static final Distance ELEVATOR_TOLERANCE = Meters.of(0.025);
   }
 }

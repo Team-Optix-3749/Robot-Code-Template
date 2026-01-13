@@ -1,5 +1,8 @@
 package frc.robot.config;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import java.util.Map;
 
 import edu.wpi.first.math.VecBuilder;
@@ -46,17 +49,18 @@ public final class SwerveConfig {
                 // public static LoggedTunableNumber maxAcceleration = new LoggedTunableNumber(
                 // "swerve/maxAcceleration", 3.3);
 
-                public static final double MAX_SPEED_MPS = 4.3;
-                public static final double MAX_ACCEL_MPSS = 3.3;
-                public static final double SPEED_DEADBAND_MPS = 0.005;
+                public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(4.3);
+                public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(3.3);
 
-                public static final double MAX_ANGULAR_SPEED_RADSS = 11;
-                public static final double MAX_ANGULAR_ACCEL_RADSSS = 9.0;
+                public static final AngularVelocity MAX_ANGULAR_VELOCITY = RadiansPerSecond.of(11);
+                public static final AngularAcceleration MAX_ANGULAR_ACCEL = RadiansPerSecondPerSecond.of(9.0);
 
-                public static final Constraints TRANSLATE_CONSTRAINTS = new Constraints(MAX_SPEED_MPS,
-                                MAX_ACCEL_MPSS);
-                public static final Constraints ROTATE_CONSTRAINTS = new Constraints(MAX_ANGULAR_SPEED_RADSS,
-                                MAX_ANGULAR_ACCEL_RADSSS);
+                public static final Constraints TRANSLATE_CONSTRAINTS = new Constraints(
+                                MAX_VELOCITY.in(MetersPerSecond),
+                                MAX_ACCEL.in(MetersPerSecondPerSecond));
+                public static final Constraints ROTATE_CONSTRAINTS = new Constraints(
+                                MAX_ANGULAR_VELOCITY.in(RadiansPerSecond),
+                                MAX_ANGULAR_ACCEL.in(RadiansPerSecondPerSecond));
         }
 
         public static final class Motor {

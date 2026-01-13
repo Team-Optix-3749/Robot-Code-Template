@@ -1,7 +1,11 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
@@ -63,15 +67,22 @@ public class MiscUtils {
         return aDouble + marginDouble >= bDouble && aDouble - marginDouble <= bDouble;
     }
 
+    public static boolean isStopped(LinearVelocity velocity) {
+        return withinMargin(RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond),
+                velocity.in(MetersPerSecond),
+                0.0);
+    }
+
     /**
      * @param <T>      any numeric type (e.g., Double, Integer). Will automatically
      *                 be inferred.
      * @param velocity
-     * @return whether or not the velocity is below 0.01, which we consider to be
+     * @return whether or not the velocity is below the default min speed, which we
+     *         consider to be
      *         stopped
      */
     public static <T extends Number> boolean isStopped(T velocity) {
-        return withinMargin(RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE_MPS, velocity.doubleValue(), 0.0);
+        return isStopped(velocity, RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
     }
 
     /**

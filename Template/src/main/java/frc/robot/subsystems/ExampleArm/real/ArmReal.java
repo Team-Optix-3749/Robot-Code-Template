@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ExampleArm.real;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +31,7 @@ public class ArmReal implements ArmIO {
 
     /* anything else after */
 
-    public double previousVelocityRadPSS = 0;
+    public AngularVelocity prevVelocity = RadiansPerSecond.of(0);
     static double prevUpdateS = 0;
 
     public ArmReal(ArmDataAutoLogged elevData) {
@@ -70,9 +73,8 @@ public class ArmReal implements ArmIO {
 
         // default units is RPM, but we have the position conversion factor set to
         // radians, so not needed
-        data.angularVelocityRadPS = armMotor.getVelocity();
-        data.angularAccelRadPSS = (data.angularVelocityRadPS - previousVelocityRadPSS) / deltaTimeS;
-        previousVelocityRadPSS = data.angularVelocityRadPS;
+        data.velocity = RadiansPerSecond.of(armMotor.getVelocity());
+        data.accel = data.velocity.minus(prevVelocity).div(Seconds.of(deltaTimeS));
 
         data.currentAmps = armMotor.getCurrent();
         data.appliedVolts = armMotor.getAppliedVolts();

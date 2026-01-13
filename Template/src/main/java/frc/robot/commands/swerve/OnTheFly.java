@@ -1,5 +1,8 @@
 package frc.robot.commands.swerve;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 import com.pathplanner.lib.config.RobotConfig;
@@ -77,11 +80,11 @@ public class OnTheFly extends Command {
                     Robot.swerve.getPose(), // Current robot position
                     createApproachPoint(pose), // Intermediate approach point
                     pose, // Final target position
-                    Robot.swerve.getMaxDriveSpeed(), // Max driving speed
-                    SwerveConfig.Control.MAX_ACCEL_MPSS, // Max acceleration
-                    Robot.swerve.getMaxAngularSpeed(), // Max angular speed
-                    SwerveConfig.Control.MAX_ANGULAR_ACCEL_RADSSS // Max angular
-                                                                  // acceleration
+                    SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond), // Max driving speed
+                    SwerveConfig.Control.MAX_ACCEL.in(MetersPerSecondPerSecond), // Max acceleration
+                    SwerveConfig.Control.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond), // Max angular speed
+                    SwerveConfig.Control.MAX_ANGULAR_ACCEL.in(RadiansPerSecondPerSecond) // Max angular
+            // acceleration
             );
             // System.out.println("path generation took: " + debugTimer.get());
             debugTimer.stop();

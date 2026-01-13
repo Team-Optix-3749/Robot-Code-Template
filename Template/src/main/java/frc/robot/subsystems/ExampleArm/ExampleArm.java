@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ExampleArm;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -33,7 +36,7 @@ public class ExampleArm {
 
     ArmFeedforward feedforward = new ArmFeedforward(config.kS, config.kG, config.kV, config.kA);
     ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
-            new Constraints(config.MAX_VELOCITY_RadPS, config.MAX_ACCEL_RadPSS));
+            new Constraints(config.VELOCITY.in(RadiansPerSecond), config.ACCEL.in(RadiansPerSecondPerSecond)));
 
     /* last is state and any other variables needed */
     ArmStates currentState = ArmStates.STOPPED;
@@ -98,12 +101,13 @@ public class ExampleArm {
         // check if within the tolerance of the setpoint and is not moving
 
         double error = Math.abs(profile.getSetpoint().position - data.angle.getRadians());
-        return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE_M &&
+        return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE.in(Meters) &&
                 isStopped();
     }
 
     public boolean isStopped() {
-        return MiscUtils.isStopped(data.angularVelocityRadPS, RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE_MPS);
+        return MiscUtils.isStopped(data.velocity.in(RadiansPerSecond),
+                RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
     }
 
     public void moveToGoal() {

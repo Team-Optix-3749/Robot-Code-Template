@@ -1,5 +1,10 @@
 package frc.robot.subsystems.ExampleElevator.sim;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
+import static edu.wpi.first.units.Units.Kilograms;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,12 +27,12 @@ public class ElevatorSiml implements ElevatorIO {
     private final ElevatorSim elevatorSimSystem = new ElevatorSim(
             DCMotor.getNEO(2),
             ExampleElevatorConfig.ElevatorSpecs.GEARING,
-            ExampleElevatorConfig.ElevatorSpecs.CARRIAGE_MASS_KG,
-            ExampleElevatorConfig.ElevatorSpecs.DRUM_RADIUS_M,
-            ExampleElevatorConfig.ElevatorSpecs.MIN_HEIGHT_M,
-            ExampleElevatorConfig.ElevatorSpecs.MAX_HEIGHT_M,
+            ExampleElevatorConfig.ElevatorSpecs.CARRIAGE_MASS.in(Kilograms),
+            ExampleElevatorConfig.ElevatorSpecs.DRUM_RADIUS.in(Meters),
+            ExampleElevatorConfig.ElevatorSpecs.MIN_HEIGHT.in(Meters),
+            ExampleElevatorConfig.ElevatorSpecs.MAX_HEIGHT.in(Meters),
             true,
-            ExampleElevatorConfig.ElevatorSpecs.STARTING_HEIGHT_M);
+            ExampleElevatorConfig.ElevatorSpecs.STARTING_HEIGHT.in(Meters));
 
     /**
      * This is our {@link ElevatorData} instance that we will update with data
@@ -78,15 +83,15 @@ public class ElevatorSiml implements ElevatorIO {
     public void updateData() {
         elevatorSimSystem.update(RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S);
 
-        data.position = new Translation2d(0, elevatorSimSystem.getPositionMeters() +
+        data.height = Meters.of(elevatorSimSystem.getPositionMeters() +
                 ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getY());
-        data.velocityMPS = elevatorSimSystem.getVelocityMetersPerSecond();
+        data.velocity = MetersPerSecond.of(elevatorSimSystem.getVelocityMetersPerSecond());
 
         // The following data is not useful in simulation:
         data.leftCurrentAmps = elevatorSimSystem.getCurrentDrawAmps();
         data.rightCurrentAmps = elevatorSimSystem.getCurrentDrawAmps();
         // this *could* be calculated by using ((currentVelocity -
         // prevVelocity)/deltaTimeS), but once again, not worth it for sim
-        data.accelMPSS = 0;
+        data.accel = MetersPerSecondPerSecond.of(0);
     }
 }

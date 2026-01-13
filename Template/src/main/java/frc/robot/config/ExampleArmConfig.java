@@ -1,15 +1,19 @@
 package frc.robot.config;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
 
 public class ExampleArmConfig {
     public static class ArmSpecs {
         // this gearing is how many ARM ROTATIONS per MOTOR ROTATION
-        // here, we have a 12 tooth sprocket on the motor, driving a 64 tooth sprocket on the arm
+        // here, we have a 12 tooth sprocket on the motor, driving a 64 tooth sprocket
+        // on the arm
         public static final double GEARING = 12.0 / 64.0;
         public static final double END_EFFECTOR_MASS_KG = Units.lbsToKilograms(15);
         public static final double ARM_LENGTH_M = Units.inchesToMeters(14);
@@ -34,8 +38,8 @@ public class ExampleArmConfig {
             public double kS;
             public double kV;
             public double kA;
-            public double MAX_VELOCITY_RadPS;
-            public double MAX_ACCEL_RadPSS;
+            public AngularVelocity VELOCITY;
+            public AngularAcceleration ACCEL;
         }
 
         public static ControlConfig SIM = new ControlConfig() {
@@ -47,8 +51,8 @@ public class ExampleArmConfig {
                 kS = 0.16;
                 kV = 7.77;
                 kA = 0.27; // 1.72
-                MAX_VELOCITY_RadPS = 1.415;
-                MAX_ACCEL_RadPSS = 4.1;
+                VELOCITY = RadiansPerSecond.of(1.415);
+                ACCEL = RadiansPerSecondPerSecond.of(4.1);
             }
         };
 
@@ -61,8 +65,8 @@ public class ExampleArmConfig {
                 kS = 0.16;
                 kV = 7.77;
                 kA = 0.27; // 1.72
-                MAX_VELOCITY_RadPS = 1.415;
-                MAX_ACCEL_RadPSS = 4.1;
+                VELOCITY = RadiansPerSecond.of(1.415);
+                ACCEL = RadiansPerSecondPerSecond.of(4.1);
             }
         };
 
