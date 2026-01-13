@@ -54,7 +54,7 @@ public class SwerveModule {
                 break;
         }
 
-        Logger.recordMetadata("SwerveModule/" + name + "/Implementation", type.name());
+        Logger.recordMetadata("Swerve/Module " + name + "/Implementation", type.name());
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -101,6 +101,9 @@ public class SwerveModule {
         double feedforward = driveFF.calculateWithVelocities(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
         double PID = drivePID.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
         moduleIO.setDriveVoltage(PID + feedforward);
+        Logger.recordOutput("Swerve/Module " + name + "/Drive FF Volts", feedforward);
+        Logger.recordOutput("Swerve/Module " + name + "/Drive PID Volts", PID);
+        Logger.recordOutput("Swerve/Module " + name + "/Volts", PID + feedforward);
     }
 
     /**
@@ -111,6 +114,7 @@ public class SwerveModule {
     public void setTurnPosition(Rotation2d positionRad) {
         double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), positionRad.getRadians());
         moduleIO.setTurnVoltage(PID);
+        Logger.recordOutput("Swerve/Module " + name + "/Turn Volts", PID);
     }
 
     /**
@@ -157,14 +161,20 @@ public class SwerveModule {
     }
 
     /**
+     * Update inputs.
+     */
+    public void updateInputs() {
+        moduleIO.updateData();
+        Logger.processInputs("Swerve/Module " + name, moduleData);
+    }
+
+    /**
      * Updates module data from hardware.
      * Called periodically by the swerve subsystem.
      */
     public void periodic() {
         setDriveSpeed(desiredState.speedMetersPerSecond);
         setTurnPosition(desiredState.angle);
-
-        moduleIO.updateData();
-        Logger.processInputs("Swerve/Module " + moduleData.index, moduleData);
+        updateInputs();
     }
 }

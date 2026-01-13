@@ -41,32 +41,6 @@ public class SwerveModuleSim implements SwerveModuleIO {
     }
 
     @Override
-    public void updateData() {
-        double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
-
-        driveSim.update(deltaT);
-        turnSim.update(deltaT);
-
-        Rotation2d angleDiff = Rotation2d.fromRadians(turnSim.getAngularVelocityRadPerSec() * deltaT);
-
-        double driveVelMps = getDriveVelocityMetersPerSec();
-        double driveAccelMps2 = (driveVelMps - prevDriveVelMps) / deltaT;
-        prevDriveVelMps = driveVelMps;
-
-        data.drivePositionM += driveVelMps * deltaT;
-        data.driveVelocityMPerSec = driveVelMps;
-        data.driveAccelerationMPerSecSquared = driveAccelMps2;
-        data.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
-        data.driveTempCelcius = 0.0;
-
-        data.turnPosition = data.turnPosition.plus(angleDiff);
-        data.absoluteEncoderPosition = data.turnPosition;
-        data.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
-        data.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
-        data.turnTempCelcius = 0.0;
-    }
-
-    @Override
     public void setDriveVoltage(double volts) {
         double apply = MiscUtils.voltageClamp(volts);
         data.driveDesiredVolts = apply;
@@ -114,5 +88,31 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     private double getDriveVelocityMetersPerSec() {
         return (driveSim.getAngularVelocityRadPerSec() * (Drivetrain.WHEEL_DIA_METERS / 2.0));
+    }
+
+    @Override
+    public void updateData() {
+        double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
+
+        driveSim.update(deltaT);
+        turnSim.update(deltaT);
+
+        Rotation2d angleDiff = Rotation2d.fromRadians(turnSim.getAngularVelocityRadPerSec() * deltaT);
+
+        double driveVelMps = getDriveVelocityMetersPerSec();
+        double driveAccelMps2 = (driveVelMps - prevDriveVelMps) / deltaT;
+        prevDriveVelMps = driveVelMps;
+
+        data.drivePositionM += driveVelMps * deltaT;
+        data.driveVelocityMPerSec = driveVelMps;
+        data.driveAccelerationMPerSecSquared = driveAccelMps2;
+        data.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
+        data.driveTempCelcius = 0.0;
+
+        data.turnPosition = data.turnPosition.plus(angleDiff);
+        data.absoluteEncoderPosition = data.turnPosition;
+        data.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
+        data.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
+        data.turnTempCelcius = 0.0;
     }
 }

@@ -145,6 +145,14 @@ public class Swerve extends SubsystemBase {
     return isOTF;
   }
 
+  public boolean getIsStopped() {
+    var chassisSpeeds = getChassisSpeeds();
+
+    return MiscUtils.isStopped(chassisSpeeds.vxMetersPerSecond)
+        && MiscUtils.isStopped(chassisSpeeds.vyMetersPerSecond)
+        && MiscUtils.isStopped(chassisSpeeds.omegaRadiansPerSecond);
+  }
+
   /**
    * Sets individual module states with desaturation.
    * 
@@ -237,12 +245,6 @@ public class Swerve extends SubsystemBase {
     driveToSample(sample);
   }
 
-  public void logSetpoints(Pose2d position, Pose2d velocity) {
-    logSetpoints(position.getX(), velocity.getX(), 0, position.getY(), velocity.getY(), 0,
-        position.getRotation().getRadians(), velocity.getRotation().getRadians(), 0);
-
-  }
-
   public void lockModules() {
     Rotation2d lockAngle = Rotation2d.fromDegrees(-45);
     for (SwerveModule module : modules) {
@@ -291,38 +293,8 @@ public class Swerve extends SubsystemBase {
     autoTurnController.reset(pose.getRotation().getRadians());
   }
 
-  public void logSetpoints(double posX, double velX, double accX, double posY, double velY, double accY, double heading,
-      double omega, double alpha) {
-    // setpoint logging for automated driving
-    double[] positions = new double[] { posX, posY, heading };
-    Logger.recordOutput("Swerve/auto/position setpoint", positions);
-    Transform2d poseDiff = new Pose2d(posX, posY, new Rotation2d(heading)).minus(getPose());
-    Logger.recordOutput("Swerve/auto/position error", poseDiff);
-
-    Double[] velocities = new Double[] { velX, velY, omega };
-    double velocity = 0;
-    velocity += Math.pow(velocities[0], 2);
-    velocity += Math.pow(velocities[1], 2);
-
-    velocity = Math.sqrt(velocity);
-    Logger.recordOutput("Swerve/auto/setpoint velocity", velocity);
-    Logger.recordOutput("Swerve/auto/setpoint rotational velocity", velocities[2]);
-    velocity = velocities[2];
-    Logger.recordOutput("Swerve/auto/velocity hypt", Math.sqrt(
-        velX * velX + velY * velY));
-
-    Double[] accelerations = new Double[] { accX, accY, alpha };
-    double acceleration = 0;
-    acceleration += Math.pow(accelerations[0], 2);
-    acceleration += Math.pow(accelerations[1], 2);
-
-    acceleration = Math.sqrt(acceleration);
-    Logger.recordOutput("Swerve/auto/setpoint acceleration", acceleration);
-    Logger.recordOutput("Swerve/auto/setpoint rotational acceleration", accelerations[2]);
-  }
-
   /**
-   * Logs all swerve telemetry data.
+   * Logs all swerve output telemetry data (non-input data).
    */
   private void logData() {
     SwerveModuleState[] moduleDesiredStates = new SwerveModuleState[4];
@@ -333,6 +305,8 @@ public class Swerve extends SubsystemBase {
       moduleRealStates[i] = modules[i].getState();
     }
 
+    Logger.processInputs("Swerve/GyroData", gyroData);
+
     Logger.recordOutput("Swerve/RealStates", moduleRealStates);
     Logger.recordOutput("Swerve/DesiredStates", moduleDesiredStates);
 
@@ -341,34 +315,26 @@ public class Swerve extends SubsystemBase {
     Logger.recordOutput("Swerve/RealChassisSpeeds", getChassisSpeeds());
     Logger.recordOutput("Swerve/DesiredChassisSpeeds", desiredChassisSpeeds);
 
-    // Current command
     String currentCommand = this.getCurrentCommand() == null ? "None" : this.getCurrentCommand().getName();
     Logger.recordOutput("Swerve/CurrentCommand", currentCommand);
-
-    Logger.processInputs("Swerve/GyroData", gyroData);
   }
 
   @Override
   public void periodic() {
-    gyro.updateData();
-    updateOdometry();
-
-    SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
-    setModuleStates(desiredStates);
+    logData();
 
     for (SwerveModule module : modules) {
       module.periodic();
     }
 
-    double netMovement = Math.abs(desiredChassisSpeeds.vxMetersPerSecond)
-        + Math.abs(desiredChassisSpeeds.vyMetersPerSecond)
-        + Math.abs(desiredChassisSpeeds.omegaRadiansPerSecond);
+    updateOdometry();
 
-    if (netMovement < 0.1 && (Timer.getTimestamp() - lastEncoderSyncTime) > 20.0) {
+    SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
+    setModuleStates(desiredStates);
+
+    if (getIsStopped() && (Timer.getTimestamp() - lastEncoderSyncTime) > 20.0) {
       syncEncoderPositions();
       lastEncoderSyncTime = Timer.getTimestamp();
     }
-
-    logData();
   }
 }
