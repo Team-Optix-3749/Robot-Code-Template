@@ -49,6 +49,8 @@ public final class SwerveConfig {
                 // public static LoggedTunableNumber maxAcceleration = new LoggedTunableNumber(
                 // "swerve/maxAcceleration", 3.3);
 
+                public static final double SPEED_SCALE = 1.0;
+
                 public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(4.3);
                 public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(3.3);
 

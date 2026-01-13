@@ -52,11 +52,10 @@ public class SwerveDefaultCommand extends Command {
       yInput /= magnitude;
     }
 
-    double speedScale = 1.0;// slowModeSupplier.getAsBoolean() ? Controller.SLOW_MODE_SCALE : 1.0;
-
-    double vx = xInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * speedScale;
-    double vy = yInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * speedScale;
-    double omega = omegaInput * SwerveConfig.Control.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond) * speedScale;
+    double vx = xInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * SwerveConfig.Control.SPEED_SCALE;
+    double vy = yInput * SwerveConfig.Control.MAX_VELOCITY.in(MetersPerSecond) * SwerveConfig.Control.SPEED_SCALE;
+    double omega = omegaInput * SwerveConfig.Control.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond)
+        * SwerveConfig.Control.SPEED_SCALE;
 
     double fieldVx = MiscUtils.isRedAlliance() ? vx : -vx;
     double fieldVy = MiscUtils.isRedAlliance() ? vy : -vy;

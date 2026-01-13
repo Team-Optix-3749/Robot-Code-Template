@@ -3,18 +3,17 @@ package frc.robot.config;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 /**
  * Centralized configuration for robot-wide settings that are not tied to a
  * specific subsystem. Grouping these constants makes it easier to reuse them
  * across the codebase while keeping the values in one authoritative location.
  */
 public final class RobotConfig {
+  public static boolean REPLAY_MODE = false;
+  
   public enum RobotType {
     REAL,
-    SIM,
-    REPLAY
+    SIM
   }
 
   public enum ControlMode {

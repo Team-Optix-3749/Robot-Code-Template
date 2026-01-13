@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedPowerDistribution;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -44,25 +47,32 @@ public class Robot extends LoggedRobot {
 
     RobotType robotType = MiscUtils.getRobotType();
     Logger.recordOutput("Robot Type", robotType);
+    Logger.recordOutput("Replay Mode", MiscUtils.isReplay());
 
     // Set up data receivers & replay source
     switch (robotType) {
-      case REAL, SIM -> {
-        Logger.addDataReceiver(new WPILOGWriter());
+      case REAL -> {
         Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new WPILOGWriter());
       }
-      case REPLAY -> {
-        // Replaying a log, set up replay source
-        // setUseTiming(false); // Run as fast as possible
-        // String logPath = LogFileUtil.findReplayLog();
-        // Logger.setReplaySource(new WPILOGReader(logPath));
-        // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-        // "_sim")));
+      case SIM -> {
+        if (MiscUtils.isReplay()) {
+          setUseTiming(false);
+          String logPath = LogFileUtil.findReplayLog();
+          Logger.setReplaySource(new WPILOGReader(logPath));
+          Logger.addDataReceiver(new NT4Publisher());
+          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
+              "_replay")));
+        } else {
+          Logger.addDataReceiver(new NT4Publisher());
+          Logger.addDataReceiver(new WPILOGWriter());
+        }
       }
     }
 
     LoggedPowerDistribution.getInstance(RobotConfig.CAN.PDH_ID, ModuleType.kRev);
 
+    Logger.registerURCL(URCL.startExternal());
     Logger.start();
   }
 
@@ -99,7 +109,8 @@ public class Robot extends LoggedRobot {
     // Dont use ^ anymore. See AutoUtils.setupAutoTrigger()
 
     // In here should be just any special setup needed before auto starts
-    // For example, if we do piece detection, maybe we would want to select a different preset
+    // For example, if we do piece detection, maybe we would want to select a
+    // different preset
   }
 
   @Override

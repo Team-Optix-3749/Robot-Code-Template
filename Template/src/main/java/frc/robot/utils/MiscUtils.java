@@ -1,7 +1,6 @@
 package frc.robot.utils;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -121,7 +120,7 @@ public class MiscUtils {
         } else if (Robot.isSimulation()) {
             return RobotType.SIM;
         } else {
-            return RobotType.REPLAY;
+            throw new IllegalStateException("[MiscUtils.java] Unknown Robot Type");
         }
     }
 
@@ -138,7 +137,7 @@ public class MiscUtils {
     }
 
     public static boolean isReplay() {
-        return getRobotType() == RobotType.REPLAY;
+        return RobotConfig.REPLAY_MODE && isSimulation();
     }
 
     public static boolean isBlueAlliance() {
