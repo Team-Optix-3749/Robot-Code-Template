@@ -14,7 +14,7 @@ import frc.robot.config.RobotConfig;
  * Pigeon 2.0 implementation
  */
 public class PigeonGyro implements GyroIO {
-    private final Pigeon2 gyro = new Pigeon2(30);
+    private final Pigeon2 gyro = new Pigeon2(GyroConfig.PIGEON_GYRO);
 
     private final Pigeon2Configuration config = new Pigeon2Configuration();
     private final MountPoseConfigs mountConfig = new MountPoseConfigs();
