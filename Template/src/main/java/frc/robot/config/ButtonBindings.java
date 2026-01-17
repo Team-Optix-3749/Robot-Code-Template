@@ -47,6 +47,10 @@ public final class ButtonBindings {
 
     public static void oneControllerBindings(CommandXboxController ctl) {
         // Add any pilot-only bindings here.
+
+        Bind.button(ctl.a()).onTrue(new OnTheFly(new Pose2d(8.0,
+                4.0,
+                Rotation2d.fromDegrees(0))));
     }
 
     public static void simBindings() {
