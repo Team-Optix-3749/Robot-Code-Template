@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -32,6 +33,38 @@ public class SwerveModule {
     private final SwerveModuleIO moduleIO;
     private final SwerveModuleDataAutoLogged moduleData = new SwerveModuleDataAutoLogged();
 
+    private double index;
+
+    LoggedNetworkNumber drive_ks_value = new LoggedNetworkNumber(
+        "Swerve/Module #" + index + "/KS",
+        Control.MODULE_DRIVE_KS);
+    LoggedNetworkNumber drive_kv_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/kV",
+            Control.MODULE_DRIVE_KV);
+    LoggedNetworkNumber drive_ka_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/KA",
+            Control.MODULE_DRIVE_KA);
+    
+    LoggedNetworkNumber drive_p_value = new LoggedNetworkNumber(
+        "Swerve/Module #" + index + "/P",
+        Control.MODULE_DRIVE_PID[0]);
+    LoggedNetworkNumber drive_i_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/I",
+            Control.MODULE_DRIVE_PID[1]);
+    LoggedNetworkNumber drive_d_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/D",
+            Control.MODULE_DRIVE_PID[2]);
+
+    LoggedNetworkNumber turn_p_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/P",
+            Control.MODULE_TURN_PID[0]);
+    LoggedNetworkNumber turn_i_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/I",
+            Control.MODULE_TURN_PID[1]);
+    LoggedNetworkNumber turn_d_value = new LoggedNetworkNumber(
+            "Swerve/Module #" + index + "/D",
+            Control.MODULE_TURN_PID[2]);
+
     /**
      * Constructs a new SwerveModule.
      * 
@@ -40,6 +73,7 @@ public class SwerveModule {
      */
     public SwerveModule(int index, SwerveModuleType type) {
         name = Drivetrain.MODULE_NAMES.get(index);
+        this.index = index;
 
         switch (type) {
             case SIM:
@@ -172,7 +206,14 @@ public class SwerveModule {
      * Updates module data from hardware.
      * Called periodically by the swerve subsystem.
      */
-    public void periodic() {
+    public void periodic() {            
+        drivePID.setPID(drive_p_value.get(), drive_i_value.get(), drive_d_value.get());
+        turnPID.setPID(turn_p_value.get(), turn_i_value.get(), turn_d_value.get());
+
+        driveFF.setKs(drive_ks_value.get());
+        driveFF.setKa(drive_ka_value.get());
+        driveFF.setKv(drive_kv_value.get());
+
         setDriveSpeed(desiredState.speedMetersPerSecond);
         setTurnPosition(desiredState.angle);
         updateInputs();
