@@ -26,8 +26,8 @@ public class ElevatorReal implements ElevatorIO {
 
     /* motors/outputs next */
 
-    OptixSpark leftMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTORS[0]);
-    OptixSpark rightMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTORS[1]);
+    OptixSpark leftMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTOR_IDS[0]);
+    OptixSpark rightMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTOR_IDS[1]);
 
     /* anything else after */
 

@@ -29,27 +29,24 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         data.index = index;
 
-        drive = OptixSpark.ofSparkMax(CAN.DRIVE_MOTORS[index]);
-        turn = OptixSpark.ofSparkMax(CAN.TURN_MOTORS[index]);
+        drive = OptixSpark.ofSparkMax(CAN.DRIVE_MOTOR_IDS[index]);
+        turn = OptixSpark.ofSparkMax(CAN.TURN_MOTOR_IDS[index]);
 
         drive
                 .setPositionConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING))
                 .setVelocityConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
-                .setIdleMode(IdleMode.kBrake)
-                .setPositionDeadband(Math.toRadians(1));
-
+                .setIdleMode(IdleMode.kBrake);
         turn
                 .setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING)
                 .setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
-                .setIdleMode(IdleMode.kBrake)
-                .setPositionDeadband(0.001);
+                .setIdleMode(IdleMode.kBrake);
 
         drive.apply();
         turn.apply();
 
-        absoluteEncoder = new CANcoder(CAN.CANCODERS[index]);
+        absoluteEncoder = new CANcoder(CAN.CANCODER_IDS[index]);
         Rotation2d absoluteEncoderOffsetRad = Motor.CANCODER_OFFSET[index];
         turn.requestPosition(
                 absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI

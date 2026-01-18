@@ -27,7 +27,7 @@ public class ArmReal implements ArmIO {
 
     /* motors/outputs next */
 
-    OptixSpark armMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTORS[0]);
+    OptixSpark armMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTOR_IDS[0]);
 
     /* anything else after */
 

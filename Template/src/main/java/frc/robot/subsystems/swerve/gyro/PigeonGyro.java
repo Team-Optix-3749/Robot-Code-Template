@@ -1,11 +1,9 @@
 package frc.robot.subsystems.swerve.gyro;
 
-import com.ctre.phoenix6.Timestamp;
 import com.ctre.phoenix6.configs.MountPoseConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.config.GyroConfig;
 import frc.robot.config.RobotConfig;
@@ -14,7 +12,7 @@ import frc.robot.config.RobotConfig;
  * Pigeon 2.0 implementation
  */
 public class PigeonGyro implements GyroIO {
-    private final Pigeon2 gyro = new Pigeon2(GyroConfig.PIGEON_GYRO);
+    private final Pigeon2 gyro = new Pigeon2(RobotConfig.CAN.PIGEON_ID);
 
     private final Pigeon2Configuration config = new Pigeon2Configuration();
     private final MountPoseConfigs mountConfig = new MountPoseConfigs();

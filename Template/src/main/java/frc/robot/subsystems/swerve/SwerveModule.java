@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -9,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import frc.robot.config.SwerveConfig.Control;
 import frc.robot.config.SwerveConfig.Drivetrain;
+import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.real.SwerveModuleSpark;
 import frc.robot.subsystems.swerve.sim.SwerveModuleSim;
 import frc.robot.utils.MiscUtils;
@@ -38,7 +41,7 @@ public class SwerveModule {
     LoggedNetworkNumber drive_ks_value;
     LoggedNetworkNumber drive_kv_value;
     LoggedNetworkNumber drive_ka_value;
-    
+
     LoggedNetworkNumber drive_p_value;
     LoggedNetworkNumber drive_i_value;
     LoggedNetworkNumber drive_d_value;
@@ -158,6 +161,13 @@ public class SwerveModule {
      * @param positionRad The target angle setpoint
      */
     public void setTurnPosition(Rotation2d positionRad) {
+        if (MiscUtils.withinMargin(positionRad.minus(moduleData.turnPosition).getRadians(),
+                -RobotConfig.ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians),
+                RobotConfig.ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians))) {
+            moduleIO.setTurnVoltage(0.0);
+            return;
+        }
+
         double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), positionRad.getRadians());
         moduleIO.setTurnVoltage(PID);
         Logger.recordOutput("Swerve/Module " + name + "/Turn Volts", PID);
