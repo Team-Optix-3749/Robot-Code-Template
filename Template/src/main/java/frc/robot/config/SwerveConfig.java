@@ -30,11 +30,11 @@ public final class SwerveConfig {
         }
 
         public static final class Control {
-                public static final double MODULE_DRIVE_KS = 0.0;
-                public static final double MODULE_DRIVE_KV = 0.0;
+                public static final double MODULE_DRIVE_KS = 0.26;
+                public static final double MODULE_DRIVE_KV = 2.765;
                 public static final double MODULE_DRIVE_KA = 0.0;
                 public static final double[] MODULE_DRIVE_PID = new double[] {
-                                12, 0, 0 };
+                                0.27, 0, 0 };
                 public static final double[] MODULE_TURN_PID = new double[] {
                                 3, 0, 0 };
 

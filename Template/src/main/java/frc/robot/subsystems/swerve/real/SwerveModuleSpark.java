@@ -36,13 +36,15 @@ public class SwerveModuleSpark implements SwerveModuleIO {
                 .setPositionConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING))
                 .setVelocityConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
-                .setIdleMode(IdleMode.kBrake);
+                .setIdleMode(IdleMode.kBrake)
+                .setPositionDeadband(Math.toRadians(1));
 
         turn
                 .setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING)
                 .setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
-                .setPositionWrapping(-Math.PI, Math.PI).setIdleMode(IdleMode.kBrake);
+                .setIdleMode(IdleMode.kBrake)
+                .setPositionDeadband(0.001);
 
         drive.apply();
         turn.apply();
@@ -115,5 +117,6 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         data.turnAppliedVolts = turn.getAppliedVolts();
         data.turnCurrentAmps = turn.getCurrent();
         data.turnTempCelcius = turn.getTemperature();
+
     };
 }

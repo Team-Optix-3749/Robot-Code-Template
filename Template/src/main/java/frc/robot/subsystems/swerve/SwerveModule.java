@@ -35,35 +35,17 @@ public class SwerveModule {
 
     private double index;
 
-    LoggedNetworkNumber drive_ks_value = new LoggedNetworkNumber(
-        "Swerve/Module #" + index + "/KS",
-        Control.MODULE_DRIVE_KS);
-    LoggedNetworkNumber drive_kv_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/kV",
-            Control.MODULE_DRIVE_KV);
-    LoggedNetworkNumber drive_ka_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/KA",
-            Control.MODULE_DRIVE_KA);
+    LoggedNetworkNumber drive_ks_value;
+    LoggedNetworkNumber drive_kv_value;
+    LoggedNetworkNumber drive_ka_value;
     
-    LoggedNetworkNumber drive_p_value = new LoggedNetworkNumber(
-        "Swerve/Module #" + index + "/P",
-        Control.MODULE_DRIVE_PID[0]);
-    LoggedNetworkNumber drive_i_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/I",
-            Control.MODULE_DRIVE_PID[1]);
-    LoggedNetworkNumber drive_d_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/D",
-            Control.MODULE_DRIVE_PID[2]);
+    LoggedNetworkNumber drive_p_value;
+    LoggedNetworkNumber drive_i_value;
+    LoggedNetworkNumber drive_d_value;
 
-    LoggedNetworkNumber turn_p_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/P",
-            Control.MODULE_TURN_PID[0]);
-    LoggedNetworkNumber turn_i_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/I",
-            Control.MODULE_TURN_PID[1]);
-    LoggedNetworkNumber turn_d_value = new LoggedNetworkNumber(
-            "Swerve/Module #" + index + "/D",
-            Control.MODULE_TURN_PID[2]);
+    LoggedNetworkNumber turn_p_value;
+    LoggedNetworkNumber turn_i_value;
+    LoggedNetworkNumber turn_d_value;
 
     /**
      * Constructs a new SwerveModule.
@@ -91,6 +73,36 @@ public class SwerveModule {
         Logger.recordMetadata("Swerve/Module " + name + "/Implementation", type.name());
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
+
+        drive_ks_value = new LoggedNetworkNumber(
+                "Swerve/Module #" + index + "/KS",
+                Control.MODULE_DRIVE_KS);
+        drive_kv_value = new LoggedNetworkNumber(
+                "Swerve/Module #" + index + "/kV",
+                Control.MODULE_DRIVE_KV);
+        drive_ka_value = new LoggedNetworkNumber(
+                "Swerve/Module #" + index + "/KA",
+                Control.MODULE_DRIVE_KA);
+
+        drive_p_value = new LoggedNetworkNumber(
+                "Swerve/Module Drive #" + index + "/P",
+                Control.MODULE_DRIVE_PID[0]);
+        drive_i_value = new LoggedNetworkNumber(
+                "Swerve/Module Drive #" + index + "/I",
+                Control.MODULE_DRIVE_PID[1]);
+        drive_d_value = new LoggedNetworkNumber(
+                "Swerve/Module Drive #" + index + "/D",
+                Control.MODULE_DRIVE_PID[2]);
+
+        turn_p_value = new LoggedNetworkNumber(
+                "Swerve/Module Turn #" + index + "/P",
+                Control.MODULE_TURN_PID[0]);
+        turn_i_value = new LoggedNetworkNumber(
+                "Swerve/Module Turn #" + index + "/I",
+                Control.MODULE_TURN_PID[1]);
+        turn_d_value = new LoggedNetworkNumber(
+                "Swerve/Module Turn #" + index + "/D",
+                Control.MODULE_TURN_PID[2]);
     }
 
     /**
@@ -206,7 +218,7 @@ public class SwerveModule {
      * Updates module data from hardware.
      * Called periodically by the swerve subsystem.
      */
-    public void periodic() {            
+    public void periodic() {
         drivePID.setPID(drive_p_value.get(), drive_i_value.get(), drive_d_value.get());
         turnPID.setPID(turn_p_value.get(), turn_i_value.get(), turn_d_value.get());
 
