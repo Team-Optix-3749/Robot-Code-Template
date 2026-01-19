@@ -15,7 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import frc.robot.config.ExampleArmConfig.ArmControl.ControlConfig;
+import frc.robot.config.ExampleArmConfig.ArmControl;
 import frc.robot.config.ExampleArmConfig.ArmStates;
 import frc.robot.config.ExampleArmConfig;
 import frc.robot.config.RobotConfig;
@@ -32,11 +32,12 @@ public class ExampleArm {
 
     /* next comes open/closed loop controllers such as pid and ff */
     // only reason for this is because its more readable
-    ControlConfig config = ExampleArmConfig.ArmControl.CONTROL_CONFIG;
+    MiscUtils.ControlConfig config = ExampleArmConfig.ArmControl.CONTROL_CONFIG.get();
 
     ArmFeedforward feedforward = new ArmFeedforward(config.kS, config.kG, config.kV, config.kA);
     ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
-            new Constraints(config.VELOCITY.in(RadiansPerSecond), config.ACCEL.in(RadiansPerSecondPerSecond)));
+            new Constraints(ArmControl.MAX_VELOCITY.in(RadiansPerSecond),
+                    ArmControl.MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
     /* last is state and any other variables needed */
     ArmStates currentState = ArmStates.STOPPED;

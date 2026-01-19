@@ -2,8 +2,12 @@ package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.io.ObjectInputFilter.Config;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -16,6 +20,73 @@ import frc.robot.config.RobotConfig.RobotType;
  * @author Neel Adem
  */
 public class MiscUtils {
+    // cleaner utility class to help make switching between real and sim configs
+    // easier
+    public static class ControlConfig {
+        public double kP;
+        public double kI;
+        public double kD;
+        public double kG;
+        public double kS;
+        public double kV;
+        public double kA;
+
+        public ControlConfig kP(double val) {
+            kP = val;
+            return this;
+        }
+
+        public ControlConfig kI(double val) {
+            kI = val;
+            return this;
+        }
+
+        public ControlConfig kD(double val) {
+            kD = val;
+            return this;
+        }
+
+        public ControlConfig kG(double val) {
+            kG = val;
+            return this;
+        }
+
+        public ControlConfig kS(double val) {
+            kS = val;
+            return this;
+        }
+
+        public ControlConfig kV(double val) {
+            kV = val;
+            return this;
+        }
+
+        public ControlConfig kA(double val) {
+            kA = val;
+            return this;
+        }
+    }
+
+    public static class ControlConfigBuilder {
+        ControlConfig realConfig = new ControlConfig();
+        ControlConfig simConfig = new ControlConfig();
+
+        public ControlConfig real() {
+            return realConfig;
+        }
+        public ControlConfig sim() {
+            return simConfig;
+        }
+
+        public ControlConfig get() {
+            if (MiscUtils.getRobotType() == RobotType.REAL) {
+                return realConfig;
+            } else {
+                return simConfig;
+            }
+        }
+    }
+
     /***
      * @param <T>   any numeric type (e.g., Double, Integer). Will automatically be
      *              inferred.
@@ -120,7 +191,7 @@ public class MiscUtils {
         } else if (Robot.isSimulation()) {
             return RobotType.SIM;
         } else {
-            throw new IllegalStateException("[MiscUtils.java] Unknown Robot Type");
+            throw new IllegalStateException("[MiscUtils.java] Unknown Robot Type. Something has gone HORRIBLY wrong.");
         }
     }
 

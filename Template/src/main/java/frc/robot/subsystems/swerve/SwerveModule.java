@@ -24,31 +24,40 @@ public class SwerveModule {
     private final String name;
     private SwerveModuleState desiredState = new SwerveModuleState();
 
+    private MiscUtils.ControlConfig driveConfig = Control.DRIVE_CONFIG.get();
+    private MiscUtils.ControlConfig turnConfig = Control.TURN_CONFIG.get();
+
     private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(
-            Control.MODULE_DRIVE_KS,
-            Control.MODULE_DRIVE_KV,
-            Control.MODULE_DRIVE_KA);
-    private final PIDController drivePID = new PIDController(Control.MODULE_DRIVE_PID[0], Control.MODULE_DRIVE_PID[1],
-            Control.MODULE_DRIVE_PID[2]);
-    private final PIDController turnPID = new PIDController(Control.MODULE_TURN_PID[0], Control.MODULE_TURN_PID[1],
-            Control.MODULE_TURN_PID[2]);
+            driveConfig.kS,
+            driveConfig.kV,
+            driveConfig.kA);
+    private final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(
+            driveConfig.kS,
+            driveConfig.kV,
+            driveConfig.kA);
+    private final PIDController drivePID = new PIDController(driveConfig.kP, driveConfig.kI,
+            driveConfig.kD);
+    private final PIDController turnPID = new PIDController(turnConfig.kP, turnConfig.kI,
+            turnConfig.kD);
 
     private final SwerveModuleIO moduleIO;
     private final SwerveModuleDataAutoLogged moduleData = new SwerveModuleDataAutoLogged();
 
-    private double index;
+    LoggedNetworkNumber tunableDriveKS;
+    LoggedNetworkNumber tunableDriveKV;
+    LoggedNetworkNumber tunableDriveKA;
 
-    LoggedNetworkNumber drive_ks_value;
-    LoggedNetworkNumber drive_kv_value;
-    LoggedNetworkNumber drive_ka_value;
+    LoggedNetworkNumber tunableDriveKP;
+    LoggedNetworkNumber tunableDriveKI;
+    LoggedNetworkNumber tunableDriveKD;
 
-    LoggedNetworkNumber drive_p_value;
-    LoggedNetworkNumber drive_i_value;
-    LoggedNetworkNumber drive_d_value;
+    LoggedNetworkNumber tunableTurnKS;
+    LoggedNetworkNumber tunableTurnKV;
+    LoggedNetworkNumber tunableTurnKA;
 
-    LoggedNetworkNumber turn_p_value;
-    LoggedNetworkNumber turn_i_value;
-    LoggedNetworkNumber turn_d_value;
+    LoggedNetworkNumber tunableTurnKP;
+    LoggedNetworkNumber tunableTurnKI;
+    LoggedNetworkNumber tunableTurnKD;
 
     /**
      * Constructs a new SwerveModule.
@@ -58,7 +67,6 @@ public class SwerveModule {
      */
     public SwerveModule(int index, SwerveModuleType type) {
         name = Drivetrain.MODULE_NAMES.get(index);
-        this.index = index;
 
         switch (type) {
             case SIM:
@@ -77,35 +85,19 @@ public class SwerveModule {
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
 
-        drive_ks_value = new LoggedNetworkNumber(
-                "Swerve/Module #" + index + "/KS",
-                Control.MODULE_DRIVE_KS);
-        drive_kv_value = new LoggedNetworkNumber(
-                "Swerve/Module #" + index + "/kV",
-                Control.MODULE_DRIVE_KV);
-        drive_ka_value = new LoggedNetworkNumber(
-                "Swerve/Module #" + index + "/KA",
-                Control.MODULE_DRIVE_KA);
+        tunableDriveKS = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kS", driveConfig.kS);
+        tunableDriveKV = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kV", driveConfig.kV);
+        tunableDriveKA = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kA", driveConfig.kA);
+        tunableDriveKP = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kP", driveConfig.kP);
+        tunableDriveKI = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kI", driveConfig.kI);
+        tunableDriveKD = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kD", driveConfig.kD);
 
-        drive_p_value = new LoggedNetworkNumber(
-                "Swerve/Module Drive #" + index + "/P",
-                Control.MODULE_DRIVE_PID[0]);
-        drive_i_value = new LoggedNetworkNumber(
-                "Swerve/Module Drive #" + index + "/I",
-                Control.MODULE_DRIVE_PID[1]);
-        drive_d_value = new LoggedNetworkNumber(
-                "Swerve/Module Drive #" + index + "/D",
-                Control.MODULE_DRIVE_PID[2]);
-
-        turn_p_value = new LoggedNetworkNumber(
-                "Swerve/Module Turn #" + index + "/P",
-                Control.MODULE_TURN_PID[0]);
-        turn_i_value = new LoggedNetworkNumber(
-                "Swerve/Module Turn #" + index + "/I",
-                Control.MODULE_TURN_PID[1]);
-        turn_d_value = new LoggedNetworkNumber(
-                "Swerve/Module Turn #" + index + "/D",
-                Control.MODULE_TURN_PID[2]);
+        tunableTurnKS = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kS", turnConfig.kS);
+        tunableTurnKV = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kV", turnConfig.kV);
+        tunableTurnKA = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kA", turnConfig.kA);
+        tunableTurnKP = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kP", turnConfig.kP);
+        tunableTurnKI = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kI", turnConfig.kI);
+        tunableTurnKD = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kD", turnConfig.kD);
     }
 
     /**
@@ -152,7 +144,7 @@ public class SwerveModule {
         moduleIO.setDriveVoltage(PID + feedforward);
         Logger.recordOutput("Swerve/Module " + name + "/Drive FF Volts", feedforward);
         Logger.recordOutput("Swerve/Module " + name + "/Drive PID Volts", PID);
-        Logger.recordOutput("Swerve/Module " + name + "/Volts", PID + feedforward);
+        Logger.recordOutput("Swerve/Module " + name + "/Drive Desired Volts", PID + feedforward);
     }
 
     /**
@@ -170,7 +162,7 @@ public class SwerveModule {
 
         double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), positionRad.getRadians());
         moduleIO.setTurnVoltage(PID);
-        Logger.recordOutput("Swerve/Module " + name + "/Turn Volts", PID);
+        Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", PID);
     }
 
     /**
@@ -229,12 +221,16 @@ public class SwerveModule {
      * Called periodically by the swerve subsystem.
      */
     public void periodic() {
-        drivePID.setPID(drive_p_value.get(), drive_i_value.get(), drive_d_value.get());
-        turnPID.setPID(turn_p_value.get(), turn_i_value.get(), turn_d_value.get());
+        drivePID.setPID(tunableDriveKP.get(), tunableDriveKI.get(), tunableDriveKD.get());
+        turnPID.setPID(tunableTurnKP.get(), tunableTurnKI.get(), tunableTurnKD.get());
 
-        driveFF.setKs(drive_ks_value.get());
-        driveFF.setKa(drive_ka_value.get());
-        driveFF.setKv(drive_kv_value.get());
+        driveFF.setKs(tunableDriveKS.get());
+        driveFF.setKa(tunableDriveKA.get());
+        driveFF.setKv(tunableDriveKV.get());
+
+        turnFF.setKs(tunableTurnKS.get());
+        turnFF.setKa(tunableTurnKA.get());
+        turnFF.setKv(tunableTurnKV.get());
 
         setDriveSpeed(desiredState.speedMetersPerSecond);
         setTurnPosition(desiredState.angle);

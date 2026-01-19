@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -17,7 +16,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.config.ExampleElevatorConfig.ElevatorControl;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.ExampleElevatorConfig.ElevatorStates;
-import frc.robot.config.ExampleElevatorConfig.ElevatorControl.ControlConfig;
 import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO.ElevatorData;
@@ -32,14 +30,15 @@ public class ExampleElevator {
 
     /* next comes open/closed loop controllers such as pid and ff */
     // only reason for this is because its more readable
-    ControlConfig config = ElevatorControl.CONTROL_CONFIG;
+    MiscUtils.ControlConfig config = ElevatorControl.CONTROL_CONFIG.get();
     /*
      * lucky for us WPILib has an elevator feedforward controller, most subsystems
      * don'tconfig.config.config.
      */
     ElevatorFeedforward feedforward = new ElevatorFeedforward(config.kS, config.kG, config.kV, config.kA);
     ProfiledPIDController profile = new ProfiledPIDController(config.kP, config.kI, config.kD,
-            new Constraints(config.VELOCITY.in(MetersPerSecond), config.ACCEL.in(MetersPerSecondPerSecond)));
+            new Constraints(ElevatorControl.MAX_VELOCITY.in(MetersPerSecond),
+                    ElevatorControl.MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
     /* last is state and any other variables needed */
     ElevatorStates currentState = ElevatorStates.STOPPED;
