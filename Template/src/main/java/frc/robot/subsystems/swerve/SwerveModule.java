@@ -81,7 +81,7 @@ public class SwerveModule {
                 break;
         }
 
-        Logger.recordMetadata("Swerve/Module " + name + "/Implementation", type.name());
+        Logger.recordMetadata("Swerve/Module " + name + "/Type", type.name());
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
 
