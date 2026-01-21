@@ -98,8 +98,8 @@ public final class SwerveConfig {
                 public static final int FREE_CURRENT = 40;
 
                 public static final Rotation2d[] CANCODER_OFFSET = {
-                                Rotation2d.fromRadians(0),
-                                Rotation2d.fromRadians(0),
+                                Rotation2d.fromRadians(2.746),
+                                Rotation2d.fromRadians(-1.161),
                                 Rotation2d.fromRadians(0),
                                 Rotation2d.fromRadians(0)
                 };

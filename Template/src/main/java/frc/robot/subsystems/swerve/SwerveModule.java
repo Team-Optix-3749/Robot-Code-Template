@@ -156,16 +156,15 @@ public class SwerveModule {
      * @param position The target angle setpoint
      */
     public void setTurnPosition(Rotation2d position) {
-        if (MiscUtils.withinMargin(RobotConfig.Accuracy.DRIVE_ROTATION_TOLERANCE.in(Radians), position.getRadians(),
+        double voltage = 0.0;
+
+        if (!MiscUtils.withinMargin(RobotConfig.Accuracy.DRIVE_ROTATION_TOLERANCE.in(Radians), position.getRadians(),
                 moduleData.turnPosition.getRadians())) {
-            moduleIO.setTurnVoltage(0.0);
-            Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", 0);
-            return;
+            voltage = turnPID.calculate(moduleData.turnPosition.getRadians(), position.getRadians());
         }
 
-        double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), position.getRadians());
-        moduleIO.setTurnVoltage(PID);
-        Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", PID);
+        moduleIO.setTurnVoltage(voltage);
+        Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", voltage);
     }
 
     /**
