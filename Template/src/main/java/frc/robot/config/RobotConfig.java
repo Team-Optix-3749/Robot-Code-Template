@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.*;
  */
 public final class RobotConfig {
   public static boolean REPLAY_MODE = false;
-  
+
   public enum RobotType {
     REAL,
     SIM
@@ -24,13 +24,21 @@ public final class RobotConfig {
     NONE
   }
 
-  public static final class GENERAL {
+  public static final class General {
     public static final double NOMINAL_LOOP_TIME_S = 0.02;
     public static final double NOMINAL_BUS_VOLTAGE = 12.0;
+  }
 
-    public static final int HIGH_CURRENT_LIMIT_AMPS = 60;
-    public static final int MED_CURRENT_LIMIT_AMPS = 40;
-    public static final int LOW_CURRENT_LIMIT_AMPS = 20;
+  public static final class CurrentLimits {
+    public static final int DEFAULT_HIGH = 60;
+    public static final int DEFAULT_MED = 40;
+    public static final int DEFAULT_LOW = 20;
+
+    public static final int DRIVE_STALL_CURRENT = DEFAULT_HIGH;
+    public static final int DRIVE_FREE_CURRENT = DEFAULT_HIGH;
+
+    public static final int TURN_STALL_CURRENT = DEFAULT_LOW;
+    public static final int TURN_FREE_CURRENT = 25;
   }
 
   public static final class CAN {
@@ -38,10 +46,8 @@ public final class RobotConfig {
     public static final int LONG_TIMEOUT_MS = 1000;
     public static final int CONFIG_TIMEOUT_MS = 5000;
 
-
     public static final int PDH_ID = 40;
     public static final int PIGEON_ID = 40;
-
 
     /** Module Settings: order is FL, FR, BL, BR */
     public static final int[] DRIVE_MOTOR_IDS = { 2, 4, 6, 8 };
@@ -50,10 +56,12 @@ public final class RobotConfig {
 
     /** Order: Left, Right */
     public static final int[] ELEVATOR_MOTOR_IDS = { 20, 21 };
+    public static final int ARM_MOTOR_ID = 22;
+
   }
 
   /** Configuration for driver/operator controllers. */
-  public static final class INPUT {
+  public static final class Input {
     public static final int PILOT_PORT = 0;
     public static final int OPERATOR_PORT = 1;
 
@@ -64,14 +72,14 @@ public final class RobotConfig {
   }
 
   /** Feature toggles and refresh rates that affect robot performance */
-  public static final class OPTIMIZATIONS {
+  public static final class Optimizations {
     public static final boolean USE_VISION = true;
     public static final int NON_ESSENTIAL_CAN_REFRESH_HZ = 20;
     public static final int ESSENTIAL_CAN_REFRESH_HZ = 80;
   }
 
   /** Acceptable tolerances for various robot actions */
-  public static final class ACCURACY {
+  public static final class Accuracy {
     // default 3 mm/s tolerance for any subsystem movement
     public static final LinearVelocity DEFAULT_MOVEMENT_TOLERANCE = InchesPerSecond.of(0.1);
 

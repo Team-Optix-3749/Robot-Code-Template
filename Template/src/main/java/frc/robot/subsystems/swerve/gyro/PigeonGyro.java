@@ -35,7 +35,7 @@ public class PigeonGyro implements GyroIO {
         gyro.reset();
         gyro.getConfigurator().apply(config);
 
-        gyro.optimizeBusUtilization(RobotConfig.OPTIMIZATIONS.ESSENTIAL_CAN_REFRESH_HZ, 0);
+        gyro.optimizeBusUtilization(RobotConfig.Optimizations.ESSENTIAL_CAN_REFRESH_HZ, 0);
     }
 
     @Override

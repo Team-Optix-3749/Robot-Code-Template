@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerve.real;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.Measure.*;
+
 import frc.robot.config.RobotConfig;
 import frc.robot.config.RobotConfig.CAN;
 import frc.robot.utils.MiscUtils;
@@ -33,8 +36,9 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         turn = OptixSpark.ofSparkMax(CAN.TURN_MOTOR_IDS[index]);
 
         drive
-                .setPositionConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / Motor.DRIVE_GEARING))
-                .setVelocityConversionFactor((Math.PI * Drivetrain.WHEEL_DIA_METERS / (60 * Motor.DRIVE_GEARING)))
+                .setPositionConversionFactor((Math.PI * Drivetrain.WHEEL_DIAMETER.in(Meters) / Motor.DRIVE_GEARING))
+                .setVelocityConversionFactor(
+                        (Math.PI * Drivetrain.WHEEL_DIAMETER.in(Meters) / (60 * Motor.DRIVE_GEARING)))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
                 .setIdleMode(IdleMode.kBrake);
         turn
@@ -54,7 +58,7 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
         absoluteEncoder.optimizeBusUtilization();
         absoluteEncoder.getAbsolutePosition()
-                .setUpdateFrequency(RobotConfig.OPTIMIZATIONS.NON_ESSENTIAL_CAN_REFRESH_HZ);
+                .setUpdateFrequency(RobotConfig.Optimizations.NON_ESSENTIAL_CAN_REFRESH_HZ);
     }
 
     @Override
@@ -102,8 +106,8 @@ public class SwerveModuleSpark implements SwerveModuleIO {
 
     @Override
     public void updateData() {
-        data.drivePositionM = drive.getPosition();
-        data.driveVelocityMPerSec = drive.getVelocity();
+        data.drivePosition = Meters.of(drive.getPosition());
+        data.driveVelocity = MetersPerSecond.of(drive.getVelocity());
         data.driveAppliedVolts = drive.getAppliedVolts();
         data.driveCurrentAmps = drive.getCurrent();
         data.driveTempCelcius = drive.getTemperature();

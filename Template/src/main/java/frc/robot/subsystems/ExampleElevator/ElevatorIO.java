@@ -11,12 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.config.ExampleElevatorConfig;
 
 public interface ElevatorIO {
-    /**
-     * Contains all the data for our elevator
-     * 
-     * @AutoLog This annotation will automatically log all fields of this class with
-     *          Akit.
-     */
     @AutoLog
     public class ElevatorData {
         public Distance height = ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getMeasureY();
@@ -44,8 +38,7 @@ public interface ElevatorIO {
 
     /**
      * will be periodically polled from our {@link ExampleElevator} class to update
-     * the
-     * {@link ElevatorData} class with the latest data
+     * the {@link ElevatorData} class with the latest data
      */
     public void updateData();
 }

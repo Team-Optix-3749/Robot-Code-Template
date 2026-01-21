@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.config.ExampleElevatorConfig;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.RobotConfig;
-import frc.robot.config.RobotConfig.GENERAL;
+import frc.robot.config.RobotConfig.CurrentLimits;
 import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO;
 import frc.robot.utils.MiscUtils;
@@ -47,7 +47,7 @@ public class ElevatorReal implements ElevatorIO {
         leftMotor
                 .setPositionConversionFactor(
                         2 * Math.PI * ElevatorSpecs.DRUM_RADIUS.in(Meters) * ElevatorSpecs.GEARING)
-                .setSmartCurrentLimit(GENERAL.MED_CURRENT_LIMIT_AMPS)
+                .setSmartCurrentLimit(CurrentLimits.DEFAULT_MED)
                 .setIdleMode(IdleMode.kBrake)
                 .setInverted(ElevatorSpecs.IS_INVERTED);
 

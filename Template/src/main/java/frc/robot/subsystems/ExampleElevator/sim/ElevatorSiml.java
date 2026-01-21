@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.config.ExampleElevatorConfig;
 import frc.robot.config.RobotConfig;
-import frc.robot.config.RobotConfig.GENERAL;
+import frc.robot.config.RobotConfig.General;
 import frc.robot.subsystems.ExampleElevator.ElevatorDataAutoLogged;
 import frc.robot.subsystems.ExampleElevator.ElevatorIO;
 import frc.robot.utils.MiscUtils;
@@ -81,7 +81,7 @@ public class ElevatorSiml implements ElevatorIO {
 
     @Override
     public void updateData() {
-        elevatorSimSystem.update(RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S);
+        elevatorSimSystem.update(RobotConfig.General.NOMINAL_LOOP_TIME_S);
 
         data.height = Meters.of(elevatorSimSystem.getPositionMeters() +
                 ExampleElevatorConfig.ElevatorSpecs.MOUNT_OFFSET.getY());

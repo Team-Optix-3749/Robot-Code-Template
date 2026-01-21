@@ -23,7 +23,7 @@ public class GyroSim implements GyroIO {
 
   @Override
   public void updateData() {
-    double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
+    double deltaT = RobotConfig.General.NOMINAL_LOOP_TIME_S;
 
     double angleDiffRad = Robot.swerve.getChassisSpeeds().omegaRadiansPerSecond * deltaT;
     yaw = yaw.plus(Rotation2d.fromRadians(angleDiffRad));

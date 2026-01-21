@@ -22,8 +22,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Robot;
-import frc.robot.config.RobotConfig.ACCURACY;
+import frc.robot.config.RobotConfig.Accuracy;
 
 public class AutoUtils {
     private static AutoFactory factory;
@@ -78,7 +79,7 @@ public class AutoUtils {
      * Sets up auto to run when autonomous mode is enabled.
      */
     public static void setupAutoTrigger() {
-        edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous()
+        RobotModeTriggers.autonomous()
                 .whileTrue(chooser.selectedCommandScheduler());
     }
 
@@ -114,8 +115,8 @@ public class AutoUtils {
                 System.out.println("[AutoUtils]: No command found for event marker: " + marker);
             }
 
-            traj.atPose(marker, ACCURACY.DRIVE_TRANSLATE_TOLERANCE.in(Meters),
-                    ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians))
+            traj.atPose(marker, Accuracy.DRIVE_TRANSLATE_TOLERANCE.in(Meters),
+                    Accuracy.DRIVE_ROTATION_TOLERANCE.in(Radians))
                     .onTrue(eventMarkerCommands.get(marker).get());
         }
     }
@@ -230,8 +231,8 @@ public class AutoUtils {
             AutoTrajectory traj = routine.trajectory(trajectoryName);
 
             for (Map.Entry<String, Supplier<Command>> entry : poseMarkers.entrySet()) {
-                traj.atPose(entry.getKey(), ACCURACY.DRIVE_TRANSLATE_TOLERANCE.in(Meters),
-                        ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians))
+                traj.atPose(entry.getKey(), Accuracy.DRIVE_TRANSLATE_TOLERANCE.in(Meters),
+                        Accuracy.DRIVE_ROTATION_TOLERANCE.in(Radians))
                         .onTrue(entry.getValue().get());
             }
 

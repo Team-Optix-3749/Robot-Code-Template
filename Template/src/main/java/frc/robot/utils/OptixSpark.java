@@ -13,12 +13,15 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -51,7 +54,7 @@ public final class OptixSpark {
         } else if (motor instanceof SparkFlex) {
             this.cfg = new SparkFlexConfig();
         } else {
-            throw new IllegalArgumentException("Unsupported motor type" + motor.getClass().getName());
+            throw new IllegalArgumentException("[OptixSpark] Unsupported motor type: " + motor.getClass().getName());
         }
     }
 
@@ -111,8 +114,6 @@ public final class OptixSpark {
     public SparkBaseConfig getConfig() {
         return cfg;
     }
-
-    // Telemetry
 
     /**
      * Gets the current position, applying wrapping if enabled.
@@ -258,9 +259,7 @@ public final class OptixSpark {
         ctrl.setSetpoint(sp, ControlType.kPosition, slot, feedforward);
     }
 
-    // Configuration helpers (fluent)
-
-    // Units
+    // Configuration helpers
 
     /**
      * Sets the position conversion factor for the relative encoder.

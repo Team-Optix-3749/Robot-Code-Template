@@ -102,13 +102,13 @@ public class ExampleArm {
         // check if within the tolerance of the setpoint and is not moving
 
         double error = Math.abs(profile.getSetpoint().position - data.angle.getRadians());
-        return error < RobotConfig.ACCURACY.ELEVATOR_TOLERANCE.in(Meters) &&
+        return error < RobotConfig.Accuracy.ELEVATOR_TOLERANCE.in(Meters) &&
                 isStopped();
     }
 
     public boolean isStopped() {
         return MiscUtils.isStopped(data.velocity.in(RadiansPerSecond),
-                RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
+                RobotConfig.Accuracy.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
     }
 
     public void moveToGoal() {
@@ -137,14 +137,11 @@ public class ExampleArm {
     public void periodic() {
         // always get latest data first
         io.updateData();
-
-        // send logged data to ascope
+        // log data and update visualizations
         Logger.processInputs("Arm", data);
+        updateMechanism();
 
         // then do control
         moveToGoal();
-
-        // finally update any logging or visualizations
-        updateMechanism();
     }
 }

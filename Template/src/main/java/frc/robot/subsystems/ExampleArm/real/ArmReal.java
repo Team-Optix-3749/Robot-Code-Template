@@ -10,44 +10,36 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.config.ExampleElevatorConfig.ElevatorSpecs;
 import frc.robot.config.RobotConfig;
+import frc.robot.config.RobotConfig.CurrentLimits;
 import frc.robot.config.ExampleArmConfig.ArmSpecs;
-import frc.robot.config.RobotConfig.GENERAL;
 import frc.robot.subsystems.ExampleArm.ArmIO;
 import frc.robot.subsystems.ExampleArm.ArmDataAutoLogged;
 import frc.robot.utils.MiscUtils;
 import frc.robot.utils.OptixSpark;
 
-/**
- * The reason this class is named weirdly is because "ElevatorSim" is already
- * taken by WPILib to give us the {@link ElevatorSim} utility class
- */
 public class ArmReal implements ArmIO {
     /* data at the top */
     private ArmDataAutoLogged data;
 
     /* motors/outputs next */
 
-    OptixSpark armMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ELEVATOR_MOTOR_IDS[0]);
+    OptixSpark armMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ARM_MOTOR_ID);
 
     /* anything else after */
 
     public AngularVelocity prevVelocity = RadiansPerSecond.of(0);
     static double prevUpdateS = 0;
 
-    public ArmReal(ArmDataAutoLogged elevData) {
-        data = elevData;
+    public ArmReal(ArmDataAutoLogged armData) {
+        data = armData;
 
-        // the position is in radians, so we set the wrapping accordingly
-        // our "gearing" is how many output ROTATIONS happen per MOTOR ROTATION, so we
-        // can multiply the motor rotation by the gearing to get the output rotations.
-        // Then multiply that by 2pi to get the motor encoder output in radians.
-        // Then apply our -pi to pi code standard for rotations :))
+        OptixSpark armMotor = OptixSpark.ofSparkMax(RobotConfig.CAN.ARM_MOTOR_ID);
         armMotor
                 .setPositionWrapping(-Math.PI, Math.PI)
                 .setPositionConversionFactor(ArmSpecs.GEARING * 2.0 * Math.PI)
-                .setSmartCurrentLimit(GENERAL.MED_CURRENT_LIMIT_AMPS)
+                .setSmartCurrentLimit(CurrentLimits.DEFAULT_MED)
                 .setIdleMode(IdleMode.kBrake)
-                .setInverted(ElevatorSpecs.IS_INVERTED);
+                .setInverted(ArmSpecs.IS_INVERTED);
 
         armMotor.apply();
     }
@@ -71,8 +63,6 @@ public class ArmReal implements ArmIO {
 
         data.angle = Rotation2d.fromRadians(armMotor.getPosition());
 
-        // default units is RPM, but we have the position conversion factor set to
-        // radians, so not needed
         data.velocity = RadiansPerSecond.of(armMotor.getVelocity());
         data.accel = data.velocity.minus(prevVelocity).div(Seconds.of(deltaTimeS));
 

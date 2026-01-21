@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.Measure.*;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -9,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.config.SwerveConfig.Control;
 import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.config.RobotConfig;
@@ -108,11 +110,11 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(moduleData.driveVelocityMPerSec, moduleData.turnPosition);
+        return new SwerveModuleState(moduleData.driveVelocity, moduleData.turnPosition);
     }
 
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(moduleData.drivePositionM, moduleData.turnPosition);
+        return new SwerveModulePosition(moduleData.drivePosition, moduleData.turnPosition);
     }
 
     public SwerveModuleState getDesiredState() {
@@ -131,16 +133,17 @@ public class SwerveModule {
     /**
      * Sets the drive motor speed with feedforward and PID control.
      * 
-     * @param speedMetersPerSecond The target velocity in m/s
+     * @param speed The target velocity in m/s
      */
-    public void setDriveSpeed(double speedMetersPerSecond) {
-        if (MiscUtils.isStopped(speedMetersPerSecond)) {
+    public void setDriveSpeed(LinearVelocity speed) {
+        if (MiscUtils.isStopped(speed)) {
             moduleIO.setDriveVoltage(0.0);
             return;
         }
 
-        double feedforward = driveFF.calculateWithVelocities(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
-        double PID = drivePID.calculate(moduleData.driveVelocityMPerSec, speedMetersPerSecond);
+        double feedforward = driveFF.calculateWithVelocities(moduleData.driveVelocity.in(MetersPerSecond),
+                speed.in(MetersPerSecond));
+        double PID = drivePID.calculate(moduleData.driveVelocity.in(MetersPerSecond), speed.in(MetersPerSecond));
         moduleIO.setDriveVoltage(PID + feedforward);
         Logger.recordOutput("Swerve/Module " + name + "/Drive FF Volts", feedforward);
         Logger.recordOutput("Swerve/Module " + name + "/Drive PID Volts", PID);
@@ -150,17 +153,17 @@ public class SwerveModule {
     /**
      * Sets the turn motor position with PID control.
      * 
-     * @param positionRad The target angle setpoint
+     * @param position The target angle setpoint
      */
-    public void setTurnPosition(Rotation2d positionRad) {
-        if (MiscUtils.withinMargin(positionRad.minus(moduleData.turnPosition).getRadians(),
-                -RobotConfig.ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians),
-                RobotConfig.ACCURACY.DRIVE_ROTATION_TOLERANCE.in(Radians))) {
+    public void setTurnPosition(Rotation2d position) {
+        if (MiscUtils.withinMargin(RobotConfig.Accuracy.DRIVE_ROTATION_TOLERANCE.in(Radians), position.getRadians(),
+                moduleData.turnPosition.getRadians())) {
             moduleIO.setTurnVoltage(0.0);
+            Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", 0);
             return;
         }
 
-        double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), positionRad.getRadians());
+        double PID = turnPID.calculate(moduleData.turnPosition.getRadians(), position.getRadians());
         moduleIO.setTurnVoltage(PID);
         Logger.recordOutput("Swerve/Module " + name + "/Turn Desired Volts", PID);
     }
@@ -232,7 +235,7 @@ public class SwerveModule {
         turnFF.setKa(tunableTurnKA.get());
         turnFF.setKv(tunableTurnKV.get());
 
-        setDriveSpeed(desiredState.speedMetersPerSecond);
+        setDriveSpeed(MetersPerSecond.of(desiredState.speedMetersPerSecond));
         setTurnPosition(desiredState.angle);
         updateInputs();
     }

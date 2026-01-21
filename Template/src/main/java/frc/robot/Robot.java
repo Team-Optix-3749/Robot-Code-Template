@@ -29,8 +29,8 @@ import frc.robot.config.ButtonBindings;
 import frc.robot.utils.MiscUtils;
 
 public class Robot extends LoggedRobot {
-  public static Swerve swerve = new Swerve();
-  public static ExampleElevator exampleElevator = new ExampleElevator();
+  public static Swerve swerve;
+  public static ExampleElevator exampleElevator;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -74,6 +74,13 @@ public class Robot extends LoggedRobot {
 
     Logger.registerURCL(URCL.startExternal());
     Logger.start();
+
+    subsystemInit();
+  }
+
+  public void subsystemInit() {
+    swerve = new Swerve();
+    exampleElevator= new ExampleElevator();
   }
 
   @Override

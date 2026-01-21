@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.config.RobotConfig.ControlMode;
-import frc.robot.config.RobotConfig.INPUT;
+import frc.robot.config.RobotConfig.Input;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.OnTheFly;
-import frc.robot.commands.swerve.SwerveDefaultCommand;
+import frc.robot.commands.swerve.TeleopCommand;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -24,8 +24,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public final class ButtonBindings {
     private static final Trigger hasDualControllers = new Trigger(() -> DriverStation.getJoystickType(1) > 1);
 
-    private static final CommandXboxController pilot = new CommandXboxController(INPUT.PILOT_PORT);
-    private static final CommandXboxController operator = new CommandXboxController(INPUT.OPERATOR_PORT);
+    private static final CommandXboxController pilot = new CommandXboxController(Input.PILOT_PORT);
+    private static final CommandXboxController operator = new CommandXboxController(Input.OPERATOR_PORT);
 
     public static final Alert controllerAlert = new Alert("No controllers connected!", Alert.AlertType.kError);
 
@@ -58,11 +58,11 @@ public final class ButtonBindings {
     }
 
     private static boolean isPilotConnected() {
-        return DriverStation.isJoystickConnected(INPUT.PILOT_PORT);
+        return DriverStation.isJoystickConnected(Input.PILOT_PORT);
     }
 
     private static boolean isOperatorConnected() {
-        return DriverStation.isJoystickConnected(INPUT.OPERATOR_PORT);
+        return DriverStation.isJoystickConnected(Input.OPERATOR_PORT);
     }
 
     private static ControlMode getControlMode() {
@@ -119,7 +119,7 @@ public final class ButtonBindings {
         switch (mode) {
             case BOTH, PILOT_ONLY, SIM -> {
                 Robot.swerve.setDefaultCommand(
-                        new SwerveDefaultCommand(
+                        new TeleopCommand(
                                 () -> getAxis(pilot, Axis.kLeftX),
                                 () -> getAxis(pilot, Axis.kLeftY),
                                 () -> getAxis(pilot, Axis.kRightX)));
@@ -135,7 +135,7 @@ public final class ButtonBindings {
     }
 
     private static double applyDeadbandInternal(double v) {
-        return MathUtil.applyDeadband(v, INPUT.DEADBAND);
+        return MathUtil.applyDeadband(v, Input.DEADBAND);
     }
 
     public static class Bind {

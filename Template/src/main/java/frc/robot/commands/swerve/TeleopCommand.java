@@ -10,20 +10,20 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.config.SwerveConfig;
-import frc.robot.config.RobotConfig.INPUT;
+import frc.robot.config.RobotConfig.Input;
 import frc.robot.utils.MiscUtils;
 
 /**
  * Default driver control for the swerve. Shapes joystick inputs, applies slew
  * rate limiting, and supports robot-relative mode when requested.
  */
-public class SwerveDefaultCommand extends Command {
+public class TeleopCommand extends Command {
   private final DoubleSupplier xSupplier;
   private final DoubleSupplier ySupplier;
   private final DoubleSupplier turnSupplier;
   // private final BooleanSupplier slowModeSupplier;
 
-  public SwerveDefaultCommand(
+  public TeleopCommand(
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier turnSupplier) {
@@ -42,9 +42,9 @@ public class SwerveDefaultCommand extends Command {
     // controller x and y is "field relative" we have to make it "driver relative"
     // (basically x is y and y is x)
     // turn is also flipped
-    double xInput = applyExpo(ySupplier.getAsDouble(), INPUT.TRANSLATE_EXPO);
-    double yInput = applyExpo(xSupplier.getAsDouble(), INPUT.TRANSLATE_EXPO);
-    double omegaInput = applyExpo(-turnSupplier.getAsDouble(), INPUT.ROTATE_EXPO);
+    double xInput = applyExpo(ySupplier.getAsDouble(), Input.TRANSLATE_EXPO);
+    double yInput = applyExpo(xSupplier.getAsDouble(), Input.TRANSLATE_EXPO);
+    double omegaInput = applyExpo(-turnSupplier.getAsDouble(), Input.ROTATE_EXPO);
 
     double magnitude = Math.hypot(xInput, yInput);
     if (magnitude > 1.0) {

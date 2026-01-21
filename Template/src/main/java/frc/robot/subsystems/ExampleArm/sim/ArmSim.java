@@ -52,7 +52,7 @@ public class ArmSim implements ArmIO {
 
     @Override
     public void updateData() {
-        armSystemSim.update(RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S);
+        armSystemSim.update(RobotConfig.General.NOMINAL_LOOP_TIME_S);
 
         // when creating Rotation2ds, always use fromRadians or fromDegrees to be
         // explicit

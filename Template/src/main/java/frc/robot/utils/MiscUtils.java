@@ -113,8 +113,8 @@ public class MiscUtils {
     public static <T extends Number> double voltageClamp(T input) {
         double value = input.doubleValue();
 
-        if (Math.abs(value) > RobotConfig.GENERAL.NOMINAL_BUS_VOLTAGE) {
-            return Math.copySign(RobotConfig.GENERAL.NOMINAL_BUS_VOLTAGE, value);
+        if (Math.abs(value) > RobotConfig.General.NOMINAL_BUS_VOLTAGE) {
+            return Math.copySign(RobotConfig.General.NOMINAL_BUS_VOLTAGE, value);
         }
 
         return value;
@@ -138,7 +138,7 @@ public class MiscUtils {
     }
 
     public static boolean isStopped(LinearVelocity velocity) {
-        return withinMargin(RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond),
+        return withinMargin(RobotConfig.Accuracy.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond),
                 velocity.in(MetersPerSecond),
                 0.0);
     }
@@ -152,7 +152,7 @@ public class MiscUtils {
      *         stopped
      */
     public static <T extends Number> boolean isStopped(T velocity) {
-        return isStopped(velocity, RobotConfig.ACCURACY.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
+        return isStopped(velocity, RobotConfig.Accuracy.DEFAULT_MOVEMENT_TOLERANCE.in(MetersPerSecond));
     }
 
     /**

@@ -1,10 +1,14 @@
 package frc.robot.subsystems.swerve.sim;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.config.RobotConfig;
 import frc.robot.subsystems.swerve.SwerveModuleDataAutoLogged;
@@ -33,7 +37,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     private final SwerveModuleDataAutoLogged data;
 
-    private double prevDriveVelMps = 0.0;
+    private LinearVelocity prevDriveVelocity = MetersPerSecond.of(0.0);
 
     public SwerveModuleSim(int index, SwerveModuleDataAutoLogged moduleData) {
         data = moduleData;
@@ -86,26 +90,28 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     }
 
-    private double getDriveVelocityMetersPerSec() {
-        return (driveSim.getAngularVelocityRadPerSec() * (Drivetrain.WHEEL_DIA_METERS / 2.0));
+    private LinearVelocity getDriveVelocity() {
+        var radius = Drivetrain.WHEEL_DIAMETER.div(2);
+        var velocity = radius.times(driveSim.getAngularVelocityRadPerSec()).in(Meters);
+        return MetersPerSecond.of(velocity);
     }
 
     @Override
     public void updateData() {
-        double deltaT = RobotConfig.GENERAL.NOMINAL_LOOP_TIME_S;
+        double deltaT = RobotConfig.General.NOMINAL_LOOP_TIME_S;
 
         driveSim.update(deltaT);
         turnSim.update(deltaT);
 
         Rotation2d angleDiff = Rotation2d.fromRadians(turnSim.getAngularVelocityRadPerSec() * deltaT);
 
-        double driveVelMps = getDriveVelocityMetersPerSec();
-        double driveAccelMps2 = (driveVelMps - prevDriveVelMps) / deltaT;
-        prevDriveVelMps = driveVelMps;
+        LinearVelocity driveVelocity = getDriveVelocity();
+        LinearAcceleration driveAccel = driveVelocity.minus(prevDriveVelocity).div(Seconds.of(deltaT));
+        prevDriveVelocity = driveVelocity;
 
-        data.drivePositionM += driveVelMps * deltaT;
-        data.driveVelocityMPerSec = driveVelMps;
-        data.driveAccelerationMPerSecSquared = driveAccelMps2;
+        data.drivePosition = data.drivePosition.plus(driveVelocity.times(Seconds.of(deltaT)));
+        data.driveVelocity = driveVelocity;
+        data.driveAcceleration = driveAccel;
         data.driveCurrentAmps = Math.abs(driveSim.getCurrentDrawAmps());
         data.driveTempCelcius = 0.0;
 

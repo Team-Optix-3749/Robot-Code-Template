@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.*;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,37 +22,22 @@ public interface SwerveModuleIO {
    */
   @AutoLog
   public class SwerveModuleData {
-    /** Module index (0-3) */
     public int index = -1;
 
-    /** Drive motor position in meters */
-    public double drivePositionM = 0.0;
-    /** Drive motor velocity in meters per second */
-    public double driveVelocityMPerSec = 0.0;
-    /** Drive motor acceleration in meters per second squared */
-    public double driveAccelerationMPerSecSquared = 0.0;
-    /** Drive motor desired voltage setpoint */
+    public Distance drivePosition = Meters.of(0);
+    public LinearVelocity driveVelocity = MetersPerSecond.of(0);
+    public LinearAcceleration driveAcceleration = MetersPerSecondPerSecond.of(0);
     public double driveDesiredVolts = 0.0;
-    /** Drive motor actual applied voltage */
     public double driveAppliedVolts = 0.0;
-    /** Drive motor current draw in amps */
     public double driveCurrentAmps = 0.0;
-    /** Drive motor temperature in celsius */
     public double driveTempCelcius = 0.0;
 
-    /** Turn motor position (0-2π radians) */
     public Rotation2d turnPosition = Rotation2d.fromDegrees(0);
-    /** Absolute encoder position (0-2π radians) */
     public Rotation2d absoluteEncoderPosition = Rotation2d.fromDegrees(0);
-    /** Turn motor velocity in radians per second */
     public double turnVelocityRadPerSec = 0.0;
-    /** Turn motor desired voltage setpoint */
     public double turnDesiredVolts = 0.0;
-    /** Turn motor actual applied voltage */
     public double turnAppliedVolts = 0.0;
-    /** Turn motor current draw in amps */
     public double turnCurrentAmps = 0.0;
-    /** Turn motor temperature in celsius */
     public double turnTempCelcius = 0.0;
   }
 

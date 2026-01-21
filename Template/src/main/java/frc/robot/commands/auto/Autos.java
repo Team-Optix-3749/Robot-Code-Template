@@ -2,7 +2,7 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 
-public class Autos {
+public  class Autos {
     /**
      * Initializes all autonomous utilities and registers auto routines.
      */
