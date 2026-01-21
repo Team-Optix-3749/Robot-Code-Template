@@ -86,7 +86,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
     }
 
     @Override
-    public void syncEncoderPosition() {
+    public void syncEncoderPosition(Rotation2d position) {
 
     }
 

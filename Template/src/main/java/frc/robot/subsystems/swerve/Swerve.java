@@ -299,16 +299,19 @@ public class Swerve extends SubsystemBase {
   private void logData() {
     SwerveModuleState[] moduleDesiredStates = new SwerveModuleState[4];
     SwerveModuleState[] moduleRealStates = new SwerveModuleState[4];
+    SwerveModuleState[] absoluteEncoderStates = new SwerveModuleState[4];
 
     for (int i = 0; i < modules.length; i++) {
       moduleDesiredStates[i] = modules[i].getDesiredState();
       moduleRealStates[i] = modules[i].getState();
+      absoluteEncoderStates[i] = new SwerveModuleState(0, modules[i].getModuleData().absoluteEncoderPosition);
     }
 
     Logger.processInputs("Swerve/GyroData", gyroData);
 
     Logger.recordOutput("Swerve/RealStates", moduleRealStates);
     Logger.recordOutput("Swerve/DesiredStates", moduleDesiredStates);
+    Logger.recordOutput("Swerve/AbsoluteEncoderStates", absoluteEncoderStates);
 
     Logger.recordOutput("Swerve/Pose", getPose());
 

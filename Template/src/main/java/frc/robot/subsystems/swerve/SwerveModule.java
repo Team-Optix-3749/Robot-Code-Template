@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.Measure.*;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -61,6 +62,9 @@ public class SwerveModule {
     LoggedNetworkNumber tunableTurnKI;
     LoggedNetworkNumber tunableTurnKD;
 
+    LoggedNetworkBoolean tunableOffsetOverride;
+    LoggedNetworkNumber tunableOffset;
+
     /**
      * Constructs a new SwerveModule.
      * 
@@ -100,6 +104,9 @@ public class SwerveModule {
         tunableTurnKP = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kP", turnConfig.kP);
         tunableTurnKI = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kI", turnConfig.kI);
         tunableTurnKD = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kD", turnConfig.kD);
+
+        tunableOffsetOverride = new LoggedNetworkBoolean("Swerve/Tuning/Module " + name + "/Offset Override", false);
+        tunableOffset = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Offset", 0.0);
     }
 
     /**
@@ -199,7 +206,15 @@ public class SwerveModule {
      * Syncs the relative encoder with the absolute encoder.
      */
     public void syncEncoderPosition() {
-        moduleIO.syncEncoderPosition();
+        boolean override = tunableOffsetOverride != null && tunableOffsetOverride.get();
+
+        if (override) {
+            double offsetRad = tunableOffsetOverride != null ? tunableOffset.get() : 0.0;
+            moduleIO.syncEncoderPosition(Rotation2d.fromRadians(offsetRad));
+            return;
+        }
+
+        moduleIO.syncEncoderPosition(moduleData.absoluteEncoderPosition);
     }
 
     /**

@@ -1,6 +1,10 @@
 package frc.robot.subsystems.swerve.real;
 
 import static edu.wpi.first.units.Units.*;
+
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import edu.wpi.first.units.Measure.*;
 
 import frc.robot.config.RobotConfig;
@@ -96,12 +100,9 @@ public class SwerveModuleSpark implements SwerveModuleIO {
     }
 
     @Override
-    public void syncEncoderPosition() {
-        Rotation2d absolutePosition = data.absoluteEncoderPosition
-                .minus(SwerveConfig.Motor.CANCODER_OFFSET[data.index]);
-
-        turn.setPosition(absolutePosition.getRadians());
-        data.turnPosition = absolutePosition;
+    public void syncEncoderPosition(Rotation2d position) {
+        turn.setPosition(position.getRadians());
+        data.turnPosition = position;
     }
 
     @Override

@@ -83,10 +83,11 @@ public interface SwerveModuleIO {
    */
   public void requestDriveVelocity(double setpoint);
 
-  /**
-   * Syncs the relative encoder position with the absolute encoder.
+    /**
+   * Syncs the relative encoder position with provided offset.
+   * @param position The offset to apply to the encoder position
    */
-  public void syncEncoderPosition();
+  public void syncEncoderPosition(Rotation2d position);
 
   /**
    * Updates sensor data from hardware.
