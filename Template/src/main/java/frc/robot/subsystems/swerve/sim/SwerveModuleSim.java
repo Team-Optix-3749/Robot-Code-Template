@@ -103,7 +103,8 @@ public class SwerveModuleSim implements SwerveModuleIO {
         driveSim.update(deltaT);
         turnSim.update(deltaT);
 
-        Rotation2d angleDiff = Rotation2d.fromRadians(turnSim.getAngularVelocityRadPerSec() * deltaT);
+        Rotation2d angleDiff = Rotation2d
+                .fromRadians(turnSim.getAngularVelocity().times(Seconds.of(deltaT)).in(Radians));
 
         LinearVelocity driveVelocity = getDriveVelocity();
         LinearAcceleration driveAccel = driveVelocity.minus(prevDriveVelocity).div(Seconds.of(deltaT));
@@ -117,7 +118,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
         data.turnPosition = data.turnPosition.plus(angleDiff);
         data.absoluteEncoderPosition = data.turnPosition;
-        data.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
+        data.turnVelocityRadPerSec = turnSim.getAngularVelocity();
         data.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
         data.turnTempCelcius = 0.0;
     }

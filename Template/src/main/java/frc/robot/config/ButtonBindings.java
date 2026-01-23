@@ -11,6 +11,7 @@ import frc.robot.config.RobotConfig.ControlMode;
 import frc.robot.config.RobotConfig.Input;
 import frc.robot.config.RobotConfig.RobotType;
 import frc.robot.utils.MiscUtils;
+import frc.robot.utils.OptixSpark;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.OnTheFly;
 import frc.robot.commands.swerve.TeleopCommand;
@@ -48,9 +49,13 @@ public final class ButtonBindings {
     public static void oneControllerBindings(CommandXboxController ctl) {
         // Add any pilot-only bindings here.
 
-        Bind.button(ctl.a()).onTrue(new OnTheFly(new Pose2d(8.0,
-                4.0,
-                Rotation2d.fromDegrees(0))));
+        Bind.button(ctl.start()).onTrue(Robot.swerve::resetGyro);
+
+        Bind.button(ctl.b()).switchCommands(() -> {
+            Robot.intakeMotor.setVoltage(7.5);
+        }, () -> {
+            Robot.intakeMotor.setVoltage(0);
+        });
     }
 
     public static void simBindings() {
@@ -122,7 +127,7 @@ public final class ButtonBindings {
                         new TeleopCommand(
                                 () -> getAxis(pilot, Axis.kLeftX),
                                 () -> getAxis(pilot, Axis.kLeftY),
-                                () -> getAxis(pilot, Axis.kRightX)));
+                                () -> getAxis(pilot, Axis.kLeftTrigger)));
             }
             default -> {
 
@@ -188,6 +193,13 @@ public final class ButtonBindings {
                 switchState = !switchState;
                 return switchState;
             }));
+            return this;
+        }
+
+        public Bind switchCommands(Runnable commandA, Runnable commandB) {
+            switchCommands(
+                    Commands.runOnce(commandA),
+                    Commands.runOnce(commandB));
             return this;
         }
 

@@ -34,7 +34,7 @@ public interface SwerveModuleIO {
 
     public Rotation2d turnPosition = Rotation2d.fromDegrees(0);
     public Rotation2d absoluteEncoderPosition = Rotation2d.fromDegrees(0);
-    public double turnVelocityRadPerSec = 0.0;
+    public AngularVelocity turnVelocityRadPerSec = RadiansPerSecond.of(0.0);
     public double turnDesiredVolts = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;

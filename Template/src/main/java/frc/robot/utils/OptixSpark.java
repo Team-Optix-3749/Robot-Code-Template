@@ -21,6 +21,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -344,11 +345,6 @@ public final class OptixSpark {
      * @return this for chaining
      */
     public OptixSpark setPositionWrapping(double min, double max) {
-        if (min == max) {
-            this.wrapEnabled = false;
-            cfg.apply(new ClosedLoopConfig().positionWrappingEnabled(false));
-            return this;
-        }
         double a = Math.min(min, max);
         double b = Math.max(min, max);
         this.wrapEnabled = true;
@@ -479,7 +475,7 @@ public final class OptixSpark {
         if (!wrapEnabled)
             return setpoint - current;
 
-        double errorBound = (wrapMax - wrapMin) / 2.0;
+        double errorBound = (this.wrapMax - this.wrapMin) / 2.0;
         return wrap(setpoint - current, -errorBound, errorBound);
     }
 
@@ -490,7 +486,7 @@ public final class OptixSpark {
      * @return wrapped position
      */
     private double wrap(double value) {
-        return wrap(value, wrapMin, wrapMax);
+        return wrap(value, this.wrapMin, this.wrapMax);
     }
 
     /**
@@ -502,18 +498,6 @@ public final class OptixSpark {
      * @return wrapped position
      */
     private double wrap(double value, double min, double max) {
-        double wrapped = value;
-
-        double modulus = max - min;
-
-        // Wrap input if it's above the maximum input
-        double numMax = ((value - min) / modulus);
-        wrapped -= numMax * modulus;
-
-        // Wrap input if it's below the minimum input
-        double numMin = ((value - min) / modulus);
-        wrapped -= numMin * modulus;
-
-        return wrapped;
+        return MathUtil.inputModulus(value, min, max);
     }
 }
