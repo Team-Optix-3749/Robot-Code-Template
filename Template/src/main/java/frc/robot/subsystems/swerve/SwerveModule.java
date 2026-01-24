@@ -214,7 +214,7 @@ public class SwerveModule {
             return;
         }
 
-        // moduleIO.syncEncoderPosition(moduleData.absoluteEncoderPosition);
+        moduleIO.syncEncoderPosition(moduleData.absoluteEncoderPosition);
     }
 
     /**

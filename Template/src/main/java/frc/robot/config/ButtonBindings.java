@@ -127,7 +127,7 @@ public final class ButtonBindings {
                         new TeleopCommand(
                                 () -> getAxis(pilot, Axis.kLeftX),
                                 () -> getAxis(pilot, Axis.kLeftY),
-                                () -> getAxis(pilot, Axis.kLeftTrigger)));
+                                () -> getAxis(pilot, Axis.kRightX)));
             }
             default -> {
 

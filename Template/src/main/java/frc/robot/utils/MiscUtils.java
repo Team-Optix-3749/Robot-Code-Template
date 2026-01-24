@@ -6,6 +6,8 @@ import java.io.ObjectInputFilter.Config;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -74,6 +76,7 @@ public class MiscUtils {
         public ControlConfig real() {
             return realConfig;
         }
+
         public ControlConfig sim() {
             return simConfig;
         }
@@ -85,6 +88,11 @@ public class MiscUtils {
                 return simConfig;
             }
         }
+    }
+
+    public static Rotation2d normalize(Rotation2d rotation) {
+        double currentRads = rotation.getRadians();
+        return Rotation2d.fromRadians(MathUtil.angleModulus(currentRads));
     }
 
     /***

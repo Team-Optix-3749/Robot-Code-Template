@@ -335,7 +335,7 @@ public class Swerve extends SubsystemBase {
     SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
     setModuleStates(desiredStates);
 
-    if (getIsStopped() && (Timer.getTimestamp() - lastEncoderSyncTime) > 20.0) {
+    if (getIsStopped() && (Timer.getTimestamp() - lastEncoderSyncTime) > 7.0) {
       syncEncoderPositions();
       lastEncoderSyncTime = Timer.getTimestamp();
     }
