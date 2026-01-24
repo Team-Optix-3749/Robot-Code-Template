@@ -24,12 +24,13 @@ import frc.robot.config.SwerveConfig.Drivetrain;
 import frc.robot.config.SwerveConfig.Motor;
 
 public class SwerveModuleSpark implements SwerveModuleIO {
+    private final SwerveModuleDataAutoLogged data;
+
     private final OptixSpark drive;
     private final OptixSpark turn;
 
     private final CANcoder absoluteEncoder;
-
-    private final SwerveModuleDataAutoLogged data;
+    private final Rotation2d absoluteEncoderOffset;
 
     public SwerveModuleSpark(int index, SwerveModuleDataAutoLogged moduleData) {
         data = moduleData;
@@ -49,16 +50,21 @@ public class SwerveModuleSpark implements SwerveModuleIO {
                 .setPositionConversionFactor((2.0 * Math.PI) / Motor.TURN_GEARING)
                 .setVelocityConversionFactor(2.0 * Math.PI / (Motor.TURN_GEARING * 60))
                 .setSmartCurrentLimit(SwerveConfig.Motor.STALL_CURRENT, SwerveConfig.Motor.FREE_CURRENT)
-                .setIdleMode(IdleMode.kBrake);
+                .setIdleMode(IdleMode.kBrake)
+                .setPositionWrapping(-Math.PI, Math.PI);
+
+        boolean turnInverted = Motor.TURN_INVERTED[index];
+
+        turn.setInverted(turnInverted);
 
         drive.apply();
         turn.apply();
 
         absoluteEncoder = new CANcoder(CAN.CANCODER_IDS[index]);
-        Rotation2d absoluteEncoderOffsetRad = Motor.CANCODER_OFFSET[index];
-        turn.requestPosition(
-                absoluteEncoder.getPosition().getValueAsDouble() * 2.0 * Math.PI
-                        - absoluteEncoderOffsetRad.getRadians());
+        absoluteEncoderOffset = Motor.CANCODER_OFFSET[index];
+
+        Rotation2d absEncoderAngle = Rotation2d.fromRotations(absoluteEncoder.getPosition().getValueAsDouble());
+        turn.setPosition(absEncoderAngle.minus(absoluteEncoderOffset).getRadians());
 
         absoluteEncoder.optimizeBusUtilization();
         absoluteEncoder.getAbsolutePosition()
@@ -114,8 +120,9 @@ public class SwerveModuleSpark implements SwerveModuleIO {
         data.driveTempCelcius = drive.getTemperature();
 
         data.turnPosition = Rotation2d.fromRadians(turn.getPosition());
-        data.absoluteEncoderPosition = Rotation2d.fromRotations(absoluteEncoder.getPosition().getValueAsDouble());
-        data.turnVelocityRadPerSec = turn.getVelocity();
+        data.absoluteEncoderPosition = Rotation2d.fromRotations(absoluteEncoder.getPosition().getValueAsDouble())
+                .minus(absoluteEncoderOffset);
+        data.turnVelocityRadPerSec = RadiansPerSecond.of(turn.getVelocity());
         data.turnAppliedVolts = turn.getAppliedVolts();
         data.turnCurrentAmps = turn.getCurrent();
         data.turnTempCelcius = turn.getTemperature();

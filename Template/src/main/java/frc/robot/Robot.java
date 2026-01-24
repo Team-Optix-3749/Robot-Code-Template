@@ -27,10 +27,13 @@ import frc.robot.subsystems.ExampleElevator.ExampleElevator;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.config.ButtonBindings;
 import frc.robot.utils.MiscUtils;
+import frc.robot.utils.OptixSpark;
 
 public class Robot extends LoggedRobot {
   public static Swerve swerve;
   public static ExampleElevator exampleElevator;
+
+  public static OptixSpark intakeMotor;
 
   public Robot() {
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -76,6 +79,10 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     subsystemInit();
+
+    intakeMotor = OptixSpark.ofSparkMax(36);
+    intakeMotor.setInverted(true);
+    intakeMotor.apply();
   }
 
   public void subsystemInit() {

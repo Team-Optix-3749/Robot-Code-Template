@@ -324,18 +324,18 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    logData();
-
     for (SwerveModule module : modules) {
       module.periodic();
     }
-
+    gyro.updateData();
     updateOdometry();
+
+    logData();
 
     SwerveModuleState[] desiredStates = Drivetrain.DRIVE_KINEMATICS.toSwerveModuleStates(desiredChassisSpeeds);
     setModuleStates(desiredStates);
 
-    if (getIsStopped() && (Timer.getTimestamp() - lastEncoderSyncTime) > 20.0) {
+    if (getIsStopped() && (Timer.getTimestamp() - lastEncoderSyncTime) > 7.0) {
       syncEncoderPositions();
       lastEncoderSyncTime = Timer.getTimestamp();
     }

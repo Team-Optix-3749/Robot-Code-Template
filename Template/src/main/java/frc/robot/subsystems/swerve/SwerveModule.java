@@ -91,22 +91,22 @@ public class SwerveModule {
 
         turnPID.enableContinuousInput(-Math.PI, Math.PI);
 
-        tunableDriveKS = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kS", driveConfig.kS);
-        tunableDriveKV = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kV", driveConfig.kV);
-        tunableDriveKA = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kA", driveConfig.kA);
-        tunableDriveKP = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kP", driveConfig.kP);
-        tunableDriveKI = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kI", driveConfig.kI);
-        tunableDriveKD = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Drive/kD", driveConfig.kD);
+        tunableDriveKS = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kS", driveConfig.kS);
+        tunableDriveKV = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kV", driveConfig.kV);
+        tunableDriveKA = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kA", driveConfig.kA);
+        tunableDriveKP = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kP", driveConfig.kP);
+        tunableDriveKI = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kI", driveConfig.kI);
+        tunableDriveKD = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Drive/kD", driveConfig.kD);
 
-        tunableTurnKS = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kS", turnConfig.kS);
-        tunableTurnKV = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kV", turnConfig.kV);
-        tunableTurnKA = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kA", turnConfig.kA);
-        tunableTurnKP = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kP", turnConfig.kP);
-        tunableTurnKI = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kI", turnConfig.kI);
-        tunableTurnKD = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Turn/kD", turnConfig.kD);
+        tunableTurnKS = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kS", turnConfig.kS);
+        tunableTurnKV = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kV", turnConfig.kV);
+        tunableTurnKA = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kA", turnConfig.kA);
+        tunableTurnKP = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kP", turnConfig.kP);
+        tunableTurnKI = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kI", turnConfig.kI);
+        tunableTurnKD = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Turn/kD", turnConfig.kD);
 
-        tunableOffsetOverride = new LoggedNetworkBoolean("Swerve/Tuning/Module " + name + "/Offset Override", false);
-        tunableOffset = new LoggedNetworkNumber("Swerve/Tuning/Module " + name + "/Offset", 0.0);
+        tunableOffsetOverride = new LoggedNetworkBoolean("/Tuning/Swerve/Module " + name + "/Offset Override", true);
+        tunableOffset = new LoggedNetworkNumber("/Tuning/Swerve/Module " + name + "/Offset", 0.0);
     }
 
     /**
